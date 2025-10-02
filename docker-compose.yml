@@ -1,0 +1,47 @@
+services:
+  server:
+    build: ./server
+    container_name: server
+    ports:
+      - "${SERVER_PORT}:5000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=dev
+      - DB_PASSWORD=1234
+      - DB_NAME=wagerdb
+    depends_on:
+      - db
+    volumes:
+      - ./server:/app
+    command: sh -c "npm install && npm run dev"
+    restart: always
+
+  client:
+    build: ./client
+    container_name: client
+    ports:
+      - "${CLIENT_PORT}:3000"
+    depends_on:
+      - server
+    volumes:
+      - ./client:/app
+    command: sh -c "npm install && npm start"
+    restart: always
+
+  db:
+    image: mariadb:11.3
+    container_name: mariadb
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wagerdb
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: 1234
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  db-data:
