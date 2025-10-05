@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './CadastroPartida.css';
 import SideBar from '../components/SideBar';
+import SideBar_Olheiro from '../components/SideBar_Olheiro';
 
 export default function CadastroCamp() {
   const [formData, setFormData] = useState({
@@ -33,7 +34,7 @@ export default function CadastroCamp() {
 
   return (
     <div className="cadastro">
-      <SideBar/>
+      <SideBar_Olheiro/>
       <div className="login-page">
         <div className="login-card">
           <div className="logo-container">

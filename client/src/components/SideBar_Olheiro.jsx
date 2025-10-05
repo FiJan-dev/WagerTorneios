@@ -6,7 +6,7 @@ import { RiGroupFill } from "react-icons/ri";
 import { BsDoorOpenFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 
-function SideBar() {
+function SideBar_Olheiro() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeItem, setActiveItem] = useState('dashboard');
 
