@@ -39,6 +39,9 @@ cd WagerTorneios
 ### Configurar variaveis de ambiente
 
 - **Fazer o .env com base no .env.example**
+```bash
+cp .env.example .env
+```
 
 ### Criar e iniciar os containers
 
@@ -50,3 +53,4 @@ docker-compose up --build
 
 - _Frontend:_ http://localhost:3000
 - _Banco:_ docker exec -it mariadb mariadb -u root -p
+
