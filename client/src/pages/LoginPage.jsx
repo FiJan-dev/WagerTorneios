@@ -18,7 +18,7 @@ export default function LoginPage() {
     <div className="container grid-center login-page">
       <div className="login-card stack-lg">
         <div className="logo-container grid-center">
-          <div className="logo">Logo</div>
+          <div className="logo">W</div>
         </div>
 
         <h1>{isLogin ? 'Bem vindo de volta' : 'Junte-se a nós'}</h1>

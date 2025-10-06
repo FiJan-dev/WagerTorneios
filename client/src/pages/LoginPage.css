@@ -53,6 +53,12 @@
   border: 1px solid var(--panel-border);
   background: var(--bg);
   transition: border-color 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  display: block;
+  text-align: center;
+  box-sizing: border-box; /* Inclui padding e border no cálculo da width */
 }
 
 .input-field:focus {
@@ -66,6 +72,11 @@
   border-radius: var(--radius-sm);
   font-weight: 500;
   transition: transform 0.2s ease, opacity 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  display: block;
+  box-sizing: border-box; /* Inclui padding e border no cálculo da width */
 }
 
 .submit-button:hover {
