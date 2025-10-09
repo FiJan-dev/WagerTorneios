@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SideBar_Olheiro from '../components/SideBar_Olheiro';
 
 export default function ChampionshipRegistrationPage() {
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ export default function ChampionshipRegistrationPage() {
 
   return (
     <div className="flex min-h-screen bg-black">
+      <SideBar_Olheiro />
       <div className="flex justify-center items-center min-h-screen w-full p-4 box-border">
         <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-md w-full flex flex-col items-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
           <div className="mb-6 flex justify-center">
