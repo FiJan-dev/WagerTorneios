@@ -3,7 +3,7 @@ import CadastroCamp from "./pages/CadastroPartida";
 import Footer from "./components/Footer"; // Adjust path as needed
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import SideBar from "./components/SideBar";
-//import CadCamp from "./pages/CadCamp"
+import CadCamp from "./pages/CadCamp"
 import "./App.css";
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/cadastrocamp" element={<CadastroCamp />} />
-          {/*<Route path="/cadcamp" element={<CadCamp />} />*/}
+          <Route path="/cadcamp" element={<CadCamp />} />
         </Routes>
         <Footer />
       </BrowserRouter>

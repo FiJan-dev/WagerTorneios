@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import './CadastroPartida.css';
-import SideBar from '../components/SideBar';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
 
 export default function CadastroCamp() {
@@ -33,33 +31,37 @@ export default function CadastroCamp() {
   };
 
   return (
-    <div className="cadastro">
-      <SideBar_Olheiro/>
-      <div className="login-page">
-        <div className="login-card">
-          <div className="logo-container">
-            <div className="logo">M</div>
+    <div className="flex min-h-screen bg-black">
+      <SideBar_Olheiro />
+      <div className="flex justify-center items-center min-h-screen w-full p-4 box-border">
+        <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-md w-full flex flex-col items-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+          <div className="mb-6 flex justify-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-2xl font-bold text-white shadow-md">
+              M
+            </div>
           </div>
-          <h1>Registrar uma partida</h1>
-          <p>Coloque todas as informações</p>
-          <div className="form-field">
+          <h1 className="text-2xl sm:text-3xl text-center font-bold text-white mb-2">
+            Registrar uma partida
+          </h1>
+          <p className="text-center text-gray-300 text-base mb-6">
+            Coloque todas as informações
+          </p>
+          <div className="w-full flex flex-col items-center gap-4">
             <input
               type="text"
               name="championship"
               value={formData.championship}
               onChange={handleInputChange}
               placeholder="Nome do Campeonato"
-              className="input-field"
+              className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full max-w-md"
             />
-          </div>
-          <div className="form-container">
             <input
               type="text"
               name="team1"
               value={formData.team1}
               onChange={handleInputChange}
               placeholder="Time 1"
-              className="input-field"
+              className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full max-w-md"
             />
             <input
               type="text"
@@ -67,21 +69,21 @@ export default function CadastroCamp() {
               value={formData.team2}
               onChange={handleInputChange}
               placeholder="Time 2"
-              className="input-field"
+              className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full max-w-md"
             />
             <input
               type="date"
               name="date"
               value={formData.date}
               onChange={handleInputChange}
-              className="input-field"
+              className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full max-w-md"
             />
             <input
               type="time"
               name="time"
               value={formData.time}
               onChange={handleInputChange}
-              className="input-field"
+              className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full max-w-md"
             />
             <input
               type="text"
@@ -89,12 +91,12 @@ export default function CadastroCamp() {
               value={formData.location}
               onChange={handleInputChange}
               placeholder="Localização da Partida"
-              className="input-field"
+              className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full max-w-md"
             />
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="submit-button"
+              className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 w-full max-w-md text-center"
             >
               {isSubmitting ? 'Registrando...' : 'Registrar Partida'}
             </button>

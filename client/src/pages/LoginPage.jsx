@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './LoginPage.css';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -10,78 +9,90 @@ export default function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission (login or register) here
     console.log('Form submitted');
   };
 
   return (
-    <div className="container grid-center login-page">
-      <div className="login-card stack-lg">
-        <div className="logo-container grid-center">
-          <div className="logo">W</div>
+    <div className="min-h-screen flex justify-center items-center bg-black">
+      <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-md w-full transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+        <div className="mb-6 flex justify-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-500 rounded-full flex items-center justify-center text-2xl font-bold text-white shadow-md">
+            W
+          </div>
         </div>
 
-        <h1>{isLogin ? 'Bem vindo de volta' : 'Junte-se a nós'}</h1>
-        <p>{isLogin ? 'Faça login para continuar sua jornada' : 'Crie uma conta para começar'}</p>
+        <h1 className="text-2xl sm:text-3xl text-center font-bold text-white mb-2">
+          {isLogin ? 'Bem vindo de volta' : 'Junte-se a nós'}
+        </h1>
+        <p className="text-center text-gray-300 text-base mb-6">
+          {isLogin ? 'Faça login para continuar sua jornada' : 'Crie uma conta para começar'}
+        </p>
 
-        <form onSubmit={handleSubmit} className="stack">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {!isLogin && (
-            <div className="stack-sm">
+            <div className="flex flex-col gap-1">
               <label htmlFor="name" className="sr-only">Name</label>
               <input
                 id="name"
                 type="text"
                 placeholder="Digite seu nome"
                 required={!isLogin}
-                className="input-field stack-sm"
+                className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full"
               />
             </div>
           )}
 
-          <div className="stack-sm">
+          <div className="flex flex-col gap-1">
             <label htmlFor="email" className="sr-only">Email</label>
             <input
               id="email"
               type="email"
               placeholder="Digite seu email"
               required
-              className="input-field stack-sm"
+              className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full"
             />
           </div>
 
-          <div className="stack-sm">
+          <div className="flex flex-col gap-1">
             <label htmlFor="password" className="sr-only">Password</label>
             <input
               id="password"
               type="password"
               placeholder="Digite sua senha"
               required
-              className="input-field stack-sm"
+              className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full"
             />
           </div>
 
           {!isLogin && (
-            <div className="stack-sm">
+            <div className="flex flex-col gap-1">
               <label htmlFor="confirm-password" className="sr-only">Confirm Password</label>
               <input
                 id="confirm-password"
                 type="password"
                 placeholder="Confirme sua senha"
                 required={!isLogin}
-                className="input-field stack-sm"
+                className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full"
               />
             </div>
           )}
 
-          <button type="submit" className="submit-button stack-sm">
+          <button
+            type="submit"
+            className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 w-full"
+          >
             {isLogin ? 'Entrar' : 'Criar Conta'}
           </button>
         </form>
 
-        <div className="stack-sm grid-center">
-          <small>
+        <div className="mt-6 text-center">
+          <small className="text-gray-400">
             {isLogin ? "Não tem uma conta? " : 'Já tem uma conta? '}
-            <a href="#" onClick={toggleForm} className="toggle-link">
+            <a
+              href="#"
+              onClick={toggleForm}
+              className="text-green-500 hover:text-green-400 transition-colors duration-200 font-medium"
+            >
               {isLogin ? 'Registrar' : 'Entrar'}
             </a>
           </small>
