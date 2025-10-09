@@ -1,9 +1,11 @@
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import CadastroPartida from "./pages/CadastroPartida";
 import Footer from "./components/Footer"; // Adjust path as needed
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import PlayerProfile from "./pages/PlayerProfile";
 import CadastroCampeonato from "./pages/CadastroCampeonato";
+import RecoverPassword from "./pages/RecoverPassword";
 import "./App.css";
 
 function App() {
@@ -12,9 +14,11 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/recover-password" element={<RecoverPassword />} />
           <Route path="/cadastropartida" element={<CadastroPartida />} />
           <Route path="/cadastrocampeonato" element={<CadastroCampeonato />} />
-          <Route path="/playerprofile" element={<PlayerProfile/>}/>
+          <Route path="/playerprofile" element={<PlayerProfile />} />
         </Routes>
         <Footer />
       </BrowserRouter>
