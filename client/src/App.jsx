@@ -6,6 +6,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import PlayerProfile from "./pages/PlayerProfile";
 import CadastroCampeonato from "./pages/CadastroCampeonato";
 import RecoverPassword from "./pages/RecoverPassword";
+import HomePage from "./pages/HomePage";
 import "./App.css";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/recover-password" element={<RecoverPassword />} />
