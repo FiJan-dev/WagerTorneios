@@ -1,22 +1,78 @@
-import { useState } from 'react';
-import SideBar_Olheiro from '../components/SideBar_Olheiro';
+import { useState } from "react";
+import axios from "axios";
+import SideBar_Olheiro from "../components/SideBar_Olheiro";
 
 export default function ChampionshipRegistrationPage() {
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    startDate: '',
-    endDate: '',
-    location: '',
+    name: "",
+    startDate: "",
+    endDate: "",
+    location: "",
+    description: "", // não vai pro banco; só manter no form se quiser
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // URL ABSOLUTA pra evitar 404 no :3000
+  const API_URL = "http://localhost:5000/api/campeonato/criarC";
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Campeonato cadastrado:', formData);
+    if (isSubmitting) return;
+
+    const { name, startDate, endDate, location } = formData;
+
+    // validações simples no front
+    if (!name || !startDate || !endDate || !location) {
+      alert("Preencha todos os campos obrigatórios.");
+      return;
+    }
+    const dtInicio = new Date(startDate);
+    const dtFim = new Date(endDate);
+    if (isNaN(dtInicio.getTime()) || isNaN(dtFim.getTime())) {
+      alert("Datas inválidas.");
+      return;
+    }
+    if (dtInicio >= dtFim) {
+      alert("A data de início deve ser anterior à data de fim.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      // mapeia para os nomes que o back espera
+      const payload = {
+        nome_campeonato: name,
+        data_inicio: startDate, // YYYY-MM-DD
+        data_fim: endDate,      // YYYY-MM-DD
+        local_campeonato: location,
+      };
+
+      await axios.post(API_URL, payload);
+
+      alert("Campeonato cadastrado com sucesso!");
+      setFormData({
+        name: "",
+        description: "",
+        startDate: "",
+        endDate: "",
+        location: "",
+      });
+    } catch (err) {
+      console.error(err);
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.statusText ||
+        err?.message ||
+        "Erro ao cadastrar campeonato.";
+      alert(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -35,25 +91,28 @@ export default function ChampionshipRegistrationPage() {
           <p className="text-center text-gray-300 text-base mb-6">
             Preencha os detalhes para criar um novo campeonato
           </p>
+
           <form onSubmit={handleSubmit} className="flex flex-col w-full gap-4">
             <input
               id="name"
               type="text"
-              placeholder="Digite o nome do campeonato"
+              placeholder="Nome do campeonato"
               value={formData.name}
               onChange={handleChange}
               required
               className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full max-w-md"
             />
+
+            {/* description é opcional e não vai pro banco */}
             <textarea
               id="description"
-              placeholder="Descreva o campeonato"
+              placeholder="Descrição (opcional)"
               value={formData.description}
               onChange={handleChange}
-              required
               className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full max-w-md resize-none"
-              rows="4"
+              rows="3"
             />
+
             <input
               id="startDate"
               type="date"
@@ -73,17 +132,19 @@ export default function ChampionshipRegistrationPage() {
             <input
               id="location"
               type="text"
-              placeholder="Digite o local do campeonato"
+              placeholder="Local do campeonato"
               value={formData.location}
               onChange={handleChange}
               required
               className="px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 text-center focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full max-w-md"
             />
+
             <button
               type="submit"
+              disabled={isSubmitting}
               className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 w-full max-w-md text-center"
             >
-              Cadastrar Campeonato
+              {isSubmitting ? "Cadastrando..." : "Cadastrar Campeonato"}
             </button>
           </form>
         </div>

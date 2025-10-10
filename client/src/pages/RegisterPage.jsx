@@ -1,15 +1,44 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Register() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const API_BASE = "http://localhost:5000/api/olheiro"; // não mexe no seu .env do client
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Register submitted', { name, email, password, confirmPassword });
+
+    if (password !== confirmPassword) {
+      alert("As senhas não conferem.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await axios.post(`${API_BASE}/cadastrar`, {
+        nome: name,
+        email,
+        senha: password,
+      });
+
+      alert("Cadastro realizado! Agora faça login.");
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+      const msg =
+        err?.response?.data?.error ||
+        "Erro ao cadastrar. Tente novamente.";
+      alert(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -83,15 +112,16 @@ export default function Register() {
 
           <button
             type="submit"
+            disabled={loading}
             className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 w-full"
           >
-            Criar Conta
+            {loading ? "Enviando..." : "Criar Conta"}
           </button>
         </form>
 
         <div className="mt-6 text-center space-y-2">
           <small className="text-gray-400 block">
-            Já tem uma conta?{' '}
+            Já tem uma conta?{" "}
             <Link
               to="/login"
               className="text-green-500 hover:text-green-400 transition-colors duration-200 font-medium"
