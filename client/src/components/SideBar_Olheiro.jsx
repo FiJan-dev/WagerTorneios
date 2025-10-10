@@ -13,8 +13,8 @@ function SideBar_Olheiro() {
 
   const mainItems = [
     { id: 'dashboard', label: 'Inicio', icon: <FaHouse />, path: '/dashboard' },
-    { id: 'cadastrocampeonato', label: 'Campeonatos', icon: <MdGroup />, path: '/cadastrocampeonato' },
-    { id: 'cadastropartida', label: 'Partidas', icon: <RiGroupFill />, path: '/cadastropartida' },
+    { id: 'cadastrocampeonatolista', label: 'Campeonatos', icon: <MdGroup />, path: '/cadastrocampeonatolista' },
+    { id: 'cadastropartidalista', label: 'Partidas', icon: <RiGroupFill />, path: '/cadastropartidalista' },
   ];
 
   const bottomItems = [
