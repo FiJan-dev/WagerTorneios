@@ -1,13 +1,43 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  // mantendo sem depender de .env do client
+  const API_BASE = "http://localhost:5000/api/olheiro";
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login submitted', { email, password });
+    setErrMsg("");
+
+    try {
+      setLoading(true);
+      const { data } = await axios.post(`${API_BASE}/login`, {
+        email,
+        senha: password,
+      });
+
+      // guarda token (e user se quiser usar depois)
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // redirecione para onde preferir (home, dashboard, perfil…)
+      navigate("/");
+    } catch (err) {
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.data?.msg ||
+        "Falha no login. Verifique email e senha.";
+      setErrMsg(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -20,7 +50,7 @@ export default function Login() {
         </div>
 
         <h1 className="text-2xl sm:text-3xl text-center font-bold text-white mb-2">
-          Bem vindo de volta
+          Bem-vindo de volta
         </h1>
         <p className="text-center text-gray-300 text-base mb-6">
           Faça login para continuar sua jornada
@@ -53,17 +83,22 @@ export default function Login() {
             />
           </div>
 
+          {errMsg && (
+            <p className="text-center text-red-400 text-sm">{errMsg}</p>
+          )}
+
           <button
             type="submit"
+            disabled={loading}
             className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 w-full"
           >
-            Entrar
+            {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
 
         <div className="mt-6 text-center space-y-2">
           <small className="text-gray-400 block">
-            Não tem uma conta?{' '}
+            Não tem uma conta?{" "}
             <Link
               to="/register"
               className="text-green-500 hover:text-green-400 transition-colors duration-200 font-medium"

@@ -2,45 +2,47 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
-const port = process.env.SERVER_PORT;
 const rotaOlheiro = require("./routes/rotaOlheiro.js");
 const rotaCampeonato = require("./routes/rotaCampeonato.js");
-const rotaPartida = require("./routes/rotaPartidas.js"); 
+const rotaPartida = require("./routes/rotaPartidas.js");
 
-const app = express(); 
-app.use(cors());
-app.use(express.json({limit: "50mb"}));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+const app = express();
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+app.use(cors()); // libera no dev; ajuste se quiser restringir
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// === Pool do MariaDB (gera/reaproveita conexões e se recupera sozinho) ===
+const db = mysql.createPool({
+  host: process.env.DB_HOST || "db",
+  user: process.env.DB_USER || "dev",
+  password: process.env.DB_PASSWORD || "1234",
+  database: process.env.DB_NAME || "wagerdb",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
-
 app.set("db", db);
+console.log("Pool do MariaDB pronto.");
 
-db.connect((err) => {
-  if (err) return console.error("Erro ao conectar com MariaDB:", err);
-  console.log("Conectado ao MariaDB!");
-});
+// Rotas
+app.use("/api/olheiro", rotaOlheiro);
+app.use("/api/campeonato", rotaCampeonato);
+app.use("/api/partida", rotaPartida);
 
-app.set('db', db)
-
-app.use('/api', rotaOlheiro);
-app.use('/api', rotaCampeonato);
-app.use('/api', rotaPartida);
-
-app.get("/", (req, res) => {
+// Healthcheck
+app.get("/", (_req, res) => {
   res.send("API funcionando!");
 });
 
+// Start
+const port = process.env.SERVER_PORT || 5000;
 app.listen(port, () => {
-  console.log("Servidor rodando na porta 5000");
+  console.log(`Servidor rodando na porta ${port}`);
 });
 
-app.use((err, req, res, next) => {
+// Handler de erro final
+app.use((err, _req, res, _next) => {
   console.error(err.stack);
-  res.status(500).send('Algo deu errado!');
+  res.status(500).send("Algo deu errado!");
 });
