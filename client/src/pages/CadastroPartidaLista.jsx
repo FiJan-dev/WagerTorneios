@@ -8,7 +8,7 @@ export default function CadastroPartidaLista() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = "http://localhost:5000/api/partida/listar"; // Assumed endpoint; adjust if necessary
+  const API_URL = "http://localhost:5000/api/partida/listarP"; // Assumed endpoint; adjust if necessary
 
   useEffect(() => {
     const fetchPartidas = async () => {
