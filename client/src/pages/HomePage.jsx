@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import backgroundImage from '../assets/backg.jpg'; // Adjust path based on your folder structure
+import backgroundImage from '../assets/backg.jpg';
 
 export default function HomePage() {
   return (
@@ -8,8 +8,8 @@ export default function HomePage() {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: `url(${backgroundImage})`,
-          filter: 'blur(4px)', // Subtle blur effect
-          zIndex: -1, // Place behind content
+          filter: 'blur(4px)',
+          zIndex: -1,
         }}
       ></div>
       <div className="relative bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-8 sm:p-12 max-w-2xl w-full mx-4 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
