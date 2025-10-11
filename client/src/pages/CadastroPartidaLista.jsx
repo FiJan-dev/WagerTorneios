@@ -71,8 +71,8 @@ export default function CadastroPartidaLista() {
                   {partidas.map((partida, index) => (
                     <tr key={index} className="border-b border-green-700/50">
                       <td className="px-4 py-2">{partida.nome_campeonato}</td>
-                      <td className="px-4 py-2">{partida.time_casa}</td>
-                      <td className="px-4 py-2">{partida.time_visitante}</td>
+                      <td className="px-4 py-2">{partida.nome_time_casa}</td>
+                      <td className="px-4 py-2">{partida.nome_time_visitante}</td>
                       <td className="px-4 py-2">{`${partida.placar_casa} x ${partida.placar_visitante}`}</td>
                       <td className="px-4 py-2">{partida.data_partida}</td>
                       <td className="px-4 py-2">{partida.local_partida}</td>
