@@ -1,10 +1,10 @@
-// server/src/controllers/controllerPartidas.js
+const Campeonato = require('../models/Campeonato');
+const Time = require('../models/Time');
+const Partida = require('../models/Partida');
 
 // Cadastra a partida criando campeonato e times automaticamente se não existirem.
 exports.registrarPartida = async (req, res) => {
   try {
-    const pool = req.app.get("db").promise();
-
     const {
       nome_campeonato,    // ex.: "Copa X"
       time_casa,          // ex.: "Time A"
@@ -19,101 +19,78 @@ exports.registrarPartida = async (req, res) => {
     if (!nome_campeonato || !time_casa || !time_visitante || !data_partida || !local_partida) {
       return res.status(400).json({ error: "Todos os campos são obrigatórios." });
     }
-    if (time_casa.trim() === time_visitante.trim()) {
-      return res.status(400).json({ error: "Os times não podem ser iguais." });
-    }
-    const dt = new Date(data_partida);
-    if (isNaN(dt.getTime())) {
-      return res.status(400).json({ error: "Data da partida inválida." });
-    }
+
 
     // helpers: find-or-create
-    const findOrCreateCampeonato = async (nome, dataJogo, localCamp) => {
-      const [c] = await pool.query(
-        "SELECT id_campeonato FROM campeonatos WHERE nome_campeonato = ? LIMIT 1",
-        [nome]
-      );
-      if (c.length) return c[0].id_campeonato;
+    let campeonato = await Campeonato.findOne({ where: { nome_campeonato } });
+    if (!campeonato) {
+      const dataISO = new Date(data_partida).toISOString().slice(0, 10);
+      campeonato = await Campeonato.create({
+        nome_campeonato,
+        data_inicio: dataISO,
+        data_fim: dataISO,
+        local_campeonato: local_partida || 'A definir',
+      });
+    }
 
-      // campeonatos pede data_inicio, data_fim e local_campeonato (NOT NULL)
-      const dataISO = dataJogo.toISOString().slice(0, 10); // YYYY-MM-DD
-      const local = localCamp || "A definir";
-      const [ins] = await pool.query(
-        "INSERT INTO campeonatos (nome_campeonato, data_inicio, data_fim, local_campeonato) VALUES (?, ?, ?, ?)",
-        [nome, dataISO, dataISO, local]
-      );
-      return ins.insertId;
-    };
+    let timeCasa = await Time.findOne({ where: { nome_time: time_casa } });
+    if (!timeCasa) {
+      timeCasa = await Time.create({ nome_time: time_casa, cidade_time: 'A definir' });
+    }
 
-    const findOrCreateTime = async (nomeTime) => {
-      const [t] = await pool.query(
-        "SELECT id_time FROM times WHERE nome_time = ? LIMIT 1",
-        [nomeTime]
-      );
-      if (t.length) return t[0].id_time;
+    let timeVisitante = await Time.findOne({ where: { nome_time: time_visitante } });
+    if (!timeVisitante) {
+      timeVisitante = await Time.create({ nome_time: time_visitante, cidade_time: 'A definir' });
+    }
 
-      // times.cidade_time é NOT NULL — usamos um default simples
-      const [ins] = await pool.query(
-        "INSERT INTO times (nome_time, cidade_time) VALUES (?, ?)",
-        [nomeTime, "A definir"]
-      );
-      return ins.insertId;
-    };
-
-    // cria se não existir
-    const idCampeonato     = await findOrCreateCampeonato(nome_campeonato, dt, local_partida);
-    const idTimeCasa       = await findOrCreateTime(time_casa);
-    const idTimeVisitante  = await findOrCreateTime(time_visitante);
-
-    if (idTimeCasa === idTimeVisitante) {
+    if (timeCasa.id_time === timeVisitante.id_time) {
       return res.status(400).json({ error: "Os times não podem ser iguais." });
     }
 
-    // grava a partida
-    const insertSQL = `
-      INSERT INTO partidas
-        (id_campeonato, id_time_casa, id_time_visitante, data_partida, local_partida, placar_casa, placar_visitante)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-    const params = [
-      idCampeonato,
-      idTimeCasa,
-      idTimeVisitante,
+    const partida = await Partida.create({
+      id_campeonato: campeonato.id_campeonato,
+      id_time_casa: timeCasa.id_time,
+      id_time_visitante: timeVisitante.id_time,
       data_partida,
       local_partida,
       placar_casa,
       placar_visitante,
-    ];
-    const [result] = await pool.query(insertSQL, params);
+    });
 
-    return res.status(201).json({ message: "Partida registrada com sucesso", id: result.insertId });
+    return res.status(201).json({ message: "Partida registrada com sucesso.", partida });
   } catch (err) {
     console.error("Erro ao registrar partida:", err);
-    const code = err.code || "UNKNOWN";
-    const msg = err.sqlMessage || err.message || "erro";
-    return res.status(500).json({ error: `Erro ao registrar partida (${code}): ${msg}` });
+    const code = err.name || 'UNKNOWN_ERROR';
+    const msg = err.message || 'erro';
+
+    return res.status(500).json({ error: 'Erro ao registrar partida (${code}): ${msg}' });
   }
 };
 
 exports.listarPartidas = async (_req, res) => {
   try {
-    const pool = req.app.get("db").promise();
-    const sql = `
-      SELECT p.id_partida, p.data_partida, p.local_partida,
-             p.placar_casa, p.placar_visitante,
-             c.nome_campeonato,
-             tc.nome_time AS nome_time_casa,
-             tv.nome_time AS nome_time_visitante
-      FROM partidas p
-      JOIN campeonatos c ON p.id_campeonato = c.id_campeonato
-      JOIN times tc ON p.id_time_casa = tc.id_time
-      JOIN times tv ON p.id_time_visitante = tv.id_time
-      ORDER BY p.data_partida ASC
-    `;
-    const [rows] = await pool.query(sql);
-    return res.status(200).json(rows);
+    const partidas = await Partida.findAll({
+      include: [
+        { model: Campeonato, attributes: ['nome_campeonato'] },
+        { model: Time, as: 'timeCasa', attributes: ['nome_time'] },
+        { model: Time, as: 'timeVisitante', attributes: ['nome_time'] },
+      ],
+      order: [['data_partida', 'ASC']],
+    });
+    
+    const formattedPartidas = partidas.map(p => ({
+      id_partida: p.id_partida,
+      data_partida: p.data_partida,
+      local_partida: p.local_partida,
+      placar_casa: p.placar_casa,
+      placar_visitante: p.placar_visitante,
+      nome_campeonato: p.Campeonato.nome_campeonato,
+      nome_time_casa: p.timeCasa.nome_time,
+      nome_time_visitante: p.timeVisitante.nome_time,
+    }));
+    return res.status(200).json(formattedPartidas);
   } catch (err) {
     console.error("Erro ao listar partidas:", err);
-    return res.status(500).json({ error: "Erro ao listar partidas" });
+    return res.status(500).json({ error: 'Erro ao listar partidas.' });
   }
 };

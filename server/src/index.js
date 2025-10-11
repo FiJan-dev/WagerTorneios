@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const mysql = require("mysql2");
+const sequelize = require('./config/database');
 const rotaOlheiro = require("./routes/rotaOlheiro.js");
 const rotaCampeonato = require("./routes/rotaCampeonato.js");
 const rotaPartida = require("./routes/rotaPartidas.js");
@@ -12,18 +12,15 @@ app.use(cors()); // libera no dev; ajuste se quiser restringir
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-// === Pool do MariaDB (gera/reaproveita conexões e se recupera sozinho) ===
-const db = mysql.createPool({
-  host: process.env.DB_HOST || "db",
-  user: process.env.DB_USER || "dev",
-  password: process.env.DB_PASSWORD || "1234",
-  database: process.env.DB_NAME || "wagerdb",
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
+app.set('sequelize', sequelize);
+
+// Sincroniza modelos com o banco de dados
+sequelize.sync({ force: false}).then(() => {
+  console.log('Banco de dados sincronizado');
+}).catch(err => {
+  console.error('Erro ao sincronizar o banco de dados:', err);
 });
-app.set("db", db);
-console.log("Pool do MariaDB pronto.");
+
 
 // Rotas
 app.use("/api/olheiro", rotaOlheiro);
