@@ -1,6 +1,4 @@
-const express = require('express');
 const jwt  = require('jsonwebtoken');
-const router = express.Router();
 const key = process.env.SECRET_KEY;
 
 const autenticarToken = (req, res, next) => {

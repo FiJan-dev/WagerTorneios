@@ -1,10 +1,12 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const mysql = require("mysql2");
+const sequelize = require('./config/database');
 const rotaOlheiro = require("./routes/rotaOlheiro.js");
 const rotaCampeonato = require("./routes/rotaCampeonato.js");
 const rotaPartida = require("./routes/rotaPartidas.js");
+const crypto = require('crypto');
+const Olheiro = require('./models/Olheiro');
 
 const app = express();
 
@@ -12,18 +14,46 @@ app.use(cors()); // libera no dev; ajuste se quiser restringir
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-// === Pool do MariaDB (gera/reaproveita conexões e se recupera sozinho) ===
-const db = mysql.createPool({
-  host: process.env.DB_HOST || "db",
-  user: process.env.DB_USER || "dev",
-  password: process.env.DB_PASSWORD || "1234",
-  database: process.env.DB_NAME || "wagerdb",
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
+app.set('sequelize', sequelize);
+
+// Função assíncrona para sincronizar e semear o admin
+const syncAndSeedAdmin = async () => {
+  try {
+    await sequelize.sync({ force: false });
+    console.log('Banco de dados sincronizado');
+
+    // Verifica e cria usuário admin padrão
+    const defaultAdmin = {
+      admin: 1,
+      nome_usuario: 'Admin',
+      email_usuario: 'admin@example.com',
+      senha_usuario: 'admin', // Será hasheado
+    };
+
+    const existingAdmin = await Olheiro.findOne({ where: { email_usuario: defaultAdmin.email_usuario } });
+    if (!existingAdmin) {
+      const hashedPassword = crypto.createHash('md5').update(defaultAdmin.senha_usuario).digest('hex');
+      await Olheiro.create({
+        admin: defaultAdmin.admin,
+        nome_usuario: defaultAdmin.nome_usuario,
+        email_usuario: defaultAdmin.email_usuario,
+        senha_usuario: hashedPassword,
+      });
+      console.log('Usuário admin padrão criado:', defaultAdmin.email_usuario);
+    } else {
+      console.log('Usuário admin padrão já existe:', defaultAdmin.email_usuario);
+    }
+  } catch (err) {
+    console.error('Erro ao sincronizar o banco de dados ou criar usuário admin:', err);
+    throw err; // Rejoga o erro para ser capturado fora
+  }
+};
+
+// Chama a função assíncrona e lida com o resultado
+syncAndSeedAdmin().catch(err => {
+  console.error('Falha na inicialização do banco de dados:', err);
+  process.exit(1); // Encerra o processo se houver erro crítico
 });
-app.set("db", db);
-console.log("Pool do MariaDB pronto.");
 
 // Rotas
 app.use("/api/olheiro", rotaOlheiro);

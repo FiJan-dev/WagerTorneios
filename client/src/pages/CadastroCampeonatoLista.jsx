@@ -8,7 +8,7 @@ export default function CadastroCampeonatoLista() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = "http://localhost:5000/api/campeonato/listar"; // Assumindo endpoint para listagem; ajuste se necessário
+  const API_URL = "http://localhost:5000/api/campeonato/listarC";
 
   useEffect(() => {
     const fetchCampeonatos = async () => {
