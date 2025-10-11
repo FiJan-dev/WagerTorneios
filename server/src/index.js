@@ -17,6 +17,27 @@ app.set('sequelize', sequelize);
 // Sincroniza modelos com o banco de dados
 sequelize.sync({ force: false}).then(() => {
   console.log('Banco de dados sincronizado');
+
+  // Verifica e cria usuário admin padrão
+  const defaultAdmin = {
+    name: 'Admin Default',
+    email: 'admin@example.com',
+    password: 'admin123', // Será hasheado
+    admin: 1,
+  };
+
+  const existingAdmin = await User.findOne({ where: { email: defaultAdmin.email } });
+  if (!existingAdmin) {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(defaultAdmin.password, saltRounds);
+    await User.create({
+      ...defaultAdmin,
+      password: hashedPassword,
+    });
+    console.log('Usuário admin padrão criado:', defaultAdmin.email);
+  } else {
+    console.log('Usuário admin padrão já existe:', defaultAdmin.email);
+  }
 }).catch(err => {
   console.error('Erro ao sincronizar o banco de dados:', err);
 });
@@ -43,3 +64,4 @@ app.use((err, _req, res, _next) => {
   console.error(err.stack);
   res.status(500).send("Algo deu errado!");
 });
+
