@@ -11,6 +11,7 @@ import CadastroCampeonato from './pages/CadastroCampeonato';
 import CadastroCampeonatoLista from './pages/CadastroCampeonatoLista';
 import RecoverPassword from './pages/RecoverPassword';
 import HomePage from './pages/HomePage';
+import PlayerList from './pages/PlayerList';
 import './App.css';
 
 function App() {
@@ -60,6 +61,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PlayerProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/dashboard'
+              element={
+                <ProtectedRoute>
+                  <PlayerList />
                 </ProtectedRoute>
               }
             />

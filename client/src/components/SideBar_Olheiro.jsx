@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { MdGroup } from "react-icons/md";
-import { FaHouse } from "react-icons/fa6";
+import { FaUsers } from "react-icons/fa";
 import { RiGroupFill } from "react-icons/ri";
 import { BsDoorOpenFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
@@ -12,7 +12,7 @@ function SideBar_Olheiro() {
   const [activeItem, setActiveItem] = useState('dashboard');
 
   const mainItems = [
-    { id: 'dashboard', label: 'Inicio', icon: <FaHouse />, path: '/dashboard' },
+    { id: 'dashboard', label: 'Jogadores', icon: <FaUsers />, path: '/dashboard' },
     { id: 'cadastrocampeonatolista', label: 'Campeonatos', icon: <MdGroup />, path: '/cadastrocampeonatolista' },
     { id: 'cadastropartidalista', label: 'Partidas', icon: <RiGroupFill />, path: '/cadastropartidalista' },
   ];
