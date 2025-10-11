@@ -29,7 +29,7 @@ const Olheiro = sequelize.define('Olheiro', {
         },
     },
     senha_usuario: {
-        type: DataTypes.STRING(60),
+        type: DataTypes.STRING(100),
         allowNull: false,
         validate: {
             notEmpty: true,

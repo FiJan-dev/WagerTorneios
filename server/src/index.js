@@ -5,8 +5,8 @@ const sequelize = require('./config/database');
 const rotaOlheiro = require("./routes/rotaOlheiro.js");
 const rotaCampeonato = require("./routes/rotaCampeonato.js");
 const rotaPartida = require("./routes/rotaPartidas.js");
-const bcrypt = require('bcrypt');
-const User = require('./models/User');
+const crypto = require('crypto');
+const Olheiro = require('./models/Olheiro');
 
 const app = express();
 
@@ -24,23 +24,24 @@ const syncAndSeedAdmin = async () => {
 
     // Verifica e cria usuário admin padrão
     const defaultAdmin = {
-      name: 'Admin',
-      email: 'admin@example.com',
-      password: 'admin123', // Será hasheado
       admin: 1,
+      nome_usuario: 'Admin',
+      email_usuario: 'admin@example.com',
+      senha_usuario: 'admin', // Será hasheado
     };
 
-    const existingAdmin = await User.findOne({ where: { email: defaultAdmin.email } });
+    const existingAdmin = await Olheiro.findOne({ where: { email_usuario: defaultAdmin.email_usuario } });
     if (!existingAdmin) {
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(defaultAdmin.password, saltRounds);
-      await User.create({
-        ...defaultAdmin,
-        password: hashedPassword,
+      const hashedPassword = crypto.createHash('md5').update(defaultAdmin.senha_usuario).digest('hex');
+      await Olheiro.create({
+        admin: defaultAdmin.admin,
+        nome_usuario: defaultAdmin.nome_usuario,
+        email_usuario: defaultAdmin.email_usuario,
+        senha_usuario: hashedPassword,
       });
-      console.log('Usuário admin padrão criado:', defaultAdmin.email);
+      console.log('Usuário admin padrão criado:', defaultAdmin.email_usuario);
     } else {
-      console.log('Usuário admin padrão já existe:', defaultAdmin.email);
+      console.log('Usuário admin padrão já existe:', defaultAdmin.email_usuario);
     }
   } catch (err) {
     console.error('Erro ao sincronizar o banco de dados ou criar usuário admin:', err);
