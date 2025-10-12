@@ -31,17 +31,17 @@ exports.cadastrarJogador = async (req, res) => {
 
         const jogador = await Jogador.create({
             nome_jogador,
-        posicao_jogador,
-        id_time: time.id_time,
-        altura_cm,
-        peso_kg,
-        idade,
-        passes_certos,
-        gols_marcados,
-        assistencias,
-        cartoes_amarelos,
-        cartoes_vermelhos,
-        finalizacoes,
+            posicao_jogador,
+            id_time: time.id_time,
+            altura_cm,
+            peso_kg,
+            idade,
+            passes_certos,
+            gols_marcados,
+            assistencias,
+            cartoes_amarelos,
+            cartoes_vermelhos,
+            finalizacoes,
         });
 
         return res.status(201).json({ message: "Jogador registrado com sucesso!", jogador });
@@ -66,19 +66,19 @@ exports.listarJogadores = async (req, res) => {
         });
 
         const formattedJogadores = jogadores.map(j => ({
-        id_jogador: j.id_jogador,
-        nome_jogador: j.nome_jogador,
-        posicao_jogador: j.posicao_jogador,
-        nome_time: j.Time ? j.Time.nome_time : 'Sem time',
-        altura_cm: j.altura_cm,
-        peso_kg: j.peso_kg,
-        idade: j.idade,
-        passes_certos: j.passes_certos,
-        gols_marcados: j.gols_marcados,
-        assistencias: j.assistencias,
-        cartoes_amarelos: j.cartoes_amarelos,
-        cartoes_vermelhos: j.cartoes_vermelhos,
-        finalizacoes: j.finalizacoes,
+            id_jogador: j.id_jogador,
+            nome_jogador: j.nome_jogador,
+            posicao_jogador: j.posicao_jogador,
+            nome_time: j.Time ? j.Time.nome_time : 'Sem time',
+            altura_cm: j.altura_cm,
+            peso_kg: j.peso_kg,
+            idade: j.idade,
+            passes_certos: j.passes_certos,
+            gols_marcados: j.gols_marcados,
+            assistencias: j.assistencias,
+            cartoes_amarelos: j.cartoes_amarelos,
+            cartoes_vermelhos: j.cartoes_vermelhos,
+            finalizacoes: j.finalizacoes,
         }));
         return res.status(200).json(formattedJogadores);
     } catch (error) {

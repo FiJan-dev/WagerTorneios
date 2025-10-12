@@ -67,7 +67,4 @@ const Jogador = sequelize.define('Jogador', {
   timestamps: false,
 });
 
-// Associação
-Jogador.belongsTo(Time, { foreignKey: 'id_time' });
-
 module.exports = Jogador;
