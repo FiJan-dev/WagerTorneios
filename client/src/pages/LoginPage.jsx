@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 export default function Login() {
@@ -8,6 +8,9 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,6 +20,10 @@ export default function Login() {
     const result = await login(email, password);
     if (!result.success) {
       setErrMsg(result.error);
+    }
+    else {
+      // Redirect to the dashboard after successful login
+      navigate('/dashboard', { replace: true });
     }
     setLoading(false);
   };

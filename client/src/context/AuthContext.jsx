@@ -27,8 +27,8 @@ export const AuthProvider = ({ children }) => {
       const { data } = await axios.post(`${API_BASE}/login`, { email, senha });
       setToken(data.token);
       setUser(data.user);
-      navigate('/');
-      return { success: true };
+      // Don't navigate here — let the caller (LoginPage) decide where to go
+      return { success: true, user: data.user };
     } catch (err) {
       const msg =
         err?.response?.data?.error ||

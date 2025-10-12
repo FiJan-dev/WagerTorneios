@@ -1,12 +1,14 @@
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 function ProtectedRoute({ children }) {
   const { user } = useContext(AuthContext);
+  const location = useLocation();
 
   if (!user) {
-    return <Navigate to='/login' replace />;
+    // pass the current location in state so Login can redirect back
+    return <Navigate to='/login' replace state={{ from: location }} />;
   }
 
   return children;
