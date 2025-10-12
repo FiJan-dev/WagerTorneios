@@ -1,5 +1,4 @@
-const Jogador = require('../models/Jogador');
-const Time = require('../models/Time');
+const { Jogador, Time } = require('../models/index');
 
 // POST /api/jogador/cadastrar
 exports.cadastrarJogador = async (req, res) => {
@@ -58,16 +57,19 @@ exports.cadastrarJogador = async (req, res) => {
 exports.listarJogadores = async (req, res) => {
     try {
         const jogadores = await Jogador.findAll({
-            include: [{ model: Time, attributes: ['nome_time'] }
-        ],
-        order: [['nome_jogador', 'ASC']],
+            include: [{ 
+                model: Time, 
+                attributes: ['nome_time'],
+                required: false // LEFT JOIN ao invés de INNER JOIN
+            }],
+            order: [['nome_jogador', 'ASC']],
         });
 
         const formattedJogadores = jogadores.map(j => ({
         id_jogador: j.id_jogador,
         nome_jogador: j.nome_jogador,
         posicao_jogador: j.posicao_jogador,
-        nome_time: j.Time.nome_time,
+        nome_time: j.Time ? j.Time.nome_time : 'Sem time',
         altura_cm: j.altura_cm,
         peso_kg: j.peso_kg,
         idade: j.idade,
@@ -78,7 +80,7 @@ exports.listarJogadores = async (req, res) => {
         cartoes_vermelhos: j.cartoes_vermelhos,
         finalizacoes: j.finalizacoes,
         }));
-        return res.status(200).json(jogadores);
+        return res.status(200).json(formattedJogadores);
     } catch (error) {
         console.error('Erro ao listar jogadores:', error);
         return res.status(500).json({ error: 'Erro ao listar jogadores.' });

@@ -10,7 +10,7 @@ export default function PlayerList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = "http://localhost:5000/api/jogador/listarJ";
+  const API_URL = "http://localhost:5000/api/jogador/listar";
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -74,10 +74,10 @@ export default function PlayerList() {
                 <tbody>
                   {players.map((player, index) => (
                     <tr key={index} className="border-b border-green-700/50">
-                      <td className="px-4 py-2">{player.nome}</td>
-                      <td className="px-4 py-2">{player.posicao}</td>
+                      <td className="px-4 py-2">{player.nome_jogador}</td>
+                      <td className="px-4 py-2">{player.posicao_jogador}</td>
                       <td className="px-4 py-2">{player.idade}</td>
-                      <td className="px-4 py-2">{player.time_atual}</td>
+                      <td className="px-4 py-2">{player.nome_time || 'Sem time'}</td>
                     </tr>
                   ))}
                 </tbody>

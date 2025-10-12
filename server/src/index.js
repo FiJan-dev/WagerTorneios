@@ -7,7 +7,7 @@ const rotaCampeonato = require("./routes/rotaCampeonato.js");
 const rotaPartida = require("./routes/rotaPartidas.js");
 const rotaJogador = require("./routes/rotaJogador.js");
 const crypto = require('crypto');
-const Olheiro = require('./models/Olheiro');
+const { Olheiro } = require('./models/index');
 
 const app = express();
 

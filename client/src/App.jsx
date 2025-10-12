@@ -12,6 +12,7 @@ import CadastroCampeonatoLista from './pages/CadastroCampeonatoLista';
 import RecoverPassword from './pages/RecoverPassword';
 import HomePage from './pages/HomePage';
 import PlayerList from './pages/PlayerList';
+import PlayerListCadastro from './pages/PlayerListCadastro';
 import './App.css';
 
 function App() {
@@ -69,6 +70,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PlayerList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/cadastrojogador'
+              element={
+                <ProtectedRoute>
+                  <PlayerListCadastro />
                 </ProtectedRoute>
               }
             />
