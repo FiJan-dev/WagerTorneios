@@ -1,10 +1,12 @@
 import { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
 
 export default function ChampionshipRegistrationPage() {
   const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     startDate: '',
@@ -72,25 +74,13 @@ export default function ChampionshipRegistrationPage() {
       // Sucesso padrão (nosso controller retorna { ok:true, ... })
       if (body && typeof body === 'object' && body.ok === true) {
         alert('Campeonato cadastrado com sucesso!');
-        setFormData({
-          name: '',
-          description: '',
-          startDate: '',
-          endDate: '',
-          location: '',
-        });
+        navigate('/cadastrocampeonatolista');
         return;
       }
 
       // Fallback (caso venha outro formato)
       alert('Campeonato cadastrado com sucesso!');
-      setFormData({
-        name: '',
-        description: '',
-        startDate: '',
-        endDate: '',
-        location: '',
-      });
+      navigate('/cadastrocampeonatolista');
     } catch (err) {
       console.error(err);
       const data = err?.response?.data;
@@ -201,7 +191,7 @@ export default function ChampionshipRegistrationPage() {
               disabled={isSubmitting}
               className='bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 w-full text-center'
             >
-              {isSubmitting ? 'Cadastrando...' : 'Cadastrar Campeonato'}
+              {isSubmitting ? 'Cadastrando...' : 'Cadastrar'}
             </button>
           </form>
         </div>

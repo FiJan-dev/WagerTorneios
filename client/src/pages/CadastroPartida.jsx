@@ -1,10 +1,12 @@
 import { useContext, useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
 
 function CadastroPartida() {
   const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     nome_campeonato: '',
@@ -70,17 +72,7 @@ function CadastroPartida() {
 
       // Sucesso normal
       alert('Partida registrada com sucesso!');
-      setFormData({
-        nome_campeonato: '',
-        time_casa: '',
-        time_visitante: '',
-        data_partida: '',
-        local_partida: '',
-        placar_casa: 0,
-        placar_visitante: 0,
-      });
-      setSuggestions([]);
-      setSelectedCampeonatoId(null);
+      navigate('/cadastropartidalista');
     } catch (err) {
       const data = err?.response?.data;
       const msg =
