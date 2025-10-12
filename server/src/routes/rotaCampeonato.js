@@ -1,10 +1,14 @@
+// routes/rotaCampeonato.js
 const express = require('express');
 const router = express.Router();
 
 const controllerCampeonato = require('../controllers/controllerCampeonato.js');
-const autenticarToken = require('../middleware/authmiddlaware.js');
+const { autenticarTokenSoft, autenticaAdminSoft } = require('../middleware/authSoft.js');
 
-router.get('/listarC',controllerCampeonato.listarCampeonatos);
-router.post('/criarC',controllerCampeonato.criarCampeonatos);
+// Listar: exige login (suave)
+router.get('/listarC', autenticarTokenSoft, controllerCampeonato.listarCampeonatos);
+
+// Criar: somente admin (suave)
+router.post('/criarC', autenticarTokenSoft, autenticaAdminSoft, controllerCampeonato.criarCampeonatos);
 
 module.exports = router;

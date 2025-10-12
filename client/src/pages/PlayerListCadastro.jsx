@@ -24,39 +24,53 @@ function PlayerListCadastro() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const normalizeInt = (v) => {
+    const n = parseInt(v, 10);
+    return Number.isFinite(n) && n >= 0 ? n : 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const payload = { ...formData };
-      // Convert numeric fields to integers
-      payload.altura_cm = parseInt(formData.altura_cm) || 0;
-      payload.peso_kg = parseInt(formData.peso_kg) || 0;
-      payload.idade = parseInt(formData.idade) || 0;
-      payload.passes_certos = parseInt(formData.passes_certos) || 0;
-      payload.gols_marcados = parseInt(formData.gols_marcados) || 0;
-      payload.assistencias = parseInt(formData.assistencias) || 0;
-      payload.cartoes_amarelos = parseInt(formData.cartoes_amarelos) || 0;
-      payload.cartoes_vermelhos = parseInt(formData.cartoes_vermelhos) || 0;
-      payload.finalizacoes = parseInt(formData.finalizacoes) || 0;
+      const payload = {
+        ...formData,
+        altura_cm: normalizeInt(formData.altura_cm),
+        peso_kg: normalizeInt(formData.peso_kg),
+        idade: normalizeInt(formData.idade),
+        passes_certos: normalizeInt(formData.passes_certos),
+        gols_marcados: normalizeInt(formData.gols_marcados),
+        assistencias: normalizeInt(formData.assistencias),
+        cartoes_amarelos: normalizeInt(formData.cartoes_amarelos),
+        cartoes_vermelhos: normalizeInt(formData.cartoes_vermelhos),
+        finalizacoes: normalizeInt(formData.finalizacoes),
+      };
 
-      await axios.post(
-        'http://localhost:5000/api/jogador/cadastrar', // Assumed endpoint; adjust if necessary
+      const resp = await axios.post(
+        'http://localhost:5000/api/jogador/cadastrar',
         payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
+
+      const body = resp?.data;
+
+      // authSoft: 200 + { ok:false, msg: '...' }
+      if (body && typeof body === 'object' && body.ok === false) {
+        setError(body.msg || 'Acesso não permitido.');
+        return;
+      }
+
       alert('Jogador registrado com sucesso!');
       navigate('/dashboard');
     } catch (err) {
+      const data = err?.response?.data;
       const msg =
-        err?.response?.data?.error ||
-        err?.response?.data?.msg ||
+        data?.msg ||
+        data?.error ||
+        (Array.isArray(data) ? data.join('; ') : null) ||
+        err?.message ||
         'Erro ao registrar jogador.';
       setError(msg);
     } finally {
@@ -66,7 +80,7 @@ function PlayerListCadastro() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -77,7 +91,9 @@ function PlayerListCadastro() {
           <h2 className='text-2xl sm:text-3xl text-center font-bold text-white mb-2'>
             Cadastrar Jogador
           </h2>
-          {error && <p className='text-center text-red-400 text-sm'>{error}</p>}
+
+          {error && <p className='text-center text-red-400 text-sm mb-2'>{error}</p>}
+
           <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Nome do Jogador</label>
@@ -90,6 +106,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Posição</label>
               <input
@@ -101,6 +118,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Nome do Time</label>
               <input
@@ -112,6 +130,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Altura (cm)</label>
               <input
@@ -124,6 +143,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Peso (kg)</label>
               <input
@@ -136,6 +156,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Idade</label>
               <input
@@ -148,6 +169,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Passes Certos</label>
               <input
@@ -159,6 +181,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Gols Marcados</label>
               <input
@@ -170,6 +193,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Assistências</label>
               <input
@@ -181,6 +205,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Cartões Amarelos</label>
               <input
@@ -192,6 +217,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Cartões Vermelhos</label>
               <input
@@ -203,6 +229,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Finalizações</label>
               <input
@@ -214,6 +241,7 @@ function PlayerListCadastro() {
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
               />
             </div>
+
             <button
               type='submit'
               disabled={loading}

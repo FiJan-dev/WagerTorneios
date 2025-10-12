@@ -1,35 +1,70 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
+import { AuthContext } from '../context/AuthContext';
 
 export default function CadastroCampeonatoLista() {
+  const { token } = useContext(AuthContext);
+
   const [campeonatos, setCampeonatos] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = "http://localhost:5000/api/campeonato/listarC";
+  const API_URL = 'http://localhost:5000/api/campeonato/listarC';
 
   useEffect(() => {
     const fetchCampeonatos = async () => {
       try {
-        const response = await axios.get(API_URL);
-        setCampeonatos(response.data);
+        const resp = await axios.get(API_URL, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+
+        const payload = resp?.data;
+
+        // Caso o authSoft tenha barrado (200 + ok:false)
+        if (
+          payload &&
+          typeof payload === 'object' &&
+          !Array.isArray(payload) &&
+          payload.ok === false
+        ) {
+          alert(payload.msg || 'Acesso não permitido.');
+          setCampeonatos([]);
+          return;
+        }
+
+        // Caso venha no formato { ok:true, data:[...] }
+        if (
+          payload &&
+          typeof payload === 'object' &&
+          !Array.isArray(payload) &&
+          Array.isArray(payload.data)
+        ) {
+          setCampeonatos(payload.data);
+          return;
+        }
+
+        // Formato recomendado: array puro
+        setCampeonatos(Array.isArray(payload) ? payload : []);
       } catch (err) {
         console.error(err);
-        setError("Erro ao carregar campeonatos.");
+        setError('Erro ao carregar campeonatos.');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchCampeonatos();
-  }, []);
+  }, [token]); // re-carrega quando o token mudar
 
-  // Filter campeonatos by nome_campeonato (case-insensitive)
-  const filteredCampeonatos = campeonatos.filter((camp) => {
-    const nome = (camp.nome_campeonato || '').toString().toLowerCase();
+  // Garanta que é array
+  const lista = Array.isArray(campeonatos) ? campeonatos : [];
+
+  // Filter campeonatos por nome (case-insensitive)
+  const filteredCampeonatos = lista.filter((camp) => {
+    const nome = (camp?.nome_campeonato || '').toString().toLowerCase();
     const query = searchQuery.trim().toLowerCase();
     return nome.includes(query);
   });
@@ -50,12 +85,14 @@ export default function CadastroCampeonatoLista() {
           <p className="text-center text-gray-300 text-base mb-6">
             Visualize e gerencie os campeonatos cadastrados
           </p>
+
           <Link
             to="/cadastrocampeonato"
             className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200 mb-8"
           >
             Adicionar Campeonato
           </Link>
+
           <div className="w-full mb-4">
             <label htmlFor="search" className="sr-only">
               Pesquisar campeonatos
@@ -69,11 +106,12 @@ export default function CadastroCampeonatoLista() {
               className="w-full bg-gray-800 text-gray-200 placeholder-gray-400 border border-green-700 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
+
           {isLoading ? (
             <p className="text-gray-300">Carregando...</p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
-          ) : campeonatos.length === 0 ? (
+          ) : lista.length === 0 ? (
             <p className="text-gray-300">Nenhum campeonato cadastrado.</p>
           ) : filteredCampeonatos.length === 0 ? (
             <p className="text-gray-300">Nenhum campeonato encontrado para a pesquisa.</p>
