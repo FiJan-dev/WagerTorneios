@@ -5,6 +5,7 @@ const sequelize = require('./config/database');
 const rotaOlheiro = require("./routes/rotaOlheiro.js");
 const rotaCampeonato = require("./routes/rotaCampeonato.js");
 const rotaPartida = require("./routes/rotaPartidas.js");
+const rotaJogador = require("./routes/rotaJogador.js");
 const crypto = require('crypto');
 const Olheiro = require('./models/Olheiro');
 
@@ -59,6 +60,7 @@ syncAndSeedAdmin().catch(err => {
 app.use("/api/olheiro", rotaOlheiro);
 app.use("/api/campeonato", rotaCampeonato);
 app.use("/api/partida", rotaPartida);
+app.use("/api/jogador", rotaJogador);
 
 // Healthcheck
 app.get("/", (_req, res) => {
