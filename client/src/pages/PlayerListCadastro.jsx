@@ -1,10 +1,12 @@
 import { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
 
 function PlayerListCadastro() {
   const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nome_jogador: '',
     posicao_jogador: '',
@@ -50,20 +52,7 @@ function PlayerListCadastro() {
         }
       );
       alert('Jogador registrado com sucesso!');
-      setFormData({
-        nome_jogador: '',
-        posicao_jogador: '',
-        nome_time: '',
-        altura_cm: '',
-        peso_kg: '',
-        idade: '',
-        passes_certos: 0,
-        gols_marcados: 0,
-        assistencias: 0,
-        cartoes_amarelos: 0,
-        cartoes_vermelhos: 0,
-        finalizacoes: 0,
-      });
+      navigate('/dashboard');
     } catch (err) {
       const msg =
         err?.response?.data?.error ||
