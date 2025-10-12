@@ -19,7 +19,7 @@ function SideBar_Olheiro() {
   ];
 
   const bottomItems = [
-    { id: 'playerprofile', label: 'Perfil', icon: <CgProfile />, path: '/playerprofile' },
+    { id: 'olheiropropfile', label: 'Perfil', icon: <CgProfile />, path: '/olheiropropfile' },
     { id: 'logout', label: 'Logout', icon: <BsDoorOpenFill />, path: '/login' },
   ];
 

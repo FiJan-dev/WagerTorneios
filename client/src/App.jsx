@@ -6,7 +6,7 @@ import CadastroPartidaLista from './pages/CadastroPartidaLista';
 import CadastroPartida from './pages/CadastroPartida';
 import Footer from './components/Footer';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import PlayerProfile from './pages/PlayerProfile';
+import OlheiroProfile from './pages/OlheiroProfile';
 import CadastroCampeonato from './pages/CadastroCampeonato';
 import CadastroCampeonatoLista from './pages/CadastroCampeonatoLista';
 import RecoverPassword from './pages/RecoverPassword';
@@ -58,10 +58,10 @@ function App() {
               }
             />
             <Route
-              path='/playerprofile'
+              path='/olheiropropfile'
               element={
                 <ProtectedRoute>
-                  <PlayerProfile />
+                  <OlheiroProfile />
                 </ProtectedRoute>
               }
             />
