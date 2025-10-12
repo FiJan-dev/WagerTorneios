@@ -14,20 +14,39 @@ export default function PlayerList() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
 
-  const API_URL = "http://localhost:5000/api/jogador/listar";
+  const API_URL = 'http://localhost:5000/api/jogador/listar';
 
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        const response = await axios.get(API_URL, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const resp = await axios.get(API_URL, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
-        setPlayers(response.data);
+
+        const payload = resp?.data;
+
+        // authSoft pode responder 200 + { ok:false, msg: '...' }
+        if (
+          payload &&
+          typeof payload === 'object' &&
+          !Array.isArray(payload) &&
+          payload.ok === false
+        ) {
+          setError(payload.msg || 'Acesso não permitido.');
+          setPlayers([]);
+          return;
+        }
+
+        // aceita array puro ou { ok:true, data:[...] }
+        const list = Array.isArray(payload)
+          ? payload
+          : (Array.isArray(payload?.data) ? payload.data : []);
+
+        setPlayers(list);
       } catch (err) {
         console.error(err);
-        setError("Erro ao carregar jogadores.");
+        setError('Erro ao carregar jogadores.');
+        setPlayers([]);
       } finally {
         setIsLoading(false);
       }
@@ -51,11 +70,14 @@ export default function PlayerList() {
   const handleCommentSubmit = (e) => {
     e.preventDefault();
     if (newComment.trim()) {
-      setComments([...comments, { 
-        id: Date.now(), 
-        text: newComment,
-        date: new Date().toLocaleString('pt-BR')
-      }]);
+      setComments((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          text: newComment,
+          date: new Date().toLocaleString('pt-BR'),
+        },
+      ]);
       setNewComment('');
     }
   };
@@ -82,6 +104,7 @@ export default function PlayerList() {
           >
             Adicionar Jogador
           </Link>
+
           {isLoading ? (
             <p className="text-gray-300">Carregando...</p>
           ) : error ? (
@@ -128,7 +151,6 @@ export default function PlayerList() {
       {isModalOpen && selectedPlayer && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
           <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto transition-all duration-300">
-            {/* Header com botão fechar */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-lg font-bold text-white shadow-md">
@@ -144,18 +166,18 @@ export default function PlayerList() {
               </button>
             </div>
 
-            {/* Player Info */}
+            {/* Info */}
             <div className="w-full flex flex-col items-center gap-6 mb-6">
               <div className="w-full flex flex-col items-center">
                 <h3 className="text-xl font-semibold text-white">{selectedPlayer.nome_jogador}</h3>
                 <p className="text-gray-300">
-                  {selectedPlayer.idade ? `${selectedPlayer.idade} anos` : 'Idade não informada'} 
+                  {selectedPlayer.idade ? `${selectedPlayer.idade} anos` : 'Idade não informada'}
                   {selectedPlayer.nome_time && ` | ${selectedPlayer.nome_time}`}
                 </p>
                 <p className="text-green-400 font-medium">{selectedPlayer.posicao_jogador}</p>
               </div>
 
-              {/* Photo Area */}
+              {/* Foto */}
               <div className="w-32 h-32 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 border border-green-700/30">
                 <div className="text-center">
                   <div className="text-3xl mb-2">⚽</div>
@@ -163,7 +185,7 @@ export default function PlayerList() {
                 </div>
               </div>
 
-              {/* Physical Info */}
+              {/* Físico */}
               <div className="w-full">
                 <h4 className="text-lg font-medium text-white mb-3 text-center">Informações Físicas</h4>
                 <div className="grid grid-cols-2 gap-4 text-center">
@@ -182,7 +204,7 @@ export default function PlayerList() {
                 </div>
               </div>
 
-              {/* Statistics Area */}
+              {/* Estatísticas */}
               <div className="w-full">
                 <h4 className="text-lg font-medium text-white mb-3 text-center">Estatísticas</h4>
                 <div className="grid grid-cols-2 gap-3 text-sm">
@@ -205,7 +227,7 @@ export default function PlayerList() {
                 </div>
               </div>
 
-              {/* Disciplinary Records */}
+              {/* Disciplina */}
               <div className="w-full">
                 <h4 className="text-lg font-medium text-white mb-3 text-center">Disciplina</h4>
                 <div className="grid grid-cols-2 gap-3 text-sm">
@@ -220,7 +242,7 @@ export default function PlayerList() {
                 </div>
               </div>
 
-              {/* Comments Area */}
+              {/* Comentários (local, só visual) */}
               <div className="w-full">
                 <h4 className="text-lg font-medium text-white mb-3 text-center">Comentários</h4>
                 <form onSubmit={handleCommentSubmit} className="flex flex-col gap-3 mb-4">
@@ -239,7 +261,7 @@ export default function PlayerList() {
                     Adicionar Comentário
                   </button>
                 </form>
-                
+
                 <div className="max-h-40 overflow-y-auto space-y-2">
                   {comments.length > 0 ? (
                     comments.map((comment) => (
@@ -257,7 +279,7 @@ export default function PlayerList() {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-center">
               <button
                 onClick={closeModal}

@@ -1,30 +1,57 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
+import { AuthContext } from '../context/AuthContext';
 
 export default function CadastroPartidaLista() {
+  const { token } = useContext(AuthContext);
+
   const [partidas, setPartidas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = "http://localhost:5000/api/partida/listarP"; // Assumed endpoint; adjust if necessary
+  const API_URL = 'http://localhost:5000/api/partida/listarP';
 
   useEffect(() => {
     const fetchPartidas = async () => {
       try {
-        const response = await axios.get(API_URL);
-        setPartidas(response.data);
+        const resp = await axios.get(API_URL, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        });
+
+        const payload = resp?.data;
+
+        // authSoft pode retornar 200 + { ok:false, msg }
+        if (
+          payload &&
+          typeof payload === 'object' &&
+          !Array.isArray(payload) &&
+          payload.ok === false
+        ) {
+          setError(payload.msg || 'Acesso não permitido.');
+          setPartidas([]);
+          return;
+        }
+
+        // aceita array puro ou { ok:true, data:[...] }
+        setPartidas(
+          Array.isArray(payload)
+            ? payload
+            : Array.isArray(payload?.data)
+            ? payload.data
+            : []
+        );
       } catch (err) {
         console.error(err);
-        setError("Erro ao carregar partidas.");
+        setError('Erro ao carregar partidas.');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchPartidas();
-  }, []);
+  }, [token]);
 
   return (
     <div className="flex min-h-screen bg-black flex-col">
@@ -73,7 +100,9 @@ export default function CadastroPartidaLista() {
                       <td className="px-4 py-2">{partida.nome_campeonato}</td>
                       <td className="px-4 py-2">{partida.nome_time_casa}</td>
                       <td className="px-4 py-2">{partida.nome_time_visitante}</td>
-                      <td className="px-4 py-2">{`${partida.placar_casa} x ${partida.placar_visitante}`}</td>
+                      <td className="px-4 py-2">
+                        {`${partida.placar_casa} x ${partida.placar_visitante}`}
+                      </td>
                       <td className="px-4 py-2">{partida.data_partida}</td>
                       <td className="px-4 py-2">{partida.local_partida}</td>
                     </tr>

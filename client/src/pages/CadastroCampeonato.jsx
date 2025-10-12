@@ -24,6 +24,12 @@ export default function ChampionshipRegistrationPage() {
     e.preventDefault();
     if (isSubmitting) return;
 
+    // Precisa de token por causa do authSoft no back
+    if (!token) {
+      alert('Faça login para continuar.');
+      return;
+    }
+
     const { name, startDate, endDate, location } = formData;
 
     if (!name || !startDate || !endDate || !location) {
@@ -51,12 +57,32 @@ export default function ChampionshipRegistrationPage() {
         local_campeonato: location,
       };
 
-      await axios.post(API_URL, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const resp = await axios.post(API_URL, payload, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
+      const body = resp?.data;
+
+      // Resposta "suave" do back (authSoft bloqueou)
+      if (body && typeof body === 'object' && body.ok === false) {
+        alert(body.msg || 'Acesso não permitido.');
+        return; // não limpa o formulário
+      }
+
+      // Sucesso padrão (nosso controller retorna { ok:true, ... })
+      if (body && typeof body === 'object' && body.ok === true) {
+        alert('Campeonato cadastrado com sucesso!');
+        setFormData({
+          name: '',
+          description: '',
+          startDate: '',
+          endDate: '',
+          location: '',
+        });
+        return;
+      }
+
+      // Fallback (caso venha outro formato)
       alert('Campeonato cadastrado com sucesso!');
       setFormData({
         name: '',
@@ -67,8 +93,11 @@ export default function ChampionshipRegistrationPage() {
       });
     } catch (err) {
       console.error(err);
+      const data = err?.response?.data;
       const msg =
-        err?.response?.data?.error ||
+        data?.msg ||
+        data?.error ||
+        (Array.isArray(data) ? data.join('; ') : null) ||
         err?.response?.statusText ||
         err?.message ||
         'Erro ao cadastrar campeonato.';
