@@ -165,7 +165,7 @@ function CadastroPartida() {
     <div className='flex min-h-screen bg-black'>
       <SideBar_Olheiro />
       <div className='flex justify-center items-center min-h-screen w-full p-4 box-border'>
-        <div className='bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-md w-full'>
+        <div className='bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-2xl w-full'>
           <h2 className='text-2xl sm:text-3xl text-center font-bold text-white mb-2'>
             Cadastrar Partida
           </h2>
