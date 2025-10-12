@@ -31,6 +31,15 @@ function SideBar_Olheiro() {
     const active = allItems.find(item => item.path === currentPath);
     if (active) {
       setActiveItem(active.id);
+    } else if (currentPath === '/cadastrocampeonato') {
+      // Keep Campeonatos active when in the add championship form
+      setActiveItem('cadastrocampeonatolista');
+    } else if (currentPath === '/cadastrojogador') {
+      // Keep Jogadores active when in the add player form
+      setActiveItem('dashboard');
+    } else if (currentPath === '/cadastropartida') {
+      // Keep Partidas active when in the add match form
+      setActiveItem('cadastropartidalista');
     } else {
       setActiveItem('dashboard'); // Default to dashboard if no match
     }
