@@ -5,6 +5,7 @@ import SideBar_Olheiro from '../components/SideBar_Olheiro';
 
 export default function CadastroCampeonatoLista() {
   const [campeonatos, setCampeonatos] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -25,6 +26,13 @@ export default function CadastroCampeonatoLista() {
 
     fetchCampeonatos();
   }, []);
+
+  // Filter campeonatos by nome_campeonato (case-insensitive)
+  const filteredCampeonatos = campeonatos.filter((camp) => {
+    const nome = (camp.nome_campeonato || '').toString().toLowerCase();
+    const query = searchQuery.trim().toLowerCase();
+    return nome.includes(query);
+  });
 
   return (
     <div className="flex min-h-screen bg-black flex-col">
@@ -48,12 +56,27 @@ export default function CadastroCampeonatoLista() {
           >
             Adicionar Campeonato
           </Link>
+          <div className="w-full mb-4">
+            <label htmlFor="search" className="sr-only">
+              Pesquisar campeonatos
+            </label>
+            <input
+              id="search"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Pesquisar por nome do campeonato..."
+              className="w-full bg-gray-800 text-gray-200 placeholder-gray-400 border border-green-700 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
           {isLoading ? (
             <p className="text-gray-300">Carregando...</p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : campeonatos.length === 0 ? (
             <p className="text-gray-300">Nenhum campeonato cadastrado.</p>
+          ) : filteredCampeonatos.length === 0 ? (
+            <p className="text-gray-300">Nenhum campeonato encontrado para a pesquisa.</p>
           ) : (
             <div className="w-full overflow-x-auto">
               <table className="w-full text-left text-gray-300">
@@ -66,7 +89,7 @@ export default function CadastroCampeonatoLista() {
                   </tr>
                 </thead>
                 <tbody>
-                  {campeonatos.map((camp, index) => (
+                  {filteredCampeonatos.map((camp, index) => (
                     <tr key={index} className="border-b border-green-700/50">
                       <td className="px-4 py-2">{camp.nome_campeonato}</td>
                       <td className="px-4 py-2">{camp.data_inicio}</td>
