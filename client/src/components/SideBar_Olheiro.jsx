@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { MdGroup } from "react-icons/md";
 import { FaUsers } from "react-icons/fa";
 import { RiGroupFill } from "react-icons/ri";
 import { BsDoorOpenFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
+import { AuthContext } from '../context/AuthContext';
 
 function SideBar_Olheiro() {
   const location = useLocation();
@@ -21,6 +22,8 @@ function SideBar_Olheiro() {
     { id: 'playerprofile', label: 'Perfil', icon: <CgProfile />, path: '/playerprofile' },
     { id: 'logout', label: 'Logout', icon: <BsDoorOpenFill />, path: '/login' },
   ];
+
+  const { logout } = useContext(AuthContext);
 
   useEffect(() => {
     const currentPath = location.pathname;
@@ -62,15 +65,27 @@ function SideBar_Olheiro() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-4">
           {bottomItems.map(item => (
-            <Link
-              key={item.id}
-              to={item.path}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer transition-all duration-200 ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
-              onClick={() => setActiveItem(item.id)}
-            >
-              <span className="text-lg">{item.icon}</span>
-              {!isCollapsed && <span className="text-sm">{item.label}</span>}
-            </Link>
+            item.id === 'logout' ? (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => { setActiveItem(item.id); logout(); }}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer transition-all duration-200 ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
+              >
+                <span className="text-lg">{item.icon}</span>
+                {!isCollapsed && <span className="text-sm">{item.label}</span>}
+              </button>
+            ) : (
+              <Link
+                key={item.id}
+                to={item.path}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer transition-all duration-200 ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
+                onClick={() => setActiveItem(item.id)}
+              >
+                <span className="text-lg">{item.icon}</span>
+                {!isCollapsed && <span className="text-sm">{item.label}</span>}
+              </Link>
+            )
           ))}
         </div>
         <button
