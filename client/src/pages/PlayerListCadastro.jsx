@@ -7,6 +7,41 @@ import SideBar_Olheiro from '../components/SideBar_Olheiro';
 function PlayerListCadastro() {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Categorias gerais de posições
+  const categoriasGerais = [
+    { value: 'GOL', label: 'GOL - Goleiro' },
+    { value: 'DEF', label: 'DEF - Defesa' },
+    { value: 'MEI', label: 'MEI - Meio-campo' },
+    { value: 'ATA', label: 'ATA - Ataque' },
+  ];
+
+  // Posições específicas por categoria
+  const posicoesPorCategoria = {
+    GOL: [
+      { value: 'GOL', label: 'GOL - Goleiro' },
+    ],
+    DEF: [
+      { value: 'ZAG', label: 'ZAG - Zagueiro' },
+      { value: 'LD', label: 'LD - Lateral Direito' },
+      { value: 'LE', label: 'LE - Lateral Esquerdo' },
+    ],
+    MEI: [
+      { value: 'VOL', label: 'VOL - Volante' },
+      { value: 'MC', label: 'MC - Meio-campo Central' },
+      { value: 'MD', label: 'MD - Meio-campo Direito' },
+      { value: 'ME', label: 'ME - Meio-campo Esquerdo' },
+      { value: 'MEI', label: 'MEI - Meia' },
+    ],
+    ATA: [
+      { value: 'ATA', label: 'ATA - Atacante' },
+      { value: 'PD', label: 'PD - Ponta Direita' },
+      { value: 'PE', label: 'PE - Ponta Esquerda' },
+    ]
+  };
+
+  // Estado para categoria selecionada
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState('');
   const [formData, setFormData] = useState({
     nome_jogador: '',
     posicao_jogador: '',
@@ -107,19 +142,50 @@ function PlayerListCadastro() {
               />
             </div>
 
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Posição</label>
-              <input
-                type='text'
-                name='posicao_jogador'
-                value={formData.posicao_jogador}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
-            </div>
+                {/* Categoria da Posição */}
+                <div>
+                  <label className="text-gray-300">
+                    Categoria da Posição
+                  </label>
+                  <select
+                    value={categoriaSelecionada}
+                    onChange={(e) => {
+                      setCategoriaSelecionada(e.target.value);
+                      setFormData({...formData, posicao_jogador: ''}); // Limpa posição específica
+                    }}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                    required
+                  >
+                    <option value="">Selecione a categoria</option>
+                    {categoriasGerais.map(categoria => (
+                      <option key={categoria.value} value={categoria.value}>
+                        {categoria.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            <div className='flex flex-col gap-1'>
+                {/* Posição Específica */}
+                {categoriaSelecionada && (
+                  <div>
+                    <label className="text-gray-300">
+                      Posição Específica
+                    </label>
+                    <select
+                      value={formData.posicao_jogador}
+                      onChange={(e) => setFormData({...formData, posicao_jogador: e.target.value})}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                      required
+                    >
+                      <option value="">Selecione a posição</option>
+                      {posicoesPorCategoria[categoriaSelecionada]?.map(posicao => (
+                        <option key={posicao.value} value={posicao.value}>
+                          {posicao.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}            <div className='flex flex-col gap-1'>
               <label className='text-gray-300'>Nome do Time</label>
               <input
                 type='text'
