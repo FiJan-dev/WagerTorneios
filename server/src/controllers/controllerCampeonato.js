@@ -49,3 +49,22 @@ exports.criarCampeonatos = async (req, res) => {
     return res.status(200).json({ ok: false, msg: 'Não foi possível criar agora.' });
   }
 };
+
+// DELETE /api/campeonato/deletar/:id
+exports.deletarCampeonato = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const campeonato = await Campeonato.findByPk(id);
+    if (!campeonato) {
+      return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Campeonato não encontrado.' });
+    }
+
+    await campeonato.destroy();
+    return res.status(200).json({ ok: true, msg: 'Campeonato deletado com sucesso.' });
+  } catch (err) {
+    console.error('Erro ao deletar campeonato:', err);
+    const code = err.name || 'UNKNOWN_ERROR';
+    const msg = err.message || 'erro';
+    return res.status(200).json({ ok: false, reason: code, msg: `Erro ao deletar campeonato (${code}): ${msg}` });
+  }
+};

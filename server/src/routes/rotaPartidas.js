@@ -12,4 +12,7 @@ router.get('/listarP', autenticarToken, controllerPartida.listarPartidas);
 // Cadastrar: somente admin
 router.post('/registrarP', autenticarToken, autenticaAdmin, controllerPartida.registrarPartida);
 
+// Deletar: somente admin
+router.delete('/deletar/:id', autenticarToken, autenticaAdmin, controllerPartida.deletarPartida);
+
 module.exports = router;

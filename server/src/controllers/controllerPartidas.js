@@ -128,3 +128,22 @@ exports.listarPartidas = async (_req, res) => {
     return res.status(200).json([]);
   }
 };
+
+// DELETE /api/partida/deletar/:id
+exports.deletarPartida = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const partida = await Partida.findByPk(id);
+    if (!partida) {
+      return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Partida não encontrada.' });
+    }
+
+    await partida.destroy();
+    return res.status(200).json({ ok: true, msg: 'Partida deletada com sucesso.' });
+  } catch (err) {
+    console.error('Erro ao deletar partida:', err);
+    const code = err.name || 'UNKNOWN_ERROR';
+    const msg = err.message || 'erro';
+    return res.status(200).json({ ok: false, reason: code, msg: `Erro ao deletar partida (${code}): ${msg}` });
+  }
+};

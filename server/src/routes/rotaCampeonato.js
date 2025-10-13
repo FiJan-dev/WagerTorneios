@@ -12,4 +12,7 @@ router.get('/listarC', autenticarToken, controllerCampeonato.listarCampeonatos);
 // Criar: somente admin
 router.post('/criarC', autenticarToken, autenticaAdmin, controllerCampeonato.criarCampeonatos);
 
+// Deletar: somente admin
+router.delete('/deletar/:id', autenticarToken, autenticaAdmin, controllerCampeonato.deletarCampeonato);
+
 module.exports = router;
