@@ -14,6 +14,7 @@ function CadastroPartida() {
     time_casa: '',
     time_visitante: '',
     data_partida: '',
+    hora_partida: '',
     local_partida: '',
     placar_casa: 0,
     placar_visitante: 0,
@@ -41,6 +42,7 @@ function CadastroPartida() {
       !formData.time_casa ||
       !formData.time_visitante ||
       !formData.data_partida ||
+      !formData.hora_partida ||
       !formData.local_partida
     ) {
       setError('Preencha todos os campos obrigatórios.');
@@ -51,13 +53,13 @@ function CadastroPartida() {
       return;
     }
 
-    // Validação de data da partida
-    const dataPartida = new Date(formData.data_partida);
+    // Validação de data da partida (combinar data e hora)
+    const dataHoraPartida = new Date(`${formData.data_partida}T${formData.hora_partida}`);
     const agora = new Date();
     const umAnoNoFuturo = new Date();
     umAnoNoFuturo.setFullYear(agora.getFullYear() + 2); // Máximo 2 anos no futuro
     
-    if (dataPartida > umAnoNoFuturo) {
+    if (dataHoraPartida > umAnoNoFuturo) {
       setError('A data da partida não pode ser superior a 2 anos no futuro.');
       return;
     }
@@ -67,7 +69,7 @@ function CadastroPartida() {
     setLoading(true);
     // Validação específica quando há campeonato selecionado
     if (selectedCampeonato) {
-      const dataPartida = new Date(formData.data_partida);
+      const dataPartida = new Date(`${formData.data_partida}T${formData.hora_partida}`);
       const dataInicio = new Date(selectedCampeonato.data_inicio + 'T00:00:00');
       const dataFim = new Date(selectedCampeonato.data_fim + 'T23:59:59');
       
@@ -80,7 +82,17 @@ function CadastroPartida() {
     }
 
     try {
-      const payload = { ...formData };
+      // Combinar data e hora para enviar ao backend
+      const dataHoraCompleta = `${formData.data_partida}T${formData.hora_partida}`;
+      
+      const payload = { 
+        ...formData, 
+        data_partida: dataHoraCompleta 
+      };
+      
+      // Remover o campo hora_partida do payload (não existe no backend)
+      delete payload.hora_partida;
+      
       if (selectedCampeonato) {
         payload.id_campeonato = selectedCampeonato.id_campeonato;
       }
@@ -323,16 +335,30 @@ function CadastroPartida() {
               />
             </div>
 
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Data da Partida</label>
-              <input
-                type='datetime-local'
-                name='data_partida'
-                value={formData.data_partida}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className='flex flex-col gap-1'>
+                <label className='text-gray-300'>Data da Partida</label>
+                <input
+                  type='date'
+                  name='data_partida'
+                  value={formData.data_partida}
+                  onChange={handleChange}
+                  required
+                  className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
+                />
+              </div>
+              
+              <div className='flex flex-col gap-1'>
+                <label className='text-gray-300'>Hora da Partida</label>
+                <input
+                  type='time'
+                  name='hora_partida'
+                  value={formData.hora_partida}
+                  onChange={handleChange}
+                  required
+                  className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
+                />
+              </div>
             </div>
 
             <div className='flex flex-col gap-1'>
