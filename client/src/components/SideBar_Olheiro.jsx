@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { MdGroup } from "react-icons/md";
 import { FaUsers } from "react-icons/fa";
@@ -10,40 +10,38 @@ import { AuthContext } from '../context/AuthContext';
 function SideBar_Olheiro() {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [activeItem, setActiveItem] = useState('dashboard');
 
-  const mainItems = [
+  const mainItems = useMemo(() => [
     { id: 'dashboard', label: 'Jogadores', icon: <FaUsers />, path: '/dashboard' },
     { id: 'cadastrocampeonatolista', label: 'Campeonatos', icon: <MdGroup />, path: '/cadastrocampeonatolista' },
     { id: 'cadastropartidalista', label: 'Partidas', icon: <RiGroupFill />, path: '/cadastropartidalista' },
-  ];
+  ], []);
 
-  const bottomItems = [
+  const bottomItems = useMemo(() => [
     { id: 'olheiropropfile', label: 'Perfil', icon: <CgProfile />, path: '/olheiropropfile' },
     { id: 'logout', label: 'Logout', icon: <BsDoorOpenFill />, path: '/login' },
-  ];
+  ], []);
 
   const { logout } = useContext(AuthContext);
 
-  useEffect(() => {
+  // Determine active item directly from current path without state
+  const getActiveItem = () => {
     const currentPath = location.pathname;
+    
+    // Check for exact matches first
     const allItems = [...mainItems, ...bottomItems];
     const active = allItems.find(item => item.path === currentPath);
-    if (active) {
-      setActiveItem(active.id);
-    } else if (currentPath === '/cadastrocampeonato') {
-      // Keep Campeonatos active when in the add championship form
-      setActiveItem('cadastrocampeonatolista');
-    } else if (currentPath === '/cadastrojogador') {
-      // Keep Jogadores active when in the add player form
-      setActiveItem('dashboard');
-    } else if (currentPath === '/cadastropartida') {
-      // Keep Partidas active when in the add match form
-      setActiveItem('cadastropartidalista');
-    } else {
-      setActiveItem('dashboard'); // Default to dashboard if no match
-    }
-  }, [location]);
+    if (active) return active.id;
+    
+    // Handle sub-routes
+    if (currentPath === '/cadastrocampeonato') return 'cadastrocampeonatolista';
+    if (currentPath === '/cadastrojogador') return 'dashboard';
+    if (currentPath === '/cadastropartida') return 'cadastropartidalista';
+    
+    return '';
+  };
+
+  const activeItem = getActiveItem();
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -62,8 +60,7 @@ function SideBar_Olheiro() {
             <Link
               key={item.id}
               to={item.path}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer transition-all duration-200 ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
-              onClick={() => setActiveItem(item.id)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
             >
               <span className="text-lg">{item.icon}</span>
               {!isCollapsed && <span className="text-sm">{item.label}</span>}
@@ -78,8 +75,8 @@ function SideBar_Olheiro() {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => { setActiveItem(item.id); logout(); }}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer transition-all duration-200 ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
+                onClick={() => logout()}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
               >
                 <span className="text-lg">{item.icon}</span>
                 {!isCollapsed && <span className="text-sm">{item.label}</span>}
@@ -88,8 +85,7 @@ function SideBar_Olheiro() {
               <Link
                 key={item.id}
                 to={item.path}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer transition-all duration-200 ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
-                onClick={() => setActiveItem(item.id)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
               >
                 <span className="text-lg">{item.icon}</span>
                 {!isCollapsed && <span className="text-sm">{item.label}</span>}
