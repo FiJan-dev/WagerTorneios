@@ -1,0 +1,331 @@
+/* Estilos customizados para RegisterPage */
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotateGlow {
+  0% {
+    transform: rotate(0deg);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    transform: rotate(180deg);
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.6);
+  }
+  100% {
+    transform: rotate(360deg);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+}
+
+@keyframes inputFocus {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+/* Classes de animação */
+.animate-slide-in-left {
+  animation: slideInFromLeft 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInFromRight 0.6s ease-out forwards;
+}
+
+.animate-slide-in-top {
+  animation: slideInFromTop 0.6s ease-out forwards;
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom 0.6s ease-out forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.8s ease-out forwards;
+}
+
+.animate-rotate-glow {
+  animation: rotateGlow 4s ease-in-out infinite;
+}
+
+.animate-input-focus {
+  animation: inputFocus 0.6s ease-out;
+}
+
+/* Delays para animações escalonadas */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+.delay-700 { animation-delay: 0.7s; }
+.delay-800 { animation-delay: 0.8s; }
+
+/* Glassmorphism card para registro */
+.glass-register-card {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(34, 197, 94, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Input com efeito glass para registro */
+.glass-register-input {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 16px;
+}
+
+.glass-register-input:focus {
+  background: rgba(0, 0, 0, 0.8);
+  border-color: rgba(34, 197, 94, 0.8);
+  box-shadow: 
+    0 0 0 3px rgba(34, 197, 94, 0.1),
+    0 4px 12px rgba(34, 197, 94, 0.2);
+  transform: translateY(-1px);
+}
+
+.glass-register-input::placeholder {
+  color: rgba(156, 163, 175, 0.7);
+  transition: color 0.3s ease;
+}
+
+.glass-register-input:focus::placeholder {
+  color: rgba(156, 163, 175, 0.5);
+}
+
+/* Botão premium para registro */
+.btn-register-primary {
+  position: relative;
+  background: linear-gradient(135deg, #10b981, #059669, #047857);
+  background-size: 300% 300%;
+  border: 0;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-register-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.6s;
+}
+
+.btn-register-primary:hover::before {
+  left: 100%;
+}
+
+.btn-register-primary:hover {
+  background-position: 100% 0;
+  transform: translateY(-3px);
+  box-shadow: 
+    0 12px 30px rgba(34, 197, 94, 0.4),
+    0 0 0 1px rgba(34, 197, 94, 0.3);
+}
+
+.btn-register-primary:active {
+  transform: translateY(-1px);
+}
+
+/* Progress indicator */
+.progress-step {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.3);
+  transition: all 0.3s ease;
+}
+
+.progress-step.active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+}
+
+.progress-line {
+  height: 2px;
+  background: rgba(34, 197, 94, 0.3);
+  transition: all 0.3s ease;
+}
+
+.progress-line.active {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+/* Link hover effect para registro */
+.register-link-hover {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.register-link-hover::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 50%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.register-link-hover:hover::after {
+  width: 100%;
+}
+
+/* Floating elements específicos para registro */
+.register-floating {
+  animation: registerFloat 8s ease-in-out infinite;
+}
+
+.register-floating:nth-child(2) {
+  animation-delay: -2.5s;
+}
+
+.register-floating:nth-child(3) {
+  animation-delay: -5s;
+}
+
+@keyframes registerFloat {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-15px) translateX(5px) rotate(1deg);
+  }
+  50% {
+    transform: translateY(0px) translateX(-5px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(10px) translateX(10px) rotate(-1deg);
+  }
+}
+
+/* Success message */
+.success-message {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Error message */
+.error-message {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .glass-register-card {
+    margin: 2rem 1rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 2.5rem 2rem;
+  }
+  
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-slide-in-top,
+  .animate-slide-in-bottom {
+    animation-duration: 0.4s;
+  }
+
+  .register-floating {
+    animation-duration: 6s;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-register-input {
+    font-size: 16px; /* Previne zoom no iOS */
+    padding: 1rem 1rem 1rem 3rem;
+  }
+
+  .glass-register-card {
+    margin: 1.5rem 1rem;
+    padding: 2rem 1.5rem;
+  }
+
+  .btn-register-primary {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+  }
+}
