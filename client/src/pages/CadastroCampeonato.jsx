@@ -49,6 +49,30 @@ export default function ChampionshipRegistrationPage() {
       return;
     }
 
+    // Aviso amigável para datas no passado (mas não bloqueia)
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0); // Reset para início do dia para comparação justa
+    
+    if (dtInicio < hoje) {
+      const confirmar = confirm(
+        'A data de início está no passado. Tem certeza que deseja criar este campeonato? ' +
+        'Isso pode ser útil para registros históricos.'
+      );
+      if (!confirmar) {
+        return;
+      }
+    }
+    
+    if (dtFim < hoje) {
+      const confirmar = confirm(
+        'A data de fim está no passado. Tem certeza que deseja criar este campeonato? ' +
+        'Este campeonato aparecerá como "Encerrado".'
+      );
+      if (!confirmar) {
+        return;
+      }
+    }
+
     try {
       setIsSubmitting(true);
 
@@ -156,6 +180,9 @@ export default function ChampionshipRegistrationPage() {
                 required
                 className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full'
               />
+              <p className='text-gray-400 text-xs'>
+                💡 Dica: Você pode cadastrar campeonatos com datas passadas para registros históricos
+              </p>
             </div>
             
             <div className='flex flex-col gap-1'>

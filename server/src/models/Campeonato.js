@@ -19,8 +19,7 @@ const Campeonato = sequelize.define('Campeonato', {
         type: DataTypes.DATEONLY,
         allowNull: false,
         validate: {
-            isDate: true,
-            isAfter: new Date().toISOString().split('T')[0]
+            isDate: true
         }
     },
     data_fim: {
@@ -30,7 +29,7 @@ const Campeonato = sequelize.define('Campeonato', {
             isDate: true,
             isAfter(value) {
                 if (new Date(value) <= new Date(this.data_inicio)) {
-                    throw new Error('data_fim must be after data_inicio');
+                    throw new Error('A data de fim deve ser posterior à data de início.');
                 }
             },
         },
