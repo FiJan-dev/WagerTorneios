@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
 
 export default function PlayerList() {
-  const { token } = useContext(AuthContext);
+  const { token, isAdmin } = useContext(AuthContext);
   const [players, setPlayers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -98,12 +98,14 @@ export default function PlayerList() {
           <p className="text-center text-gray-300 text-base mb-6">
             Visualize e gerencie os jogadores cadastrados
           </p>
-          <Link
-            to="/cadastrojogador"
-            className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200 mb-8"
-          >
-            Adicionar Jogador
-          </Link>
+          {isAdmin() && (
+            <Link
+              to="/cadastrojogador"
+              className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200 mb-8"
+            >
+              Adicionar Jogador
+            </Link>
+          )}
 
           {isLoading ? (
             <p className="text-gray-300">Carregando...</p>

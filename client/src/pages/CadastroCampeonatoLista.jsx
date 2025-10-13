@@ -5,7 +5,7 @@ import SideBar_Olheiro from '../components/SideBar_Olheiro';
 import { AuthContext } from '../context/AuthContext';
 
 export default function CadastroCampeonatoLista() {
-  const { token } = useContext(AuthContext);
+  const { token, isAdmin } = useContext(AuthContext);
 
   const [campeonatos, setCampeonatos] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -86,12 +86,14 @@ export default function CadastroCampeonatoLista() {
             Visualize e gerencie os campeonatos cadastrados
           </p>
 
-          <Link
-            to="/cadastrocampeonato"
-            className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200 mb-8"
-          >
-            Adicionar Campeonato
-          </Link>
+          {isAdmin() && (
+            <Link
+              to="/cadastrocampeonato"
+              className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200 mb-8"
+            >
+              Adicionar Campeonato
+            </Link>
+          )}
 
           <div className="w-full mb-4">
             <label htmlFor="search" className="sr-only">

@@ -3,12 +3,13 @@ const express = require('express');
 const router = express.Router();
 
 const controllerCampeonato = require('../controllers/controllerCampeonato.js');
-const { autenticarTokenSoft, autenticaAdminSoft } = require('../middleware/authSoft.js');
+const autenticarToken = require('../middleware/authmiddlaware');
+const autenticaAdmin = require('../middleware/authAdmin');
 
-// Listar: exige login (suave)
-router.get('/listarC', autenticarTokenSoft, controllerCampeonato.listarCampeonatos);
+// Listar: exige login
+router.get('/listarC', autenticarToken, controllerCampeonato.listarCampeonatos);
 
-// Criar: somente admin (suave)
-router.post('/criarC', autenticarTokenSoft, autenticaAdminSoft, controllerCampeonato.criarCampeonatos);
+// Criar: somente admin
+router.post('/criarC', autenticarToken, autenticaAdmin, controllerCampeonato.criarCampeonatos);
 
 module.exports = router;

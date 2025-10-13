@@ -10,6 +10,12 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const API_BASE = 'http://localhost:5000/api/olheiro'; // Same as LoginPage.jsx
 
+  // Função helper para verificar se o usuário é admin
+  const isAdmin = () => {
+    if (!user) return false;
+    return user.admin === 1 || (user.role && user.role.toLowerCase() === 'admin');
+  };
+
   // Sync user state with localStorage
   useEffect(() => {
     if (token && user) {
@@ -47,7 +53,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );

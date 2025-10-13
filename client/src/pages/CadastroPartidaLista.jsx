@@ -5,7 +5,7 @@ import SideBar_Olheiro from '../components/SideBar_Olheiro';
 import { AuthContext } from '../context/AuthContext';
 
 export default function CadastroPartidaLista() {
-  const { token } = useContext(AuthContext);
+  const { token, isAdmin } = useContext(AuthContext);
 
   const [partidas, setPartidas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,12 +69,14 @@ export default function CadastroPartidaLista() {
           <p className="text-center text-gray-300 text-base mb-6">
             Visualize e gerencie as partidas cadastradas
           </p>
-          <Link
-            to="/cadastropartida"
-            className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200 mb-8"
-          >
-            Adicionar Partida
-          </Link>
+          {isAdmin() && (
+            <Link
+              to="/cadastropartida"
+              className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200 mb-8"
+            >
+              Adicionar Partida
+            </Link>
+          )}
           {isLoading ? (
             <p className="text-gray-300">Carregando...</p>
           ) : error ? (
