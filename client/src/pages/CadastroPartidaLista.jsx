@@ -4,6 +4,34 @@ import axios from 'axios';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
 import { AuthContext } from '../context/AuthContext';
 
+// Função auxiliar para formatar datas
+const formatarDataHora = (dataString, formato = 'completo') => {
+  if (!dataString) return 'Data não informada';
+  
+  const data = new Date(dataString);
+  if (isNaN(data.getTime())) return 'Data inválida';
+  
+  const opcoes = {
+    simples: {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    },
+    completo: {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }
+  };
+  
+  return data.toLocaleString('pt-BR', opcoes[formato] || opcoes.simples);
+};
+
 export default function CadastroPartidaLista() {
   const { token, isAdmin, user } = useContext(AuthContext);
 
@@ -179,7 +207,7 @@ export default function CadastroPartidaLista() {
                       <td className="px-4 py-2">
                         {`${partida.placar_casa} x ${partida.placar_visitante}`}
                       </td>
-                      <td className="px-4 py-2">{partida.data_partida}</td>
+                      <td className="px-4 py-2">{formatarDataHora(partida.data_partida, 'simples')}</td>
                       <td className="px-4 py-2">{partida.local_partida}</td>
                       <td className="px-4 py-2">
                         <div className="flex gap-2 items-center">
@@ -263,7 +291,7 @@ export default function CadastroPartidaLista() {
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
                     <p className="text-gray-400 text-sm mb-1">Data e Horário</p>
                     <p className="text-white font-semibold">
-                      {new Date(selectedPartida.data_partida).toLocaleString('pt-BR')}
+                      {formatarDataHora(selectedPartida.data_partida, 'completo')}
                     </p>
                   </div>
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
@@ -308,7 +336,7 @@ export default function CadastroPartidaLista() {
                 {partidaToDelete.nome_time_casa} × {partidaToDelete.nome_time_visitante}
               </p>
               <p className="text-gray-400 text-sm">
-                {partidaToDelete.nome_campeonato} • {new Date(partidaToDelete.data_partida).toLocaleDateString('pt-BR')}
+                {partidaToDelete.nome_campeonato} • {formatarDataHora(partidaToDelete.data_partida, 'simples')}
               </p>
             </div>
 

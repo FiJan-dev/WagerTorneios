@@ -33,7 +33,6 @@ const Partida = sequelize.define('Partida', {
         allowNull: false,
         validate: {
             isDate: true,
-            isAfter: new Date().toISOString(),
         },
     },
     local_partida: {

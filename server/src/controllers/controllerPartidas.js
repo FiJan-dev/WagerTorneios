@@ -113,7 +113,7 @@ exports.listarPartidas = async (_req, res) => {
 
     const formattedPartidas = partidas.map(p => ({
       id_partida: p.id_partida,
-      data_partida: p.data_partida,
+      data_partida: p.data_partida ? p.data_partida.toISOString() : null,
       local_partida: p.local_partida,
       placar_casa: p.placar_casa,
       placar_visitante: p.placar_visitante,
