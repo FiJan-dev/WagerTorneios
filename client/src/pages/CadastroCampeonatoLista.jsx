@@ -4,6 +4,79 @@ import axios from 'axios';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
 import { AuthContext } from '../context/AuthContext';
 
+// Função auxiliar para formatar datas
+const formatarData = (dataString, formato = 'padrao') => {
+  if (!dataString) return 'Data não informada';
+  
+  const data = new Date(dataString);
+  if (isNaN(data.getTime())) return 'Data inválida';
+  
+  const opcoes = {
+    padrao: {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    },
+    completo: {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    },
+    extenso: {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }
+  };
+  
+  return data.toLocaleDateString('pt-BR', opcoes[formato] || opcoes.padrao);
+};
+
+// Função para calcular duração do campeonato
+const calcularDuracao = (dataInicio, dataFim) => {
+  if (!dataInicio || !dataFim) return 'Duração não calculável';
+  
+  const inicio = new Date(dataInicio);
+  const fim = new Date(dataFim);
+  
+  if (isNaN(inicio.getTime()) || isNaN(fim.getTime())) return 'Datas inválidas';
+  
+  const diffTime = Math.abs(fim - inicio);
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 1) return '1 dia';
+  if (diffDays < 7) return `${diffDays} dias`;
+  if (diffDays < 30) {
+    const semanas = Math.floor(diffDays / 7);
+    const diasRestantes = diffDays % 7;
+    if (diasRestantes === 0) return semanas === 1 ? '1 semana' : `${semanas} semanas`;
+    return `${semanas} semana${semanas > 1 ? 's' : ''} e ${diasRestantes} dia${diasRestantes > 1 ? 's' : ''}`;
+  }
+  
+  const meses = Math.floor(diffDays / 30);
+  const diasRestantes = diffDays % 30;
+  if (diasRestantes === 0) return meses === 1 ? '1 mês' : `${meses} meses`;
+  return `${meses} mês${meses > 1 ? 'es' : ''} e ${diasRestantes} dia${diasRestantes > 1 ? 's' : ''}`;
+};
+
+// Função para verificar status do campeonato
+const verificarStatus = (dataInicio, dataFim) => {
+  if (!dataInicio || !dataFim) return { status: 'indefinido', cor: 'gray', texto: 'Status indefinido' };
+  
+  const hoje = new Date();
+  const inicio = new Date(dataInicio);
+  const fim = new Date(dataFim);
+  
+  if (hoje < inicio) {
+    return { status: 'futuro', cor: 'blue', texto: 'Ainda não iniciou' };
+  } else if (hoje > fim) {
+    return { status: 'encerrado', cor: 'red', texto: 'Encerrado' };
+  } else {
+    return { status: 'ativo', cor: 'green', texto: 'Em andamento' };
+  }
+};
+
 export default function CadastroCampeonatoLista() {
   const { token, isAdmin } = useContext(AuthContext);
 
@@ -199,6 +272,7 @@ export default function CadastroCampeonatoLista() {
                 <thead>
                   <tr className="border-b border-green-700">
                     <th className="px-4 py-2">Nome</th>
+                    <th className="px-4 py-2">Status</th>
                     <th className="px-4 py-2">Data Início</th>
                     <th className="px-4 py-2">Data Fim</th>
                     <th className="px-4 py-2">Local</th>
@@ -206,11 +280,22 @@ export default function CadastroCampeonatoLista() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredCampeonatos.map((camp, index) => (
+                  {filteredCampeonatos.map((camp, index) => {
+                    const status = verificarStatus(camp.data_inicio, camp.data_fim);
+                    return (
                     <tr key={index} className="border-b border-green-700/50">
                       <td className="px-4 py-2">{camp.nome_campeonato}</td>
-                      <td className="px-4 py-2">{camp.data_inicio}</td>
-                      <td className="px-4 py-2">{camp.data_fim}</td>
+                      <td className="px-4 py-2">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          status.status === 'ativo' ? 'bg-green-900/30 text-green-400 border border-green-700' :
+                          status.status === 'futuro' ? 'bg-blue-900/30 text-blue-400 border border-blue-700' :
+                          'bg-red-900/30 text-red-400 border border-red-700'
+                        }`}>
+                          {status.texto}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2">{formatarData(camp.data_inicio)}</td>
+                      <td className="px-4 py-2">{formatarData(camp.data_fim)}</td>
                       <td className="px-4 py-2">{camp.local_campeonato}</td>
                       <td className="px-4 py-2">
                         <div className="flex gap-2 items-center">
@@ -232,7 +317,8 @@ export default function CadastroCampeonatoLista() {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -263,6 +349,20 @@ export default function CadastroCampeonatoLista() {
               <div className="w-full flex flex-col items-center">
                 <h3 className="text-xl font-semibold text-white text-center">{selectedCampeonato.nome_campeonato}</h3>
                 <p className="text-green-400 font-medium text-center">{selectedCampeonato.local_campeonato}</p>
+                <div className="mt-2">
+                  {(() => {
+                    const status = verificarStatus(selectedCampeonato.data_inicio, selectedCampeonato.data_fim);
+                    return (
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                        status.status === 'ativo' ? 'bg-green-900/30 text-green-400 border border-green-700' :
+                        status.status === 'futuro' ? 'bg-blue-900/30 text-blue-400 border border-blue-700' :
+                        'bg-red-900/30 text-red-400 border border-red-700'
+                      }`}>
+                        {status.texto}
+                      </span>
+                    );
+                  })()}
+                </div>
               </div>
 
               <div className="w-full">
@@ -271,13 +371,19 @@ export default function CadastroCampeonatoLista() {
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
                     <p className="text-gray-400 text-sm mb-1">Data de Início</p>
                     <p className="text-white font-semibold text-lg">
-                      {new Date(selectedCampeonato.data_inicio).toLocaleDateString('pt-BR')}
+                      {formatarData(selectedCampeonato.data_inicio, 'extenso')}
                     </p>
                   </div>
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
                     <p className="text-gray-400 text-sm mb-1">Data de Término</p>
                     <p className="text-white font-semibold text-lg">
-                      {new Date(selectedCampeonato.data_fim).toLocaleDateString('pt-BR')}
+                      {formatarData(selectedCampeonato.data_fim, 'extenso')}
+                    </p>
+                  </div>
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
+                    <p className="text-gray-400 text-sm mb-1">Duração</p>
+                    <p className="text-white font-semibold">
+                      {calcularDuracao(selectedCampeonato.data_inicio, selectedCampeonato.data_fim)}
                     </p>
                   </div>
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
@@ -322,7 +428,7 @@ export default function CadastroCampeonatoLista() {
                 {campeonatoToDelete.nome_campeonato}
               </p>
               <p className="text-gray-400 text-sm">
-                {campeonatoToDelete.local_campeonato} • {new Date(campeonatoToDelete.data_inicio).toLocaleDateString('pt-BR')} a {new Date(campeonatoToDelete.data_fim).toLocaleDateString('pt-BR')}
+                {campeonatoToDelete.local_campeonato} • {formatarData(campeonatoToDelete.data_inicio)} a {formatarData(campeonatoToDelete.data_fim)}
               </p>
               <div className="mt-3 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
                 <p className="text-yellow-400 text-sm">

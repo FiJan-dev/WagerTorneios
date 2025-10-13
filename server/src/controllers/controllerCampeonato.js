@@ -3,9 +3,20 @@ const Campeonato = require('../models/Campeonato');
 
 exports.listarCampeonatos = async (req, res) => {
   try {
-    const campeonatos = await Campeonato.findAll();
-    // >>> Front espera ARRAY puro
-    return res.status(200).json(campeonatos);
+    const campeonatos = await Campeonato.findAll({
+      order: [['data_inicio', 'ASC']]
+    });
+    
+    // Formatação consistente das datas
+    const campeonatosFormatados = campeonatos.map(c => ({
+      id_campeonato: c.id_campeonato,
+      nome_campeonato: c.nome_campeonato,
+      data_inicio: c.data_inicio, // Mantém formato YYYY-MM-DD para compatibilidade
+      data_fim: c.data_fim,       // O frontend fará a formatação de exibição
+      local_campeonato: c.local_campeonato
+    }));
+    
+    return res.status(200).json(campeonatosFormatados);
   } catch (err) {
     console.error('Erro ao listar campeonatos:', err);
     // >>> Para não quebrar a tabela no front, devolve []

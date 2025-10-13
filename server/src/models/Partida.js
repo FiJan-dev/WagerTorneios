@@ -33,6 +33,22 @@ const Partida = sequelize.define('Partida', {
         allowNull: false,
         validate: {
             isDate: true,
+            async isWithinCampeonatoRange(value) {
+                if (!this.id_campeonato) return; // Será validado no controller
+                
+                const campeonato = await Campeonato.findByPk(this.id_campeonato);
+                if (!campeonato) {
+                    throw new Error('Campeonato não encontrado.');
+                }
+                
+                const dataPartida = new Date(value);
+                const dataInicio = new Date(campeonato.data_inicio + 'T00:00:00');
+                const dataFim = new Date(campeonato.data_fim + 'T23:59:59');
+                
+                if (dataPartida < dataInicio || dataPartida > dataFim) {
+                    throw new Error(`A data da partida deve estar entre ${campeonato.data_inicio} e ${campeonato.data_fim}.`);
+                }
+            }
         },
     },
     local_partida: {

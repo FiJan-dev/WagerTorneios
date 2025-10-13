@@ -51,6 +51,33 @@ function CadastroPartida() {
       return;
     }
 
+    // Validação de data da partida
+    const dataPartida = new Date(formData.data_partida);
+    const agora = new Date();
+    const umAnoNoFuturo = new Date();
+    umAnoNoFuturo.setFullYear(agora.getFullYear() + 2); // Máximo 2 anos no futuro
+    
+    if (dataPartida > umAnoNoFuturo) {
+      setError('A data da partida não pode ser superior a 2 anos no futuro.');
+      return;
+    }
+
+    // Validação específica quando há campeonato selecionado
+    if (selectedCampeonatoId && allCampeonatos) {
+      const campeonatoSelecionado = allCampeonatos.find(c => c.id_campeonato === selectedCampeonatoId);
+      if (campeonatoSelecionado) {
+        const dataInicio = new Date(campeonatoSelecionado.data_inicio + 'T00:00:00');
+        const dataFim = new Date(campeonatoSelecionado.data_fim + 'T23:59:59');
+        
+        if (dataPartida < dataInicio || dataPartida > dataFim) {
+          const inicioFormatado = dataInicio.toLocaleDateString('pt-BR');
+          const fimFormatado = dataFim.toLocaleDateString('pt-BR');
+          setError(`A data da partida deve estar entre ${inicioFormatado} e ${fimFormatado} (período do campeonato selecionado).`);
+          return;
+        }
+      }
+    }
+
     setLoading(true);
     try {
       const payload = { ...formData };

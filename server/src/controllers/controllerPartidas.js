@@ -36,22 +36,30 @@ exports.registrarPartida = async (req, res) => {
       // find-or-create por nome
       campeonato = await Campeonato.findOne({ where: { nome_campeonato } });
       if (!campeonato) {
-        // ajusta datas para respeitar validações do model (data_inicio isAfter hoje)
-        const dt = new Date(data_partida);
-        const todayYMD = new Date().toISOString().slice(0, 10);
-        const ymd = isNaN(dt.getTime()) ? todayYMD : dt.toISOString().slice(0, 10);
-        const inicio = ymd > todayYMD ? ymd : todayYMD;
-        const fim = inicio; // mantém igual; seu model exige fim > início? (se sim, use um dia após)
-
-        // se seu model exigir data_fim > data_inicio estritamente, use:
-        // const fim = new Date(inicio);
-        // fim.setDate(fim.getDate() + 1);
-        // const fimYMD = fim.toISOString().slice(0,10);
+        // Cria campeonato com base na data da partida
+        const dataPartidaObj = new Date(data_partida);
+        const hoje = new Date();
+        
+        // Define início do campeonato
+        const dataInicio = dataPartidaObj < hoje ? 
+          hoje.toISOString().slice(0, 10) : 
+          dataPartidaObj.toISOString().slice(0, 10);
+        
+        // Define fim do campeonato (3 meses após o início ou data da partida, o que for maior)
+        const dataFimObj = new Date(dataInicio);
+        dataFimObj.setMonth(dataFimObj.getMonth() + 3);
+        
+        const dataPartidaFim = new Date(data_partida);
+        dataPartidaFim.setDate(dataPartidaFim.getDate() + 1); // Um dia após a partida
+        
+        const dataFim = dataPartidaFim > dataFimObj ? 
+          dataPartidaFim.toISOString().slice(0, 10) : 
+          dataFimObj.toISOString().slice(0, 10);
 
         campeonato = await Campeonato.create({
           nome_campeonato,
-          data_inicio: inicio,
-          data_fim: fim,
+          data_inicio: dataInicio,
+          data_fim: dataFim,
           local_campeonato: local_partida || 'A definir',
         });
       }
@@ -70,6 +78,21 @@ exports.registrarPartida = async (req, res) => {
 
     if (timeCasa.id_time === timeVisitante.id_time) {
       return res.status(200).json({ ok: false, reason: 'validation', msg: 'Os times não podem ser iguais.' });
+    }
+
+    // --- validação de data da partida dentro do período do campeonato ---
+    const dataPartida = new Date(data_partida);
+    const dataInicio = new Date(campeonato.data_inicio + 'T00:00:00');
+    const dataFim = new Date(campeonato.data_fim + 'T23:59:59');
+    
+    if (dataPartida < dataInicio || dataPartida > dataFim) {
+      const inicioFormatado = new Date(campeonato.data_inicio).toLocaleDateString('pt-BR');
+      const fimFormatado = new Date(campeonato.data_fim).toLocaleDateString('pt-BR');
+      return res.status(200).json({ 
+        ok: false, 
+        reason: 'validation', 
+        msg: `A data da partida deve estar entre ${inicioFormatado} e ${fimFormatado} (período do campeonato "${campeonato.nome_campeonato}").` 
+      });
     }
 
     // --- partida ---

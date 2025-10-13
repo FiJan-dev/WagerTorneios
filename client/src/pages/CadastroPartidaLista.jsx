@@ -5,14 +5,14 @@ import SideBar_Olheiro from '../components/SideBar_Olheiro';
 import { AuthContext } from '../context/AuthContext';
 
 // Função auxiliar para formatar datas
-const formatarDataHora = (dataString, formato = 'completo') => {
+const formatarDataHora = (dataString, formato = 'padrao') => {
   if (!dataString) return 'Data não informada';
   
   const data = new Date(dataString);
   if (isNaN(data.getTime())) return 'Data inválida';
   
   const opcoes = {
-    simples: {
+    padrao: {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -29,7 +29,7 @@ const formatarDataHora = (dataString, formato = 'completo') => {
     }
   };
   
-  return data.toLocaleString('pt-BR', opcoes[formato] || opcoes.simples);
+  return data.toLocaleString('pt-BR', opcoes[formato] || opcoes.padrao);
 };
 
 export default function CadastroPartidaLista() {
@@ -207,7 +207,7 @@ export default function CadastroPartidaLista() {
                       <td className="px-4 py-2">
                         {`${partida.placar_casa} x ${partida.placar_visitante}`}
                       </td>
-                      <td className="px-4 py-2">{formatarDataHora(partida.data_partida, 'simples')}</td>
+                      <td className="px-4 py-2">{formatarDataHora(partida.data_partida)}</td>
                       <td className="px-4 py-2">{partida.local_partida}</td>
                       <td className="px-4 py-2">
                         <div className="flex gap-2 items-center">
@@ -336,7 +336,7 @@ export default function CadastroPartidaLista() {
                 {partidaToDelete.nome_time_casa} × {partidaToDelete.nome_time_visitante}
               </p>
               <p className="text-gray-400 text-sm">
-                {partidaToDelete.nome_campeonato} • {formatarDataHora(partidaToDelete.data_partida, 'simples')}
+                {partidaToDelete.nome_campeonato} • {formatarDataHora(partidaToDelete.data_partida)}
               </p>
             </div>
 
