@@ -13,6 +13,9 @@ export default function PlayerList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
+  const [playerToDelete, setPlayerToDelete] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const API_URL = 'http://localhost:5000/api/jogador/listar';
 
@@ -82,6 +85,45 @@ export default function PlayerList() {
     }
   };
 
+  const openDeleteModal = (player) => {
+    setPlayerToDelete(player);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setPlayerToDelete(null);
+    setIsDeleteModalOpen(false);
+    setIsDeleting(false);
+  };
+
+  const handleDeletePlayer = async () => {
+    if (!playerToDelete || !token) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/api/jogador/deletar/${playerToDelete.id_jogador}`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data.ok) {
+        // Remove o jogador da lista local
+        setPlayers(prev => prev.filter(p => p.id_jogador !== playerToDelete.id_jogador));
+        closeDeleteModal();
+        alert('Jogador removido com sucesso!');
+      } else {
+        alert(response.data.msg || 'Erro ao remover jogador.');
+      }
+    } catch (err) {
+      console.error('Erro ao deletar jogador:', err);
+      alert('Erro ao remover jogador. Tente novamente.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-black flex-col">
       <SideBar_Olheiro />
@@ -133,12 +175,23 @@ export default function PlayerList() {
                       <td className="px-4 py-2">{player.idade}</td>
                       <td className="px-4 py-2">{player.nome_time || 'Sem time'}</td>
                       <td className="px-4 py-2">
-                        <button
-                          onClick={() => openModal(player)}
-                          className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-1 px-3 rounded hover:from-green-700 hover:to-green-600 transition-all duration-200 text-sm"
-                        >
-                          Detalhes
-                        </button>
+                        <div className="flex gap-2 items-center">
+                          <button
+                            onClick={() => openModal(player)}
+                            className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-1 px-3 rounded hover:from-green-700 hover:to-green-600 transition-all duration-200 text-sm"
+                          >
+                            Detalhes
+                          </button>
+                          {isAdmin() && (
+                            <button
+                              onClick={() => openDeleteModal(player)}
+                              className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold py-1 px-2 rounded hover:from-red-700 hover:to-red-600 transition-all duration-200 text-sm flex items-center justify-center"
+                              title="Remover jogador"
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -288,6 +341,52 @@ export default function PlayerList() {
                 className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-8 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200"
               >
                 Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Confirmação de Delete */}
+      {isDeleteModalOpen && playerToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-black/90 backdrop-blur-sm border border-red-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-md w-full transition-all duration-300">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                !
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Confirmar Remoção</h2>
+                <p className="text-gray-300 text-sm">Esta ação não pode ser desfeita</p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-gray-300 mb-2">
+                Tem certeza que deseja remover o jogador:
+              </p>
+              <p className="text-white font-semibold text-lg">
+                {playerToDelete.nome_jogador}
+              </p>
+              <p className="text-gray-400 text-sm">
+                {playerToDelete.posicao_jogador} • {playerToDelete.nome_time || 'Sem time'}
+              </p>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={closeDeleteModal}
+                disabled={isDeleting}
+                className="bg-gray-700 text-gray-300 font-semibold py-2.5 px-6 rounded-lg hover:bg-gray-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeletePlayer}
+                disabled={isDeleting}
+                className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-red-700 hover:to-red-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              >
+                {isDeleting ? 'Removendo...' : 'Remover'}
               </button>
             </div>
           </div>
