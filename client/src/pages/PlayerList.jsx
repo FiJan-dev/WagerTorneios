@@ -128,7 +128,7 @@ export default function PlayerList() {
     <div className="flex min-h-screen bg-black flex-col">
       <SideBar_Olheiro />
       <div className="flex justify-center items-center min-h-screen w-full p-4 box-border pt-16 sm:pt-20">
-        <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-4xl w-full flex flex-col items-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+        <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-7xl w-full flex flex-col items-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
           <div className="mb-6 flex justify-center">
             <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-2xl font-bold text-white shadow-md">
               J
