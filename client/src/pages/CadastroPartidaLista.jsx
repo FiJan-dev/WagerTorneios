@@ -5,7 +5,7 @@ import SideBar_Olheiro from '../components/SideBar_Olheiro';
 import { AuthContext } from '../context/AuthContext';
 
 export default function CadastroPartidaLista() {
-  const { token, isAdmin } = useContext(AuthContext);
+  const { token, isAdmin, user } = useContext(AuthContext);
 
   const [partidas, setPartidas] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,10 +80,16 @@ export default function CadastroPartidaLista() {
   };
 
   const handleDeletePartida = async () => {
-    if (!partidaToDelete || !token) return;
+    if (!partidaToDelete || !token) {
+      console.error('Dados insuficientes para deletar:', { partidaToDelete, token });
+      return;
+    }
 
     setIsDeleting(true);
     try {
+      console.log('Tentando deletar partida:', partidaToDelete.id_partida);
+      console.log('Token sendo usado:', token);
+      
       const response = await axios.delete(
         `http://localhost:5000/api/partida/deletar/${partidaToDelete.id_partida}`,
         {
@@ -91,17 +97,30 @@ export default function CadastroPartidaLista() {
         }
       );
 
+      console.log('Resposta do servidor:', response.data);
+
       if (response.data.ok) {
         // Remove a partida da lista local
         setPartidas(prev => prev.filter(p => p.id_partida !== partidaToDelete.id_partida));
         closeDeleteModal();
         alert('Partida removida com sucesso!');
       } else {
+        console.error('Erro retornado pelo servidor:', response.data);
         alert(response.data.msg || 'Erro ao remover partida.');
       }
     } catch (err) {
       console.error('Erro ao deletar partida:', err);
-      alert('Erro ao remover partida. Tente novamente.');
+      console.error('Detalhes do erro:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message
+      });
+      
+      const errorMsg = err.response?.data?.msg || 
+                      err.response?.data?.error || 
+                      err.message || 
+                      'Erro ao remover partida. Tente novamente.';
+      alert(errorMsg);
     } finally {
       setIsDeleting(false);
     }

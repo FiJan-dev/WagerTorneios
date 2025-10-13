@@ -133,17 +133,29 @@ exports.listarPartidas = async (_req, res) => {
 exports.deletarPartida = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('Tentando deletar partida com ID:', id);
+    console.log('Usuário que está deletando:', req.user);
+    
+    if (!id || isNaN(id)) {
+      console.log('ID inválido fornecido:', id);
+      return res.status(400).json({ ok: false, reason: 'invalid_id', msg: 'ID da partida inválido.' });
+    }
+    
     const partida = await Partida.findByPk(id);
+    console.log('Partida encontrada:', partida ? partida.toJSON() : null);
+    
     if (!partida) {
-      return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Partida não encontrada.' });
+      console.log('Partida não encontrada com ID:', id);
+      return res.status(404).json({ ok: false, reason: 'not_found', msg: 'Partida não encontrada.' });
     }
 
     await partida.destroy();
+    console.log('Partida deletada com sucesso, ID:', id);
     return res.status(200).json({ ok: true, msg: 'Partida deletada com sucesso.' });
   } catch (err) {
     console.error('Erro ao deletar partida:', err);
     const code = err.name || 'UNKNOWN_ERROR';
     const msg = err.message || 'erro';
-    return res.status(200).json({ ok: false, reason: code, msg: `Erro ao deletar partida (${code}): ${msg}` });
+    return res.status(500).json({ ok: false, reason: code, msg: `Erro ao deletar partida (${code}): ${msg}` });
   }
 };

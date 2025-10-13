@@ -52,7 +52,13 @@ export default function CadastroCampeonatoLista() {
         }
 
         // Formato recomendado: array puro
-        setCampeonatos(Array.isArray(payload) ? payload : []);
+        const campanhasList = Array.isArray(payload) ? payload : [];
+        console.log('Campeonatos recebidos:', campanhasList);
+        if (campanhasList.length > 0) {
+          console.log('Primeiro campeonato:', campanhasList[0]);
+          console.log('Campos disponíveis:', Object.keys(campanhasList[0]));
+        }
+        setCampeonatos(campanhasList);
       } catch (err) {
         console.error(err);
         setError('Erro ao carregar campeonatos.');
@@ -98,6 +104,10 @@ export default function CadastroCampeonatoLista() {
   const handleDeleteCampeonato = async () => {
     if (!campeonatoToDelete || !token) return;
 
+    console.log('Tentando deletar campeonato:', campeonatoToDelete);
+    console.log('ID do campeonato:', campeonatoToDelete.id_campeonato);
+    console.log('URL que será chamada:', `http://localhost:5000/api/campeonato/deletar/${campeonatoToDelete.id_campeonato}`);
+
     setIsDeleting(true);
     try {
       const response = await axios.delete(
@@ -107,17 +117,29 @@ export default function CadastroCampeonatoLista() {
         }
       );
 
+      console.log('Response recebida:', response);
+
       if (response.data.ok) {
         // Remove o campeonato da lista local
         setCampeonatos(prev => prev.filter(c => c.id_campeonato !== campeonatoToDelete.id_campeonato));
         closeDeleteModal();
         alert('Campeonato removido com sucesso!');
       } else {
+        console.error('Erro no servidor:', response.data);
         alert(response.data.msg || 'Erro ao remover campeonato.');
       }
     } catch (err) {
-      console.error('Erro ao deletar campeonato:', err);
-      alert('Erro ao remover campeonato. Tente novamente.');
+      console.error('Erro completo:', err);
+      console.error('Status do erro:', err.response?.status);
+      console.error('Response data:', err.response?.data);
+      console.error('Config da requisição:', err.config);
+      
+      if (err.response?.status === 404) {
+        alert('Rota não encontrada. Verifique se o servidor está rodando e se as rotas estão configuradas corretamente.');
+      } else {
+        const errorMsg = err.response?.data?.msg || err.message || 'Erro ao remover campeonato. Tente novamente.';
+        alert(errorMsg);
+      }
     } finally {
       setIsDeleting(false);
     }
@@ -302,6 +324,11 @@ export default function CadastroCampeonatoLista() {
               <p className="text-gray-400 text-sm">
                 {campeonatoToDelete.local_campeonato} • {new Date(campeonatoToDelete.data_inicio).toLocaleDateString('pt-BR')} a {new Date(campeonatoToDelete.data_fim).toLocaleDateString('pt-BR')}
               </p>
+              <div className="mt-3 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
+                <p className="text-yellow-400 text-sm">
+                  ⚠️ <strong>Atenção:</strong> Só é possível deletar campeonatos que não possuem partidas associadas.
+                </p>
+              </div>
             </div>
 
             <div className="flex gap-3 justify-end">

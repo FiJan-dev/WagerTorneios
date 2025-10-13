@@ -52,19 +52,58 @@ exports.criarCampeonatos = async (req, res) => {
 
 // DELETE /api/campeonato/deletar/:id
 exports.deletarCampeonato = async (req, res) => {
+  console.log('Rota de deletar campeonato chamada!');
+  console.log('Parâmetros recebidos:', req.params);
+  console.log('ID recebido:', req.params.id);
+
   try {
     const { id } = req.params;
+    const Partida = require('../models/Partida'); // Importar aqui para evitar circular dependency
+    
+    console.log('Procurando campeonato com ID:', id);
     const campeonato = await Campeonato.findByPk(id);
+    console.log('Campeonato encontrado:', campeonato ? 'Sim' : 'Não');
+    
     if (!campeonato) {
+      console.log('Campeonato não encontrado');
       return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Campeonato não encontrado.' });
     }
 
+    console.log('Verificando partidas associadas...');
+    // Verificar se existem partidas associadas a este campeonato
+    const partidasAssociadas = await Partida.findAll({
+      where: { id_campeonato: id }
+    });
+
+    console.log('Partidas associadas encontradas:', partidasAssociadas.length);
+
+    if (partidasAssociadas.length > 0) {
+      console.log('Deletar cancelado - partidas associadas');
+      return res.status(200).json({ 
+        ok: false, 
+        reason: 'foreign_key_constraint', 
+        msg: `Não é possível deletar o campeonato pois existem ${partidasAssociadas.length} partida(s) associada(s). Delete as partidas primeiro.` 
+      });
+    }
+
+    console.log('Deletando campeonato...');
     await campeonato.destroy();
+    console.log('Campeonato deletado com sucesso!');
     return res.status(200).json({ ok: true, msg: 'Campeonato deletado com sucesso.' });
   } catch (err) {
     console.error('Erro ao deletar campeonato:', err);
     const code = err.name || 'UNKNOWN_ERROR';
     const msg = err.message || 'erro';
+    
+    // Tratamento específico para erro de chave estrangeira
+    if (err.name === 'SequelizeForeignKeyConstraintError') {
+      return res.status(200).json({ 
+        ok: false, 
+        reason: 'foreign_key_constraint', 
+        msg: 'Não é possível deletar o campeonato pois existem partidas associadas. Delete as partidas primeiro.' 
+      });
+    }
+    
     return res.status(200).json({ ok: false, reason: code, msg: `Erro ao deletar campeonato (${code}): ${msg}` });
   }
 };

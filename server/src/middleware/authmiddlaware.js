@@ -12,13 +12,13 @@ const autenticarToken = (req, res, next) => {
 
     if(!token){
         console.log('sem token')
-        return res.sendStatus(401).json({msg:'token nao fornecido'})
+        return res.status(401).json({msg:'token nao fornecido'})
     }
 
     jwt.verify(token, key, (err, user)=>{
         if(err){
             console.log(err)
-            return res.sendStatus(401).json({msg: 'erro do verify'});
+            return res.status(401).json({msg: 'erro do verify'});
         }
 
         console.log('Token decodificado com sucesso:', user);
