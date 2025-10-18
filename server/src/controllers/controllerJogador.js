@@ -1,5 +1,5 @@
 // controllers/controllerJogador.js
-const { Jogador, Time } = require('../models/index');
+const { Jogador, Time, Comentarios } = require('../models/index');
 const { Op } = require('sequelize');
 
 // POST /api/jogador/cadastrar
@@ -246,4 +246,70 @@ exports.filtrarJogadores = async (req, res) => {
         console.error('Erro ao filtrar jogadores:', error);
         return res.status(200).json([]); // Retorna array vazio para não quebrar o frontend
     }
+};
+
+exports.registrarComentario = async (req, res) => {
+  try {
+    const { id_jogador } = req.params;
+    const { comentario } = req.body;
+
+    const comentarioCriado = await Comentarios.create({
+      id_jogador,
+      comentario,
+    });
+    
+    return res.status(200).json({ ok: true, msg: 'Comentário registrado com sucesso.', comentario: comentarioCriado });
+  } catch (err) {
+    console.error('Erro ao registrar comentário:', err);
+    const code = err.name || 'UNKNOWN_ERROR';
+    const msg = err.message || 'erro';
+    return res.status(200).json({ ok: false, reason: code, msg: `Erro ao registrar comentário (${code}): ${msg}` });
+  }
+};
+
+exports.pegarComentarios = async (req, res) => {
+  try {
+    const { id_jogador } = req.params;
+    const comentarios = await Comentarios.findAll({ where: { id_jogador } });
+    
+    return res.status(200).json({ ok: true, comentarios });
+  } catch (err) {
+    console.error('Erro ao pegar comentários:', err);
+    const code = err.name || 'UNKNOWN_ERROR';
+    const msg = err.message || 'erro';
+    return res.status(200).json({ ok: false, reason: code, msg: `Erro ao pegar comentários (${code}): ${msg}` });
+  }
+};
+
+exports.estatisticasJogador = async (req, res) => {
+  try {
+    //com base no id do jogador, retornar as estatísticas solicitadas
+    const { id } = req.params;
+    const jogador = await Jogador.findByPk(id);
+    if (!jogador) {
+      return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Jogador não encontrado.' });
+    }
+    
+    //dado extra, calcular quantas finalizações o jogador converteu em gol
+    const media_finalizacoes = jogador.finalizacoes > 0 ? (jogador.gols_marcados / jogador.finalizacoes).toFixed(2) : 0;
+
+    //front espera este
+    const estatisticas = {
+      passes_certos: jogador.passes_certos,
+      gols_marcados: jogador.gols_marcados,
+      assistencias: jogador.assistencias,
+      cartoes_amarelos: jogador.cartoes_amarelos,
+      cartoes_vermelhos: jogador.cartoes_vermelhos,
+      finalizacoes: jogador.finalizacoes,
+      media_finalizacoes: parseFloat(media_finalizacoes)
+    };
+    
+    return res.status(200).json({ ok: true, estatisticas });
+  }
+  catch (err) {
+    console.error('Erro ao obter estatísticas do jogador:', err);
+    const code = err.name || 'ERRO AO OBTER ESTATÍSTICAS';
+    const msg = err.message || 'erro no db';
+    return res.status(200).json({ ok: false, reason: code, msg: `Erro ao obter estatísticas do jogador (${code}): ${msg}` });
+  }
 };
