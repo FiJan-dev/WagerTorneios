@@ -1,125 +1,170 @@
 import { Link } from 'react-router-dom';
-import backgroundImage from '../assets/backg.jpg';
 import './HomePage.css';
 
 export default function HomePage() {
-  const features = [
-    {
-      icon: "🏆",
-      title: "Gestão de Torneios",
-      description: "Organize e acompanhe campeonatos com facilidade"
-    },
-    {
-      icon: "⚽",
-      title: "Controle de Partidas",
-      description: "Gerencie resultados e estatísticas em tempo real"
-    },
-    {
-      icon: "👥",
-      title: "Perfis de Jogadores",
-      description: "Monitore e avalie o desempenho dos atletas"
-    }
-  ];
-
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Background with overlay */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${backgroundImage})`,
-          filter: 'brightness(0.3)',
-        }}
-      ></div>
+    <div className="homepage-container">
+      {/* Background Effects */}
+      <div className="background-gradient"></div>
+      <div className="background-grid"></div>
       
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-gray-900/70 to-green-900/60"></div>
-      
-      {/* Animated background elements */}
-      <div className="absolute top-20 left-10 w-32 h-32 bg-green-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl animate-pulse delay-500"></div>
-      
-      {/* Main content */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-8">
-        
-        {/* Hero Section */}
-        <div className="text-center max-w-4xl mx-auto mb-12">
-          {/* Logo */}
-          <div className="mb-8 flex justify-center animate-fade-in-scale">
-            <div className="relative group animate-float">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-emerald-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-glow"></div>
-              <div className="relative w-28 h-28 bg-gradient-to-br from-green-600 via-emerald-500 to-green-700 rounded-full flex items-center justify-center text-4xl font-bold text-white shadow-2xl ring-4 ring-white/20">
-                WT
-              </div>
-            </div>
+      {/* Navigation */}
+      <nav className="navbar">
+        <div className="nav-content">
+          <div className="logo-section">
+            <div className="logo-icon">WT</div>
+            <span className="logo-text">WagerTorneios</span>
           </div>
           
-          {/* Main heading */}
-          <h1 className="text-5xl sm:text-7xl font-black mb-6 gradient-text leading-relaxed animate-slide-up delay-100">
-            WagerTorneios
+          <div className="nav-actions">
+            <Link to="/login" className="nav-link">Entrar</Link>
+            <Link to="/register" className="nav-button">Começar</Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <main className="hero-section">
+        <div className="hero-content">
+          <div className="hero-badge">
+            <svg className="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+            Plataforma Profissional de Gestão Esportiva
+          </div>
+
+          <h1 className="hero-title">
+            Gestão inteligente para
+            <span className="hero-title-highlight"> olheiros profissionais</span>
           </h1>
-          
-          {/* Subtitle */}
-          <div className="relative animate-slide-up delay-200">
-            <p className="text-xl sm:text-2xl text-gray-300 mb-8 font-light leading-relaxed">
-              A plataforma definitiva para{' '}
-              <span className="text-green-400 font-semibold">olheiros profissionais</span>
-            </p>
-            <p className="text-lg text-gray-400 mb-12 max-w-3xl mx-auto">
-              Descubra talentos, organize competições e acompanhe o desempenho dos atletas 
-              com ferramentas avançadas de gestão esportiva
-            </p>
-          </div>
-          
-          {/* CTA Button */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-up delay-300">
-            <Link
-              to="/login"
-              className="btn-primary group relative px-8 py-4 text-white font-semibold rounded-xl shadow-2xl hover:shadow-green-500/25 hover-lift overflow-hidden"
-            >
-              <span className="relative flex items-center gap-2">
-                Entrar na Plataforma
-                <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </span>
+
+          <p className="hero-description">
+            Sistema completo de gestão para descoberta de talentos, 
+            organização de campeonatos e análise de performance de atletas.
+          </p>
+
+          <div className="hero-buttons">
+            <Link to="/login" className="btn-primary">
+              Acessar Plataforma
+              <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </Link>
             
-            <Link
-              to="/register"
-              className="px-8 py-4 border-2 border-gray-600 text-gray-300 font-semibold rounded-xl hover:border-green-500 hover:text-green-400 hover:shadow-lg transition-all duration-300 hover-lift"
-            >
-              Criar Conta
+            <Link to="/register" className="btn-secondary">
+              Criar Conta Grátis
             </Link>
           </div>
-        </div>
-        
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className={`group glass-card rounded-2xl p-8 text-center hover:bg-white/10 hover:border-green-500/30 transition-all duration-500 hover-lift animate-slide-up delay-${(index + 4) * 100}`}
-            >
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-green-600/10 to-emerald-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
-              
-              <div className="relative z-10">
-                <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3 group-hover:text-green-400 transition-colors duration-300">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-400 leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
+
+          {/* Stats */}
+          <div className="hero-stats">
+            <div className="stat-item">
+              <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Seguro e Confiável</span>
             </div>
-          ))}
+            <div className="stat-item">
+              <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span>Rápido e Eficiente</span>
+            </div>
+            <div className="stat-item">
+              <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              </svg>
+              <span>Totalmente Personalizável</span>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
+
+      {/* Features Section */}
+      <section className="features-section">
+        <div className="features-content">
+          <div className="section-header">
+            <h2 className="section-title">Recursos Principais</h2>
+            <p className="section-description">
+              Ferramentas profissionais para gestão completa de atividades esportivas
+            </p>
+          </div>
+
+          <div className="features-grid">
+            <div className="feature-card">
+              <div className="feature-icon-wrapper">
+                <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <h3 className="feature-title">Gestão de Torneios</h3>
+              <p className="feature-description">
+                Crie e organize campeonatos com facilidade. Sistema completo de gerenciamento de competições.
+              </p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon-wrapper">
+                <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h3 className="feature-title">Análise de Performance</h3>
+              <p className="feature-description">
+                Acompanhe estatísticas detalhadas e métricas de desempenho dos atletas em tempo real.
+              </p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon-wrapper">
+                <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 className="feature-title">Gestão de Jogadores</h3>
+              <p className="feature-description">
+                Mantenha perfis detalhados de atletas com histórico, avaliações e informações completas.
+              </p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon-wrapper">
+                <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="feature-title">Controle de Partidas</h3>
+              <p className="feature-description">
+                Registre resultados, gerencie calendários e acompanhe o andamento das competições.
+              </p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon-wrapper">
+                <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="feature-title">Relatórios Detalhados</h3>
+              <p className="feature-description">
+                Gere relatórios completos com insights e dados importantes para tomada de decisões.
+              </p>
+            </div>
+
+            <div className="feature-card">
+              <div className="feature-icon-wrapper">
+                <svg className="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h3 className="feature-title">Segurança e Privacidade</h3>
+              <p className="feature-description">
+                Proteção avançada de dados com criptografia e controles de acesso personalizados.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
