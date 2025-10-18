@@ -1,0 +1,237 @@
+:root {
+  --cc-bg-primary: #0a0e1f;
+  --cc-bg-secondary: #111827;
+  --cc-bg-card: #1a1f35;
+  --cc-accent: #3b82f6;
+  --cc-accent-hover: #2563eb;
+  --cc-text-primary: #f9fafb;
+  --cc-text-secondary: #9ca3af;
+  --cc-border: #1f2937;
+  --cc-success: #10b981;
+  --cc-error: #ef4444;
+  --cc-warning: #f59e0b;
+}
+
+.campeonato-cadastro-page {
+  min-height: 100vh;
+  background: var(--cc-bg-primary);
+  padding-top: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.cadastro-container {
+  max-width: 800px;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.page-header-cadastro {
+  margin-bottom: 2rem;
+}
+
+.page-header-cadastro h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--cc-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.page-header-cadastro p {
+  color: var(--cc-text-secondary);
+  font-size: 0.95rem;
+}
+
+.cadastro-card {
+  background: var(--cc-bg-card);
+  border: 1px solid var(--cc-border);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.campeonato-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--cc-text-primary);
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--cc-accent);
+  margin-bottom: 0.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--cc-text-secondary);
+}
+
+.form-group label .required {
+  color: var(--cc-error);
+  margin-left: 0.25rem;
+}
+
+.form-input,
+.form-textarea {
+  padding: 0.75rem 1rem;
+  background: var(--cc-bg-secondary);
+  border: 1px solid var(--cc-border);
+  border-radius: 8px;
+  color: var(--cc-text-primary);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--cc-accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #4b5563;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.form-hint svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.date-inputs-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 0.875rem;
+  background: transparent;
+  border: 1px solid var(--cc-border);
+  border-radius: 8px;
+  color: var(--cc-text-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: var(--cc-bg-secondary);
+  border-color: var(--cc-text-secondary);
+  color: var(--cc-text-primary);
+}
+
+.btn-submit {
+  flex: 2;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, var(--cc-accent) 0%, #1d4ed8 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--cc-accent-hover) 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .campeonato-cadastro-page {
+    padding-top: 80px;
+  }
+  
+  .cadastro-container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .campeonato-cadastro-page {
+    padding-top: 100px;
+  }
+  
+  .cadastro-container {
+    padding: 0 1rem;
+  }
+
+  .cadastro-card {
+    padding: 1.5rem;
+  }
+
+  .date-inputs-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header-cadastro h1 {
+    font-size: 1.5rem;
+  }
+
+  .cadastro-card {
+    padding: 1rem;
+  }
+}

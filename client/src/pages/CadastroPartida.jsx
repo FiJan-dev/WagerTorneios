@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
+import './CadastroPartida.css';
 
 function CadastroPartida() {
   const { token } = useContext(AuthContext);
@@ -228,158 +229,204 @@ function CadastroPartida() {
 
 
   return (
-    <div className='flex min-h-screen bg-black'>
+    <div className="partida-cadastro-page">
       <SideBar_Olheiro />
-      <div className='flex justify-center items-center min-h-screen w-full p-4 box-border'>
-        <div className='bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-2xl w-full'>
-          <h2 className='text-2xl sm:text-3xl text-center font-bold text-white mb-2'>
-            Cadastrar Partida
-          </h2>
-          {error && <p className='text-center text-red-400 text-sm'>{error}</p>}
+      
+      <div className="cadastro-container-partida">
+        <div className="page-header-partida">
+          <h1>Cadastrar Partida</h1>
+          <p>Registre uma nova partida com todos os detalhes</p>
+        </div>
 
-          <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Nome do Campeonato</label>
-              <div ref={dropdownRef} className='relative'>
-                <input
-                  type='text'
-                  name='nome_campeonato'
-                  value={formData.nome_campeonato}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  onKeyDown={handleKeyDown}
-                  required
-                  placeholder='Digite para buscar ou selecionar um campeonato...'
-                  className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-                />
-                
-                {showDropdown && (
-                  <div className='absolute z-50 w-full mt-1 bg-black border border-green-700 rounded-lg shadow-xl max-h-60 overflow-y-auto'>
-                    {filteredCampeonatos.length === 0 ? (
-                      <div className='px-4 py-3 text-gray-400 text-sm'>
-                        {formData.nome_campeonato.trim() ? 'Nenhum campeonato encontrado' : 'Carregando campeonatos...'}
-                      </div>
-                    ) : (
-                      <>
-                        <div className='px-4 py-2 text-xs text-gray-400 border-b border-green-700/30 bg-green-900/20'>
-                          {filteredCampeonatos.length} campeonato{filteredCampeonatos.length !== 1 ? 's' : ''} encontrado{filteredCampeonatos.length !== 1 ? 's' : ''}
+        <div className="cadastro-card-partida">
+          {error && (
+            <div className="error-message">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="partida-form">
+            <div className="form-section-partida">
+              <h2 className="section-title-partida">Campeonato</h2>
+              
+              <div className="form-group-partida">
+                <label htmlFor="nome_campeonato">
+                  Nome do Campeonato <span className="required">*</span>
+                </label>
+                <div ref={dropdownRef} style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    id="nome_campeonato"
+                    name="nome_campeonato"
+                    className="form-input-partida"
+                    value={formData.nome_campeonato}
+                    onChange={handleChange}
+                    onFocus={handleFocus}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Digite para buscar ou selecionar um campeonato..."
+                    required
+                  />
+                  
+                  {showDropdown && (
+                    <div className="campeonato-dropdown">
+                      {filteredCampeonatos.length === 0 ? (
+                        <div className="dropdown-empty">
+                          {formData.nome_campeonato.trim() ? 'Nenhum campeonato encontrado' : 'Carregando campeonatos...'}
                         </div>
-                        {filteredCampeonatos.map((campeonato, index) => (
-                          <div
-                            key={campeonato.id_campeonato}
-                            onClick={() => handleSelectCampeonato(campeonato)}
-                            className={`px-4 py-3 cursor-pointer border-b border-green-700/10 last:border-b-0 transition-colors duration-200 ${
-                              index === selectedIndex 
-                                ? 'bg-green-700/30 border-green-500' 
-                                : 'hover:bg-green-700/20'
-                            }`}
-                          >
-                            <div className='flex flex-col'>
-                              <span className='text-gray-100 font-medium'>{campeonato.nome_campeonato}</span>
-                              <span className='text-gray-400 text-xs mt-1'>
-                                📍 {campeonato.local_campeonato} • 📅 {new Date(campeonato.data_inicio).toLocaleDateString('pt-BR')} - {new Date(campeonato.data_fim).toLocaleDateString('pt-BR')}
-                              </span>
-                            </div>
+                      ) : (
+                        <>
+                          <div className="dropdown-header">
+                            {filteredCampeonatos.length} campeonato{filteredCampeonatos.length !== 1 ? 's' : ''} encontrado{filteredCampeonatos.length !== 1 ? 's' : ''}
                           </div>
-                        ))}
-                        {formData.nome_campeonato.trim() && !filteredCampeonatos.some(c => c.nome_campeonato.toLowerCase() === formData.nome_campeonato.toLowerCase()) && (
-                          <div className='px-4 py-3 border-t border-green-700/30 bg-blue-900/20'>
-                            <div className='text-blue-400 text-sm'>
+                          {filteredCampeonatos.map((campeonato, index) => (
+                            <div
+                              key={campeonato.id_campeonato}
+                              onClick={() => handleSelectCampeonato(campeonato)}
+                              className={`dropdown-item ${index === selectedIndex ? 'selected' : ''}`}
+                            >
+                              <div className="dropdown-item-title">{campeonato.nome_campeonato}</div>
+                              <div className="dropdown-item-info">
+                                📍 {campeonato.local_campeonato} • 📅 {new Date(campeonato.data_inicio).toLocaleDateString('pt-BR')} - {new Date(campeonato.data_fim).toLocaleDateString('pt-BR')}
+                              </div>
+                            </div>
+                          ))}
+                          {formData.nome_campeonato.trim() && !filteredCampeonatos.some(c => c.nome_campeonato.toLowerCase() === formData.nome_campeonato.toLowerCase()) && (
+                            <div className="dropdown-new-campeonato">
                               💡 Novo campeonato será criado: "{formData.nome_campeonato}"
                             </div>
-                          </div>
-                        )}
-                      </>
-                    )}
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                {selectedCampeonato && (
+                  <div className="selected-campeonato">
+                    <div className="selected-campeonato-title">
+                      ✅ Campeonato selecionado
+                    </div>
+                    <div className="selected-campeonato-name">
+                      {selectedCampeonato.nome_campeonato}
+                    </div>
+                    <div className="selected-campeonato-details">
+                      📍 {selectedCampeonato.local_campeonato}<br/>
+                      📅 {new Date(selectedCampeonato.data_inicio).toLocaleDateString('pt-BR')} - {new Date(selectedCampeonato.data_fim).toLocaleDateString('pt-BR')}
+                    </div>
                   </div>
                 )}
               </div>
+            </div>
+
+            <div className="form-section-partida">
+              <h2 className="section-title-partida">Times</h2>
               
-              {selectedCampeonato && (
-                <div className='mt-2 p-3 bg-green-900/20 border border-green-700/30 rounded-lg'>
-                  <div className='text-green-400 text-sm font-medium mb-1'>
-                    ✅ Campeonato selecionado:
-                  </div>
-                  <div className='text-gray-300 text-sm'>
-                    <strong>{selectedCampeonato.nome_campeonato}</strong>
-                  </div>
-                  <div className='text-gray-400 text-xs mt-1'>
-                    📍 {selectedCampeonato.local_campeonato}<br/>
-                    📅 {new Date(selectedCampeonato.data_inicio).toLocaleDateString('pt-BR')} - {new Date(selectedCampeonato.data_fim).toLocaleDateString('pt-BR')}
-                  </div>
+              <div className="times-grid">
+                <div className="form-group-partida">
+                  <label htmlFor="time_casa">
+                    Time Casa <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="time_casa"
+                    name="time_casa"
+                    className="form-input-partida"
+                    value={formData.time_casa}
+                    onChange={handleChange}
+                    placeholder="Nome do time da casa"
+                    required
+                  />
                 </div>
-              )}
-            </div>
 
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Time Casa</label>
-              <input
-                type='text'
-                name='time_casa'
-                value={formData.time_casa}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
-            </div>
-
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Time Visitante</label>
-              <input
-                type='text'
-                name='time_visitante'
-                value={formData.time_visitante}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
-            </div>
-
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-              <div className='flex flex-col gap-1'>
-                <label className='text-gray-300'>Data da Partida</label>
-                <input
-                  type='date'
-                  name='data_partida'
-                  value={formData.data_partida}
-                  onChange={handleChange}
-                  required
-                  className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-                />
+                <div className="form-group-partida">
+                  <label htmlFor="time_visitante">
+                    Time Visitante <span className="required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="time_visitante"
+                    name="time_visitante"
+                    className="form-input-partida"
+                    value={formData.time_visitante}
+                    onChange={handleChange}
+                    placeholder="Nome do time visitante"
+                    required
+                  />
+                </div>
               </div>
+            </div>
+
+            <div className="form-section-partida">
+              <h2 className="section-title-partida">Detalhes da Partida</h2>
               
-              <div className='flex flex-col gap-1'>
-                <label className='text-gray-300'>Hora da Partida</label>
+              <div className="datetime-grid">
+                <div className="form-group-partida">
+                  <label htmlFor="data_partida">
+                    Data <span className="required">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    id="data_partida"
+                    name="data_partida"
+                    className="form-input-partida"
+                    value={formData.data_partida}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group-partida">
+                  <label htmlFor="hora_partida">
+                    Hora <span className="required">*</span>
+                  </label>
+                  <input
+                    type="time"
+                    id="hora_partida"
+                    name="hora_partida"
+                    className="form-input-partida"
+                    value={formData.hora_partida}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group-partida">
+                <label htmlFor="local_partida">
+                  Local <span className="required">*</span>
+                </label>
                 <input
-                  type='time'
-                  name='hora_partida'
-                  value={formData.hora_partida}
+                  type="text"
+                  id="local_partida"
+                  name="local_partida"
+                  className="form-input-partida"
+                  value={formData.local_partida}
                   onChange={handleChange}
+                  placeholder="Ex: Estádio Nacional, Arena da Baixada..."
                   required
-                  className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
                 />
               </div>
             </div>
 
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Local da Partida</label>
-              <input
-                type='text'
-                name='local_partida'
-                value={formData.local_partida}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
+            <div className="form-actions-partida">
+              <button
+                type="button"
+                className="btn-cancel-partida"
+                onClick={() => navigate('/cadastropartidalista')}
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="btn-submit-partida"
+                disabled={loading}
+              >
+                {loading ? 'Cadastrando...' : 'Cadastrar Partida'}
+              </button>
             </div>
-
-            <button
-              type='submit'
-              disabled={loading}
-              className='bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed w-full'
-            >
-              {loading ? 'Cadastrando...' : 'Cadastrar'}
-            </button>
           </form>
         </div>
       </div>

@@ -136,7 +136,7 @@ export default function PlayerList() {
         <div className="page-header">
           <div className="header-content">
             <div className="header-title-section">
-              <h1 className="page-title">Jogadores Cadastrados: {players.length}</h1>
+              <h1 className="page-title">Jogadores</h1>
               <p className="page-subtitle">Gerencie e visualize todos os jogadores</p>
             </div>
             

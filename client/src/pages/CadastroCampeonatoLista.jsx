@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
 import { AuthContext } from '../context/AuthContext';
+import './CadastroCampeonatoLista.css';
 
 // Função auxiliar para formatar datas
 const formatarData = (dataString, formato = 'padrao') => {
@@ -89,6 +90,10 @@ export default function CadastroCampeonatoLista() {
   const [campeonatoToDelete, setCampeonatoToDelete] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const API_URL = 'http://localhost:5000/api/campeonato/listarC';
 
@@ -152,6 +157,22 @@ export default function CadastroCampeonatoLista() {
     const query = searchQuery.trim().toLowerCase();
     return nome.includes(query);
   });
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCampeonatos = filteredCampeonatos.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredCampeonatos.length / itemsPerPage);
+
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
 
   const openModal = (campeonato) => {
     setSelectedCampeonato(campeonato);
@@ -219,108 +240,324 @@ export default function CadastroCampeonatoLista() {
   };
 
   return (
-    <div className="flex min-h-screen bg-black flex-col">
+    <div className="campeonato-list-page">
       <SideBar_Olheiro />
-      <div className="flex justify-center items-center min-h-screen w-full p-4 box-border pt-16 sm:pt-20">
-        <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-7xl w-full flex flex-col items-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
-          <div className="mb-6 flex justify-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-2xl font-bold text-white shadow-md">
-              C
+      
+      <div className="campeonato-list-container">
+        {/* Header */}
+        <div className="page-header">
+          <div className="header-content">
+            <div className="header-title-section">
+              <h1 className="page-title">Campeonatos</h1>
+              <p className="page-subtitle">Visualize e gerencie os campeonatos</p>
+            </div>
+            
+            <div className="header-actions">
+              {isAdmin() && (
+                <Link to="/cadastrocampeonato" className="btn-add">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Adicionar Campeonato
+                </Link>
+              )}
             </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl text-center font-bold text-white mb-2">
-            Lista de Campeonatos
-          </h1>
-          <p className="text-center text-gray-300 text-base mb-6">
-            Visualize e gerencie os campeonatos cadastrados
-          </p>
+        </div>
 
-          {isAdmin() && (
-            <Link
-              to="/cadastrocampeonato"
-              className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200 mb-8"
-            >
-              Adicionar Campeonato
-            </Link>
-          )}
+        {/* Search */}
+        <div className="search-container">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Pesquisar por nome do campeonato..."
+            className="search-input"
+          />
+        </div>
 
-          <div className="w-full mb-4">
-            <label htmlFor="search" className="sr-only">
-              Pesquisar campeonatos
-            </label>
-            <input
-              id="search"
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Pesquisar por nome do campeonato..."
-              className="w-full bg-gray-800 text-gray-200 placeholder-gray-400 border border-green-700 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-
+        {/* Content */}
+        <div className="page-content">
           {isLoading ? (
-            <p className="text-gray-300">Carregando...</p>
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p>Carregando campeonatos...</p>
+            </div>
           ) : error ? (
-            <p className="text-red-500">{error}</p>
+            <div className="error-state">
+              <p>{error}</p>
+            </div>
           ) : lista.length === 0 ? (
-            <p className="text-gray-300">Nenhum campeonato cadastrado.</p>
+            <div className="empty-state">
+              <p>Nenhum campeonato cadastrado</p>
+              {isAdmin() && (
+                <Link to="/cadastrocampeonato" className="btn-add">
+                  Cadastrar primeiro campeonato
+                </Link>
+              )}
+            </div>
           ) : filteredCampeonatos.length === 0 ? (
-            <p className="text-gray-300">Nenhum campeonato encontrado para a pesquisa.</p>
+            <div className="empty-state">
+              <p>Nenhum campeonato encontrado para a pesquisa</p>
+            </div>
           ) : (
-            <div className="w-full overflow-x-auto">
-              <table className="w-full text-left text-gray-300">
+            <div className="table-container">
+              <table className="campeonatos-table">
                 <thead>
-                  <tr className="border-b border-green-700">
-                    <th className="px-4 py-2">Nome</th>
-                    <th className="px-4 py-2">Status</th>
-                    <th className="px-4 py-2">Data Início</th>
-                    <th className="px-4 py-2">Data Fim</th>
-                    <th className="px-4 py-2">Local</th>
-                    <th className="px-4 py-2">Ações</th>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Status</th>
+                    <th>Data Início</th>
+                    <th>Data Fim</th>
+                    <th>Local</th>
+                    <th>Ações</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredCampeonatos.map((camp, index) => {
+                  {currentCampeonatos.map((camp, index) => {
                     const status = verificarStatus(camp.data_inicio, camp.data_fim);
                     return (
-                    <tr key={index} className="border-b border-green-700/50">
-                      <td className="px-4 py-2">{camp.nome_campeonato}</td>
-                      <td className="px-4 py-2">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          status.status === 'ativo' ? 'bg-green-900/30 text-green-400 border border-green-700' :
-                          status.status === 'futuro' ? 'bg-blue-900/30 text-blue-400 border border-blue-700' :
-                          'bg-red-900/30 text-red-400 border border-red-700'
-                        }`}>
-                          {status.texto}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2">{formatarData(camp.data_inicio)}</td>
-                      <td className="px-4 py-2">{formatarData(camp.data_fim)}</td>
-                      <td className="px-4 py-2">{camp.local_campeonato}</td>
-                      <td className="px-4 py-2">
-                        <div className="flex gap-2 items-center">
-                          <button
-                            onClick={() => openModal(camp)}
-                            className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-1 px-3 rounded hover:from-green-700 hover:to-green-600 transition-all duration-200 text-sm"
-                          >
-                            Detalhes
-                          </button>
-                          {isAdmin() && (
+                      <tr key={index}>
+                        <td>{camp.nome_campeonato}</td>
+                        <td>
+                          <span className={`status-badge ${status.status}`}>
+                            {status.texto}
+                          </span>
+                        </td>
+                        <td>{formatarData(camp.data_inicio)}</td>
+                        <td>{formatarData(camp.data_fim)}</td>
+                        <td>{camp.local_campeonato}</td>
+                        <td>
+                          <div className="action-buttons">
                             <button
-                              onClick={() => openDeleteModal(camp)}
-                              className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold py-1 px-2 rounded hover:from-red-700 hover:to-red-600 transition-all duration-200 text-sm flex items-center justify-center"
-                              title="Remover campeonato"
+                              onClick={() => openModal(camp)}
+                              className="btn-action"
                             >
-                              ×
+                              Detalhes
                             </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
+                            {isAdmin() && (
+                              <button
+                                onClick={() => openDeleteModal(camp)}
+                                className="btn-action btn-delete"
+                                title="Remover campeonato"
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
                     );
                   })}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* Footer com paginação */}
+          {!isLoading && !error && filteredCampeonatos.length > 0 && (
+            <div style={{
+              padding: '1.5rem',
+              borderTop: '1px solid var(--cl-border)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                fontSize: '0.875rem',
+                color: 'var(--cl-text-secondary)'
+              }}>
+                <span>
+                  Mostrando {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, filteredCampeonatos.length)} de {filteredCampeonatos.length} campeonatos
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.875rem', color: 'var(--cl-text-secondary)' }}>
+                    Itens por página:
+                  </label>
+                  <select 
+                    value={itemsPerPage} 
+                    onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                    style={{
+                      padding: '0.5rem',
+                      background: 'var(--cl-bg-secondary)',
+                      color: 'var(--cl-text-primary)',
+                      border: '1px solid var(--cl-border)',
+                      borderRadius: '6px',
+                      fontSize: '0.875rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+              </div>
+
+              {totalPages > 1 && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      background: 'var(--cl-bg-secondary)',
+                      border: '1px solid var(--cl-border)',
+                      borderRadius: '6px',
+                      color: 'var(--cl-text-secondary)',
+                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                      opacity: currentPage === 1 ? 0.4 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title="Página anterior"
+                  >
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    {(() => {
+                      const pages = [];
+                      const maxVisible = 5;
+                      let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+                      let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+                      if (endPage - startPage < maxVisible - 1) {
+                        startPage = Math.max(1, endPage - maxVisible + 1);
+                      }
+
+                      if (startPage > 1) {
+                        pages.push(
+                          <button 
+                            key={1}
+                            onClick={() => goToPage(1)}
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              background: 'var(--cl-bg-secondary)',
+                              border: '1px solid var(--cl-border)',
+                              borderRadius: '8px',
+                              color: 'var(--cl-text-secondary)',
+                              fontSize: '0.875rem',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            1
+                          </button>
+                        );
+                        if (startPage > 2) {
+                          pages.push(
+                            <span key="start-ellipsis" style={{ padding: '0 0.5rem', color: 'var(--cl-text-secondary)', fontSize: '0.875rem' }}>
+                              ...
+                            </span>
+                          );
+                        }
+                      }
+
+                      for (let i = startPage; i <= endPage; i++) {
+                        pages.push(
+                          <button
+                            key={i}
+                            onClick={() => goToPage(i)}
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              background: currentPage === i ? 'var(--cl-accent)' : 'var(--cl-bg-secondary)',
+                              border: `1px solid ${currentPage === i ? 'var(--cl-accent)' : 'var(--cl-border)'}`,
+                              borderRadius: '8px',
+                              color: currentPage === i ? 'white' : 'var(--cl-text-secondary)',
+                              fontSize: '0.875rem',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            {i}
+                          </button>
+                        );
+                      }
+
+                      if (endPage < totalPages) {
+                        if (endPage < totalPages - 1) {
+                          pages.push(
+                            <span key="end-ellipsis" style={{ padding: '0 0.5rem', color: 'var(--cl-text-secondary)', fontSize: '0.875rem' }}>
+                              ...
+                            </span>
+                          );
+                        }
+                        pages.push(
+                          <button
+                            key={totalPages}
+                            onClick={() => goToPage(totalPages)}
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              background: 'var(--cl-bg-secondary)',
+                              border: '1px solid var(--cl-border)',
+                              borderRadius: '8px',
+                              color: 'var(--cl-text-secondary)',
+                              fontSize: '0.875rem',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          >
+                            {totalPages}
+                          </button>
+                        );
+                      }
+
+                      return pages;
+                    })()}
+                  </div>
+
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      background: 'var(--cl-bg-secondary)',
+                      border: '1px solid var(--cl-border)',
+                      borderRadius: '6px',
+                      color: 'var(--cl-text-secondary)',
+                      cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                      opacity: currentPage === totalPages ? 0.4 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title="Próxima página"
+                  >
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -328,77 +565,61 @@ export default function CadastroCampeonatoLista() {
 
       {/* Modal de Detalhes */}
       {isModalOpen && selectedCampeonato && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto transition-all duration-300">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-lg font-bold text-white shadow-md">
-                  C
-                </div>
-                <h2 className="text-2xl font-bold text-white">Detalhes do Campeonato</h2>
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title-section">
+                <h2 className="modal-title">{selectedCampeonato.nome_campeonato}</h2>
+                <p className="modal-subtitle">{selectedCampeonato.local_campeonato}</p>
               </div>
-              <button
-                onClick={closeModal}
-                className="text-gray-400 hover:text-white text-2xl font-bold transition-colors duration-200"
-              >
+              <button className="modal-close" onClick={closeModal}>
                 ×
               </button>
             </div>
 
-            <div className="w-full flex flex-col gap-6 mb-6">
-              <div className="w-full flex flex-col items-center">
-                <h3 className="text-xl font-semibold text-white text-center">{selectedCampeonato.nome_campeonato}</h3>
-                <p className="text-green-400 font-medium text-center">{selectedCampeonato.local_campeonato}</p>
-                <div className="mt-2">
-                  {(() => {
-                    const status = verificarStatus(selectedCampeonato.data_inicio, selectedCampeonato.data_fim);
-                    return (
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                        status.status === 'ativo' ? 'bg-green-900/30 text-green-400 border border-green-700' :
-                        status.status === 'futuro' ? 'bg-blue-900/30 text-blue-400 border border-blue-700' :
-                        'bg-red-900/30 text-red-400 border border-red-700'
-                      }`}>
-                        {status.texto}
-                      </span>
-                    );
-                  })()}
-                </div>
-              </div>
+            <div className="modal-body">
+              {(() => {
+                const status = verificarStatus(selectedCampeonato.data_inicio, selectedCampeonato.data_fim);
+                return (
+                  <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
+                    <span className={`status-badge ${status.status}`}>
+                      {status.texto}
+                    </span>
+                  </div>
+                );
+              })()}
 
-              <div className="w-full">
-                <h4 className="text-lg font-medium text-white mb-3 text-center">Informações do Evento</h4>
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
-                    <p className="text-gray-400 text-sm mb-1">Data de Início</p>
-                    <p className="text-white font-semibold text-lg">
-                      {formatarData(selectedCampeonato.data_inicio, 'extenso')}
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
-                    <p className="text-gray-400 text-sm mb-1">Data de Término</p>
-                    <p className="text-white font-semibold text-lg">
-                      {formatarData(selectedCampeonato.data_fim, 'extenso')}
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
-                    <p className="text-gray-400 text-sm mb-1">Duração</p>
-                    <p className="text-white font-semibold">
-                      {calcularDuracao(selectedCampeonato.data_inicio, selectedCampeonato.data_fim)}
-                    </p>
-                  </div>
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
-                    <p className="text-gray-400 text-sm mb-1">Localização</p>
-                    <p className="text-white font-semibold">{selectedCampeonato.local_campeonato}</p>
-                  </div>
+              <div className="info-grid">
+                <div className="info-card">
+                  <p className="info-label">Data de Início</p>
+                  <p className="info-value">
+                    {formatarData(selectedCampeonato.data_inicio, 'extenso')}
+                  </p>
+                </div>
+
+                <div className="info-card">
+                  <p className="info-label">Data de Término</p>
+                  <p className="info-value">
+                    {formatarData(selectedCampeonato.data_fim, 'extenso')}
+                  </p>
+                </div>
+
+                <div className="info-card">
+                  <p className="info-label">Duração</p>
+                  <p className="info-value">
+                    {calcularDuracao(selectedCampeonato.data_inicio, selectedCampeonato.data_fim)}
+                  </p>
+                </div>
+
+                <div className="info-card">
+                  <p className="info-label">Localização</p>
+                  <p className="info-value">{selectedCampeonato.local_campeonato}</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-center">
-              <button
-                onClick={closeModal}
-                className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-8 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200"
-              >
+            <div className="modal-footer">
+              <button onClick={closeModal} className="btn-add">
                 Fechar
               </button>
             </div>
@@ -408,50 +629,53 @@ export default function CadastroCampeonatoLista() {
 
       {/* Modal de Confirmação de Delete */}
       {isDeleteModalOpen && campeonatoToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-black/90 backdrop-blur-sm border border-red-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-md w-full transition-all duration-300">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
-                !
+        <div className="modal-overlay" onClick={closeDeleteModal}>
+          <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title-section">
+                <h2 className="modal-title">Confirmar Remoção</h2>
+                <p className="modal-subtitle" style={{color: 'var(--cl-error)'}}>Esta ação não pode ser desfeita</p>
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">Confirmar Remoção</h2>
-                <p className="text-gray-300 text-sm">Esta ação não pode ser desfeita</p>
-              </div>
+              <button className="modal-close" onClick={closeDeleteModal}>
+                ×
+              </button>
             </div>
 
-            <div className="mb-6">
-              <p className="text-gray-300 mb-2">
-                Tem certeza que deseja remover o campeonato:
-              </p>
-              <p className="text-white font-semibold text-lg">
-                {campeonatoToDelete.nome_campeonato}
-              </p>
-              <p className="text-gray-400 text-sm">
-                {campeonatoToDelete.local_campeonato} • {formatarData(campeonatoToDelete.data_inicio)} a {formatarData(campeonatoToDelete.data_fim)}
-              </p>
-              <div className="mt-3 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded-lg">
-                <p className="text-yellow-400 text-sm">
-                  ⚠️ <strong>Atenção:</strong> Só é possível deletar campeonatos que não possuem partidas associadas.
+            <div className="modal-body">
+              <div className="delete-info">
+                <p style={{color: 'var(--cl-text-secondary)', marginBottom: '0.5rem'}}>
+                  Tem certeza que deseja remover o campeonato:
+                </p>
+                <p className="delete-campeonato-name">
+                  {campeonatoToDelete.nome_campeonato}
+                </p>
+                <p className="delete-campeonato-details">
+                  {campeonatoToDelete.local_campeonato} • {formatarData(campeonatoToDelete.data_inicio)} a {formatarData(campeonatoToDelete.data_fim)}
                 </p>
               </div>
+
+              <div className="delete-warning">
+                ⚠️ <strong>Atenção:</strong> Só é possível deletar campeonatos que não possuem partidas associadas.
+              </div>
             </div>
 
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={closeDeleteModal}
-                disabled={isDeleting}
-                className="bg-gray-700 text-gray-300 font-semibold py-2.5 px-6 rounded-lg hover:bg-gray-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleDeleteCampeonato}
-                disabled={isDeleting}
-                className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-red-700 hover:to-red-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                {isDeleting ? 'Removendo...' : 'Remover'}
-              </button>
+            <div className="modal-footer">
+              <div className="delete-actions">
+                <button
+                  onClick={closeDeleteModal}
+                  disabled={isDeleting}
+                  className="btn-cancel"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteCampeonato}
+                  disabled={isDeleting}
+                  className="btn-confirm-delete"
+                >
+                  {isDeleting ? 'Removendo...' : 'Remover'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

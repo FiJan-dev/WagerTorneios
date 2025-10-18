@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
+import './CadastroCampeonato.css';
 
 export default function ChampionshipRegistrationPage() {
   const { token } = useContext(AuthContext);
@@ -122,104 +123,119 @@ export default function ChampionshipRegistrationPage() {
   };
 
   return (
-    <div className='flex min-h-screen bg-black'>
+    <div className="campeonato-cadastro-page">
       <SideBar_Olheiro />
-      <div className='flex justify-center items-center min-h-screen w-full p-4 box-border'>
-        <div className='bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-2xl w-full flex flex-col items-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl'>
-          <div className='mb-6 flex justify-center'>
-            <div className='w-20 h-20 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-2xl font-bold text-white shadow-md'>
-              C
-            </div>
-          </div>
-          <h1 className='text-2xl sm:text-3xl text-center font-bold text-white mb-2'>
-            Cadastro de Campeonato
-          </h1>
-          <p className='text-center text-gray-300 text-base mb-6'>
-            Preencha os detalhes para criar um novo campeonato
-          </p>
+      
+      <div className="cadastro-container">
+        <div className="page-header-cadastro">
+          <h1>Cadastrar Campeonato</h1>
+          <p>Preencha as informações para criar um novo campeonato</p>
+        </div>
 
-          <form onSubmit={handleSubmit} className='flex flex-col w-full gap-4'>
-            <div className='flex flex-col gap-1'>
-              <label htmlFor='name' className='text-gray-300 font-medium'>
-                Nome do Campeonato *
-              </label>
-              <input
-                id='name'
-                type='text'
-                placeholder='Ex: Copa América 2024, Liga dos Campeões...'
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full'
-              />
+        <div className="cadastro-card">
+          <form onSubmit={handleSubmit} className="campeonato-form">
+            <div className="form-section">
+              <h2 className="section-title">Informações Básicas</h2>
+              
+              <div className="form-group">
+                <label htmlFor="name">
+                  Nome do Campeonato <span className="required">*</span>
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  className="form-input"
+                  placeholder="Ex: Copa América 2024, Liga dos Campeões..."
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="description">Descrição</label>
+                <textarea
+                  id="description"
+                  className="form-textarea"
+                  placeholder="Adicione detalhes sobre o campeonato, regulamento, premiação, etc."
+                  value={formData.description}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="location">
+                  Local <span className="required">*</span>
+                </label>
+                <input
+                  id="location"
+                  type="text"
+                  className="form-input"
+                  placeholder="Ex: Estádio Nacional, Arena da Baixada, Cidade/Estado..."
+                  value={formData.location}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
             </div>
-            
-            <div className='flex flex-col gap-1'>
-              <label htmlFor='description' className='text-gray-300 font-medium'>
-                Descrição (opcional)
-              </label>
-              <textarea
-                id='description'
-                placeholder='Adicione detalhes sobre o campeonato, regulamento, premiação, etc.'
-                value={formData.description}
-                onChange={handleChange}
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full resize-none'
-                rows='3'
-              />
-            </div>
-            
-            <div className='flex flex-col gap-1'>
-              <label htmlFor='startDate' className='text-gray-300 font-medium'>
-                Data de Início *
-              </label>
-              <input
-                id='startDate'
-                type='date'
-                value={formData.startDate}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full'
-              />
-              <p className='text-gray-400 text-xs'>
-                💡 Dica: Você pode cadastrar campeonatos com datas passadas para registros históricos
+
+            <div className="form-section">
+              <h2 className="section-title">Período</h2>
+              
+              <div className="date-inputs-row">
+                <div className="form-group">
+                  <label htmlFor="startDate">
+                    Data de Início <span className="required">*</span>
+                  </label>
+                  <input
+                    id="startDate"
+                    type="date"
+                    className="form-input"
+                    value={formData.startDate}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="endDate">
+                    Data de Término <span className="required">*</span>
+                  </label>
+                  <input
+                    id="endDate"
+                    type="date"
+                    className="form-input"
+                    value={formData.endDate}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <p className="form-hint">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Você pode cadastrar campeonatos com datas passadas para registros históricos
               </p>
             </div>
-            
-            <div className='flex flex-col gap-1'>
-              <label htmlFor='endDate' className='text-gray-300 font-medium'>
-                Data de Término *
-              </label>
-              <input
-                id='endDate'
-                type='date'
-                value={formData.endDate}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full'
-              />
+
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn-cancel"
+                onClick={() => navigate('/cadastrocampeonatolista')}
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="btn-submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Cadastrando...' : 'Cadastrar Campeonato'}
+              </button>
             </div>
-            
-            <div className='flex flex-col gap-1'>
-              <label htmlFor='location' className='text-gray-300 font-medium'>
-                Local do Campeonato *
-              </label>
-              <input
-                id='location'
-                type='text'
-                placeholder='Ex: Estádio Nacional, Arena da Baixada, Cidade/Estado...'
-                value={formData.location}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full'
-              />
-            </div>
-            <button
-              type='submit'
-              disabled={isSubmitting}
-              className='bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 w-full text-center'
-            >
-              {isSubmitting ? 'Cadastrando...' : 'Cadastrar'}
-            </button>
           </form>
         </div>
       </div>

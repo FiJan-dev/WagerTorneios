@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
 import { AuthContext } from '../context/AuthContext';
+import './CadastroPartidaLista.css';
 
 // Função auxiliar para formatar datas
 const formatarDataHora = (dataString, formato = 'padrao') => {
@@ -43,8 +44,26 @@ export default function CadastroPartidaLista() {
   const [partidaToDelete, setPartidaToDelete] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const API_URL = 'http://localhost:5000/api/partida/listarP';
+
+  // Lógica de paginação
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentPartidas = partidas.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(partidas.length / itemsPerPage);
+
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
 
   useEffect(() => {
     const fetchPartidas = async () => {
@@ -155,72 +174,66 @@ export default function CadastroPartidaLista() {
   };
 
   return (
-    <div className="flex min-h-screen bg-black flex-col">
+    <div className="partida-list-page">
       <SideBar_Olheiro />
-      <div className="flex justify-center items-center min-h-screen w-full p-4 box-border pt-16 sm:pt-20">
-        <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-7xl w-full flex flex-col items-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
-          <div className="mb-6 flex justify-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-2xl font-bold text-white shadow-md">
-              P
-            </div>
+      
+      <div className="partida-list-container">
+        <div className="page-header-partida-list">
+          <div className="header-left">
+            <h1>Partidas</h1>
+            <p>Visualize e gerencie as partidas cadastradas</p>
           </div>
-          <h1 className="text-2xl sm:text-3xl text-center font-bold text-white mb-2">
-            Lista de Partidas
-          </h1>
-          <p className="text-center text-gray-300 text-base mb-6">
-            Visualize e gerencie as partidas cadastradas
-          </p>
           {isAdmin() && (
-            <Link
-              to="/cadastropartida"
-              className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200 mb-8"
-            >
+            <Link to="/cadastropartida" className="btn-add-partida">
               Adicionar Partida
             </Link>
           )}
+        </div>
+
+        <div className="partida-content">
           {isLoading ? (
-            <p className="text-gray-300">Carregando...</p>
+            <div className="loading-state">Carregando...</div>
           ) : error ? (
-            <p className="text-red-500">{error}</p>
+            <div className="error-state">{error}</div>
           ) : partidas.length === 0 ? (
-            <p className="text-gray-300">Nenhuma partida cadastrada.</p>
+            <div className="empty-state">Nenhuma partida cadastrada.</div>
           ) : (
-            <div className="w-full overflow-x-auto">
-              <table className="w-full text-left text-gray-300">
+            <>
+              <table className="partidas-table">
                 <thead>
-                  <tr className="border-b border-green-700">
-                    <th className="px-4 py-2">Campeonato</th>
-                    <th className="px-4 py-2">Time Casa</th>
-                    <th className="px-4 py-2">Time Visitante</th>
-                    <th className="px-4 py-2">Placar</th>
-                    <th className="px-4 py-2">Data/Hora</th>
-                    <th className="px-4 py-2">Local</th>
-                    <th className="px-4 py-2">Ações</th>
+                  <tr>
+                    <th>CAMPEONATO</th>
+                    <th>TIME CASA</th>
+                    <th>TIME VISITANTE</th>
+                    <th>PLACAR</th>
+                    <th>DATA/HORA</th>
+                    <th>LOCAL</th>
+                    <th>AÇÕES</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {partidas.map((partida, index) => (
-                    <tr key={index} className="border-b border-green-700/50">
-                      <td className="px-4 py-2">{partida.nome_campeonato}</td>
-                      <td className="px-4 py-2">{partida.nome_time_casa}</td>
-                      <td className="px-4 py-2">{partida.nome_time_visitante}</td>
-                      <td className="px-4 py-2">
-                        {`${partida.placar_casa} x ${partida.placar_visitante}`}
+                  {currentPartidas.map((partida) => (
+                    <tr key={partida.id_partida}>
+                      <td className="partida-campeonato">{partida.nome_campeonato}</td>
+                      <td>{partida.nome_time_casa}</td>
+                      <td>{partida.nome_time_visitante}</td>
+                      <td className="partida-placar">
+                        {partida.placar_casa} × {partida.placar_visitante}
                       </td>
-                      <td className="px-4 py-2">{formatarDataHora(partida.data_partida)}</td>
-                      <td className="px-4 py-2">{partida.local_partida}</td>
-                      <td className="px-4 py-2">
-                        <div className="flex gap-2 items-center">
+                      <td>{formatarDataHora(partida.data_partida)}</td>
+                      <td>{partida.local_partida}</td>
+                      <td>
+                        <div className="actions-cell">
                           <button
                             onClick={() => openModal(partida)}
-                            className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-1 px-3 rounded hover:from-green-700 hover:to-green-600 transition-all duration-200 text-sm"
+                            className="btn-details"
                           >
                             Detalhes
                           </button>
                           {isAdmin() && (
                             <button
                               onClick={() => openDeleteModal(partida)}
-                              className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold py-1 px-2 rounded hover:from-red-700 hover:to-red-600 transition-all duration-200 text-sm flex items-center justify-center"
+                              className="btn-delete"
                               title="Remover partida"
                             >
                               ×
@@ -232,81 +245,176 @@ export default function CadastroPartidaLista() {
                   ))}
                 </tbody>
               </table>
-            </div>
+
+              {/* Footer com paginação */}
+              {partidas.length > 0 && (
+                <div className="partida-footer">
+                  <div className="footer-info">
+                    <span>
+                      Mostrando {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, partidas.length)} de {partidas.length} partidas
+                    </span>
+                    <div className="items-per-page">
+                      <label>Itens por página:</label>
+                      <select 
+                        value={itemsPerPage} 
+                        onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                      >
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {totalPages > 1 && (
+                    <div className="pagination-controls">
+                      <button
+                        onClick={() => goToPage(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="pagination-btn"
+                        title="Página anterior"
+                      >
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+
+                      {(() => {
+                        const pages = [];
+                        const maxVisible = 5;
+                        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+                        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+                        if (endPage - startPage < maxVisible - 1) {
+                          startPage = Math.max(1, endPage - maxVisible + 1);
+                        }
+
+                        if (startPage > 1) {
+                          pages.push(
+                            <button
+                              key={1}
+                              onClick={() => goToPage(1)}
+                              className="pagination-number"
+                            >
+                              1
+                            </button>
+                          );
+                          if (startPage > 2) {
+                            pages.push(
+                              <span key="start-ellipsis" className="pagination-ellipsis">
+                                ...
+                              </span>
+                            );
+                          }
+                        }
+
+                        for (let i = startPage; i <= endPage; i++) {
+                          pages.push(
+                            <button
+                              key={i}
+                              onClick={() => goToPage(i)}
+                              className={`pagination-number ${currentPage === i ? 'active' : ''}`}
+                            >
+                              {i}
+                            </button>
+                          );
+                        }
+
+                        if (endPage < totalPages) {
+                          if (endPage < totalPages - 1) {
+                            pages.push(
+                              <span key="end-ellipsis" className="pagination-ellipsis">
+                                ...
+                              </span>
+                            );
+                          }
+                          pages.push(
+                            <button
+                              key={totalPages}
+                              onClick={() => goToPage(totalPages)}
+                              className="pagination-number"
+                            >
+                              {totalPages}
+                            </button>
+                          );
+                        }
+
+                        return pages;
+                      })()}
+
+                      <button
+                        onClick={() => goToPage(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="pagination-btn"
+                        title="Próxima página"
+                      >
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
 
       {/* Modal de Detalhes */}
       {isModalOpen && selectedPartida && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto transition-all duration-300">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-lg font-bold text-white shadow-md">
-                  P
-                </div>
-                <h2 className="text-2xl font-bold text-white">Detalhes da Partida</h2>
-              </div>
-              <button
-                onClick={closeModal}
-                className="text-gray-400 hover:text-white text-2xl font-bold transition-colors duration-200"
-              >
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Detalhes da Partida</h2>
+              <button onClick={closeModal} className="modal-close">
                 ×
               </button>
             </div>
 
-            <div className="w-full flex flex-col gap-6 mb-6">
-              <div className="w-full flex flex-col items-center">
-                <h3 className="text-xl font-semibold text-white text-center">{selectedPartida.nome_campeonato}</h3>
-                <p className="text-green-400 font-medium text-center">{selectedPartida.local_partida}</p>
+            <div className="modal-body">
+              <div className="modal-campeonato">
+                <h3>{selectedPartida.nome_campeonato}</h3>
+                <p className="modal-campeonato-local">{selectedPartida.local_partida}</p>
               </div>
 
-              {/* Confronto */}
-              <div className="w-full">
-                <h4 className="text-lg font-medium text-white mb-3 text-center">Confronto</h4>
-                <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
-                  <div className="flex items-center justify-between">
-                    <div className="text-center flex-1">
-                      <p className="text-gray-400 text-sm">Time Casa</p>
-                      <p className="text-white font-semibold text-lg">{selectedPartida.nome_time_casa}</p>
-                    </div>
-                    <div className="mx-4">
-                      <div className="text-2xl font-bold text-green-400">
-                        {selectedPartida.placar_casa} × {selectedPartida.placar_visitante}
-                      </div>
-                    </div>
-                    <div className="text-center flex-1">
-                      <p className="text-gray-400 text-sm">Time Visitante</p>
-                      <p className="text-white font-semibold text-lg">{selectedPartida.nome_time_visitante}</p>
-                    </div>
+              <div className="modal-section">
+                <h4 className="modal-section-title">Confronto</h4>
+                <div className="confronto-box">
+                  <div className="confronto-time">
+                    <div className="confronto-time-label">Time Casa</div>
+                    <div className="confronto-time-name">{selectedPartida.nome_time_casa}</div>
+                  </div>
+                  <div className="confronto-placar">
+                    {selectedPartida.placar_casa} × {selectedPartida.placar_visitante}
+                  </div>
+                  <div className="confronto-time">
+                    <div className="confronto-time-label">Time Visitante</div>
+                    <div className="confronto-time-name">{selectedPartida.nome_time_visitante}</div>
                   </div>
                 </div>
               </div>
 
-              {/* Informações da partida */}
-              <div className="w-full">
-                <h4 className="text-lg font-medium text-white mb-3 text-center">Informações da Partida</h4>
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
-                    <p className="text-gray-400 text-sm mb-1">Data e Horário</p>
-                    <p className="text-white font-semibold">
+              <div className="modal-section">
+                <h4 className="modal-section-title">Informações</h4>
+                <div className="info-grid">
+                  <div className="info-card">
+                    <div className="info-card-label">Data e Horário</div>
+                    <div className="info-card-value">
                       {formatarDataHora(selectedPartida.data_partida, 'completo')}
-                    </p>
+                    </div>
                   </div>
-                  <div className="bg-gray-800/50 rounded-lg p-4 border border-green-700/30">
-                    <p className="text-gray-400 text-sm mb-1">Local</p>
-                    <p className="text-white font-semibold">{selectedPartida.local_partida}</p>
+                  <div className="info-card">
+                    <div className="info-card-label">Local</div>
+                    <div className="info-card-value">{selectedPartida.local_partida}</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-center">
-              <button
-                onClick={closeModal}
-                className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-8 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200"
-              >
+            <div className="modal-footer">
+              <button onClick={closeModal} className="btn-modal-close">
                 Fechar
               </button>
             </div>
@@ -316,42 +424,41 @@ export default function CadastroPartidaLista() {
 
       {/* Modal de Confirmação de Delete */}
       {isDeleteModalOpen && partidaToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-black/90 backdrop-blur-sm border border-red-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-md w-full transition-all duration-300">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
-                !
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">Confirmar Remoção</h2>
-                <p className="text-gray-300 text-sm">Esta ação não pode ser desfeita</p>
-              </div>
+        <div className="modal-overlay" onClick={closeDeleteModal}>
+          <div className="modal-content delete-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header delete-modal-header">
+              <h2>Confirmar Remoção</h2>
+              <button onClick={closeDeleteModal} className="modal-close">
+                ×
+              </button>
             </div>
 
-            <div className="mb-6">
-              <p className="text-gray-300 mb-2">
-                Tem certeza que deseja remover a partida:
-              </p>
-              <p className="text-white font-semibold text-lg">
-                {partidaToDelete.nome_time_casa} × {partidaToDelete.nome_time_visitante}
-              </p>
-              <p className="text-gray-400 text-sm">
-                {partidaToDelete.nome_campeonato} • {formatarDataHora(partidaToDelete.data_partida)}
-              </p>
+            <div className="delete-modal-body">
+              <div className="delete-warning-icon">!</div>
+              <p>Tem certeza que deseja remover a partida:</p>
+              <div className="delete-partida-info">
+                <div className="delete-partida-name">
+                  {partidaToDelete.nome_time_casa} × {partidaToDelete.nome_time_visitante}
+                </div>
+                <div className="delete-partida-details">
+                  {partidaToDelete.nome_campeonato} • {formatarDataHora(partidaToDelete.data_partida)}
+                </div>
+              </div>
+              <p style={{ marginTop: '1rem', fontSize: '0.875rem' }}>Esta ação não pode ser desfeita.</p>
             </div>
 
-            <div className="flex gap-3 justify-end">
+            <div className="modal-actions">
               <button
                 onClick={closeDeleteModal}
                 disabled={isDeleting}
-                className="bg-gray-700 text-gray-300 font-semibold py-2.5 px-6 rounded-lg hover:bg-gray-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="btn-cancel-delete"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleDeletePartida}
                 disabled={isDeleting}
-                className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-red-700 hover:to-red-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="btn-confirm-delete"
               >
                 {isDeleting ? 'Removendo...' : 'Remover'}
               </button>
