@@ -6,6 +6,7 @@ import { RiGroupFill } from "react-icons/ri";
 import { BsDoorOpenFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
 import { AuthContext } from '../context/AuthContext';
+import './SideBar_Olheiro.css';
 
 function SideBar_Olheiro() {
   const location = useLocation();
@@ -48,54 +49,60 @@ function SideBar_Olheiro() {
   };
 
   return (
-    <nav className={`bg-black/90 backdrop-blur-sm border-b border-green-700 w-full flex flex-row items-center justify-between px-4 py-2 fixed top-0 left-0 transition-all duration-300 z-50`}>
-      <div className="flex items-center gap-4">
-        {!isCollapsed && (
-          <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-green-500 rounded-full flex items-center justify-center text-lg font-bold text-white shadow-md">
-            S
-          </div>
-        )}
-        <div className={`flex items-center gap-4 ${isCollapsed ? 'justify-center' : ''}`}>
-          {mainItems.map(item => (
-            <Link
-              key={item.id}
-              to={item.path}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
-            >
-              <span className="text-lg">{item.icon}</span>
-              {!isCollapsed && <span className="text-sm">{item.label}</span>}
-            </Link>
-          ))}
-        </div>
+    <nav className={`topbar ${isCollapsed ? 'collapsed' : ''}`}>
+      {/* Logo Section */}
+      <div className="topbar-logo">
+        <div className="logo-icon">W</div>
+        {!isCollapsed && <span className="logo-text">WagerTorneios</span>}
       </div>
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-4">
+
+      {/* Main Navigation */}
+      <div className="topbar-nav">
+        {mainItems.map(item => (
+          <Link
+            key={item.id}
+            to={item.path}
+            className={`nav-item ${activeItem === item.id ? 'active' : ''}`}
+          >
+            <span className="nav-item-icon">{item.icon}</span>
+            <span className="nav-item-label">{item.label}</span>
+          </Link>
+        ))}
+      </div>
+
+      {/* Right Actions */}
+      <div className="topbar-actions">
+        <div className="action-group">
           {bottomItems.map(item => (
             item.id === 'logout' ? (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => logout()}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
+                className="action-btn logout-btn"
               >
-                <span className="text-lg">{item.icon}</span>
-                {!isCollapsed && <span className="text-sm">{item.label}</span>}
+                <span className="action-icon">{item.icon}</span>
+                <span>{item.label}</span>
               </button>
             ) : (
               <Link
                 key={item.id}
                 to={item.path}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:bg-green-700/50 hover:text-white cursor-pointer ${activeItem === item.id ? 'bg-green-600 text-white font-bold border-b-2 border-green-400' : ''}`}
+                className={`action-btn ${activeItem === item.id ? 'active' : ''}`}
               >
-                <span className="text-lg">{item.icon}</span>
-                {!isCollapsed && <span className="text-sm">{item.label}</span>}
+                <span className="action-icon">{item.icon}</span>
+                <span>{item.label}</span>
               </Link>
             )
           ))}
         </div>
+
+        <div className="topbar-divider"></div>
+
         <button
-          className="text-white text-lg font-bold hover:text-green-500 transition-colors duration-200"
+          className="toggle-btn"
           onClick={toggleSidebar}
+          title={isCollapsed ? 'Expandir' : 'Recolher'}
         >
           {isCollapsed ? '→' : '←'}
         </button>

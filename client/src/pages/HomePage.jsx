@@ -1,9 +1,16 @@
 import { Link } from 'react-router-dom';
+import backgroundImage from '../assets/backg.jpg';
 import './HomePage.css';
 
 export default function HomePage() {
   return (
     <div className="homepage-container">
+      {/* Background Image */}
+      <div 
+        className="background-image"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      ></div>
+      
       {/* Background Effects */}
       <div className="background-gradient"></div>
       <div className="background-grid"></div>

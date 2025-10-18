@@ -1,0 +1,307 @@
+/* ===========================
+   PLAYER CADASTRO - DESIGN MINIMALISTA PROFISSIONAL
+   =========================== */
+
+:root {
+  --pc-bg-dark: #0a0e1f;
+  --pc-bg-secondary: #111827;
+  --pc-bg-card: #1a1f35;
+  --pc-accent: #3b82f6;
+  --pc-accent-hover: #2563eb;
+  --pc-text-primary: #f9fafb;
+  --pc-text-secondary: #9ca3af;
+  --pc-border: #1f2937;
+  --pc-border-light: #374151;
+  --pc-error: #ef4444;
+  --pc-success: #10b981;
+}
+
+/* ===========================
+   PAGE LAYOUT
+   =========================== */
+
+.player-cadastro-page {
+  min-height: 100vh;
+  background: var(--pc-bg-dark);
+  display: flex;
+  justify-content: center;
+  padding-top: 80px;
+  padding-bottom: 2rem;
+}
+
+.cadastro-container {
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+}
+
+/* ===========================
+   FORM CARD
+   =========================== */
+
+.cadastro-card {
+  background: var(--pc-bg-card);
+  border: 1px solid var(--pc-border);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.cadastro-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.cadastro-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--pc-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.cadastro-subtitle {
+  font-size: 0.938rem;
+  color: var(--pc-text-secondary);
+  margin: 0;
+}
+
+/* Error Message */
+.error-message {
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: var(--pc-error);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* ===========================
+   FORM
+   =========================== */
+
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--pc-text-primary);
+  margin: 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--pc-border);
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group.two-columns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--pc-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.form-label .required {
+  color: var(--pc-error);
+}
+
+/* Input Styles */
+.form-input,
+.form-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--pc-bg-secondary);
+  border: 1px solid var(--pc-border);
+  border-radius: 8px;
+  color: var(--pc-text-primary);
+  font-size: 0.938rem;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+  outline: none;
+  border-color: var(--pc-accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input::placeholder {
+  color: var(--pc-text-secondary);
+  opacity: 0.6;
+}
+
+.form-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.form-input[type="number"]::-webkit-outer-spin-button,
+.form-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.form-select {
+  cursor: pointer;
+}
+
+.form-select option {
+  background: var(--pc-bg-secondary);
+  color: var(--pc-text-primary);
+}
+
+/* ===========================
+   BUTTONS
+   =========================== */
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-submit {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, var(--pc-accent), var(--pc-accent-hover));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-cancel {
+  padding: 0.875rem 1.5rem;
+  background: var(--pc-bg-secondary);
+  color: var(--pc-text-primary);
+  border: 1px solid var(--pc-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-cancel:hover {
+  background: var(--pc-bg-dark);
+  border-color: var(--pc-border-light);
+}
+
+/* ===========================
+   STATS GRID
+   =========================== */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+@media (max-width: 768px) {
+  .player-cadastro-page {
+    padding-top: 70px;
+    padding-bottom: 1rem;
+  }
+
+  .cadastro-container {
+    padding: 1rem;
+  }
+
+  .cadastro-card {
+    padding: 1.5rem;
+  }
+
+  .cadastro-title {
+    font-size: 1.5rem;
+  }
+
+  .form-group.two-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-submit,
+  .btn-cancel {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .cadastro-card {
+    padding: 1rem;
+  }
+
+  .cadastro-title {
+    font-size: 1.25rem;
+  }
+
+  .form-input,
+  .form-select {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-submit,
+  .btn-cancel {
+    padding: 0.75rem 1rem;
+    font-size: 0.938rem;
+  }
+}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
+import './PlayerList.css';
 
 export default function PlayerList() {
   const { token, isAdmin } = useContext(AuthContext);
@@ -11,11 +12,14 @@ export default function PlayerList() {
   const [error, setError] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
   const [playerToDelete, setPlayerToDelete] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const API_URL = 'http://localhost:5000/api/jogador/listar';
 
@@ -58,6 +62,22 @@ export default function PlayerList() {
     fetchPlayers();
   }, [token]);
 
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentPlayers = players.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(players.length / itemsPerPage);
+
+  const goToPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
   const openModal = (player) => {
     setSelectedPlayer(player);
     setIsModalOpen(true);
@@ -66,23 +86,6 @@ export default function PlayerList() {
   const closeModal = () => {
     setSelectedPlayer(null);
     setIsModalOpen(false);
-    setComments([]);
-    setNewComment('');
-  };
-
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-    if (newComment.trim()) {
-      setComments((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          text: newComment,
-          date: new Date().toLocaleString('pt-BR'),
-        },
-      ]);
-      setNewComment('');
-    }
   };
 
   const openDeleteModal = (player) => {
@@ -125,70 +128,136 @@ export default function PlayerList() {
   };
 
   return (
-    <div className="flex min-h-screen bg-black flex-col">
+    <div className="player-list-page">
       <SideBar_Olheiro />
-      <div className="flex justify-center items-center min-h-screen w-full p-4 box-border pt-16 sm:pt-20">
-        <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-7xl w-full flex flex-col items-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
-          <div className="mb-6 flex justify-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-2xl font-bold text-white shadow-md">
-              J
+      
+      <div className="player-list-container">
+        {/* Header */}
+        <div className="page-header">
+          <div className="header-content">
+            <div className="header-title-section">
+              <h1 className="page-title">Jogadores Cadastrados: {players.length}</h1>
+              <p className="page-subtitle">Gerencie e visualize todos os jogadores</p>
+            </div>
+            
+            <div className="header-actions">
+              {isAdmin() && (
+                <Link to="/cadastrojogador" className="btn-add-player">
+                  <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Adicionar Jogador
+                </Link>
+              )}
+              
+              <div className="view-toggle">
+                <button
+                  className={`toggle-btn ${viewMode === 'table' ? 'active' : ''}`}
+                  onClick={() => setViewMode('table')}
+                  title="Visualização em tabela"
+                >
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                </button>
+                <button
+                  className={`toggle-btn ${viewMode === 'cards' ? 'active' : ''}`}
+                  onClick={() => setViewMode('cards')}
+                  title="Visualização em cards"
+                >
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl text-center font-bold text-white mb-2">
-            Lista de Jogadores
-          </h1>
-          <p className="text-center text-gray-300 text-base mb-6">
-            Visualize e gerencie os jogadores cadastrados
-          </p>
-          {isAdmin() && (
-            <Link
-              to="/cadastrojogador"
-              className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200 mb-8"
-            >
-              Adicionar Jogador
-            </Link>
-          )}
+        </div>
 
+        {/* Content */}
+        <div className="page-content">
           {isLoading ? (
-            <p className="text-gray-300">Carregando...</p>
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p>Carregando jogadores...</p>
+            </div>
           ) : error ? (
-            <p className="text-red-500">{error}</p>
+            <div className="error-state">
+              <svg className="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p>{error}</p>
+            </div>
           ) : players.length === 0 ? (
-            <p className="text-gray-300">Nenhum jogador cadastrado.</p>
-          ) : (
-            <div className="w-full overflow-x-auto">
-              <table className="w-full text-left text-gray-300">
+            <div className="empty-state">
+              <svg className="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <p>Nenhum jogador cadastrado</p>
+              {isAdmin() && (
+                <Link to="/cadastrojogador" className="btn-secondary">
+                  Cadastrar primeiro jogador
+                </Link>
+              )}
+            </div>
+          ) : viewMode === 'table' ? (
+            <div className="table-container">
+              <table className="players-table">
                 <thead>
-                  <tr className="border-b border-green-700">
-                    <th className="px-4 py-2">Nome</th>
-                    <th className="px-4 py-2">Posição</th>
-                    <th className="px-4 py-2">Idade</th>
-                    <th className="px-4 py-2">Time Atual</th>
-                    <th className="px-4 py-2">Ações</th>
+                  <tr>
+                    <th>Jogador</th>
+                    <th>Posição</th>
+                    <th>Idade</th>
+                    <th>Time</th>
+                    <th>Estatísticas</th>
+                    <th>Ações</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {players.map((player, index) => (
-                    <tr key={index} className="border-b border-green-700/50">
-                      <td className="px-4 py-2">{player.nome_jogador}</td>
-                      <td className="px-4 py-2">{player.posicao_jogador}</td>
-                      <td className="px-4 py-2">{player.idade}</td>
-                      <td className="px-4 py-2">{player.nome_time || 'Sem time'}</td>
-                      <td className="px-4 py-2">
-                        <div className="flex gap-2 items-center">
+                  {currentPlayers.map((player) => (
+                    <tr key={player.id_jogador}>
+                      <td>
+                        <div className="player-cell">
+                          <div className="player-avatar">
+                            {player.nome_jogador?.charAt(0).toUpperCase() || 'J'}
+                          </div>
+                          <span className="player-name">{player.nome_jogador}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="position-badge">{player.posicao_jogador}</span>
+                      </td>
+                      <td>{player.idade || 'N/A'}</td>
+                      <td>
+                        <span className="team-name">{player.nome_time || 'Sem time'}</span>
+                      </td>
+                      <td>
+                        <div className="stats-mini">
+                          <span title="Gols">{player.gols_marcados || 0}G</span>
+                          <span title="Assistências">{player.assistencias || 0}A</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="action-buttons">
                           <button
+                            className="btn-action btn-view"
                             onClick={() => openModal(player)}
-                            className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-1 px-3 rounded hover:from-green-700 hover:to-green-600 transition-all duration-200 text-sm"
+                            title="Ver detalhes"
                           >
-                            Detalhes
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
                           </button>
                           {isAdmin() && (
                             <button
+                              className="btn-action btn-delete"
                               onClick={() => openDeleteModal(player)}
-                              className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold py-1 px-2 rounded hover:from-red-700 hover:to-red-600 transition-all duration-200 text-sm flex items-center justify-center"
                               title="Remover jogador"
                             >
-                              ×
+                              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
                             </button>
                           )}
                         </div>
@@ -198,150 +267,273 @@ export default function PlayerList() {
                 </tbody>
               </table>
             </div>
+          ) : (
+            <div className="cards-grid">
+              {currentPlayers.map((player) => (
+                <div key={player.id_jogador} className="player-card">
+                  <div className="card-header">
+                    <div className="player-avatar-large">
+                      {player.nome_jogador?.charAt(0).toUpperCase() || 'J'}
+                    </div>
+                    <span className="position-badge">{player.posicao_jogador}</span>
+                  </div>
+                  
+                  <div className="card-body">
+                    <h3 className="card-player-name">{player.nome_jogador}</h3>
+                    <p className="card-team-name">{player.nome_time || 'Sem time'}</p>
+                    
+                    <div className="card-info">
+                      <span>Idade: {player.idade || 'N/A'}</span>
+                    </div>
+                    
+                    <div className="card-stats">
+                      <div className="stat-item">
+                        <span className="stat-label">Gols</span>
+                        <span className="stat-value">{player.gols_marcados || 0}</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">Assist.</span>
+                        <span className="stat-value">{player.assistencias || 0}</span>
+                      </div>
+                      <div className="stat-item">
+                        <span className="stat-label">Passes</span>
+                        <span className="stat-value">{player.passes_certos || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="card-footer">
+                    <button
+                      className="btn-card-action"
+                      onClick={() => openModal(player)}
+                    >
+                      Ver Detalhes
+                    </button>
+                    {isAdmin() && (
+                      <button
+                        className="btn-card-delete"
+                        onClick={() => openDeleteModal(player)}
+                        title="Remover"
+                      >
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {players.length > 0 && (
+            <div className="pagination-container">
+              <div className="pagination-info">
+                <span>
+                  Mostrando {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, players.length)} de {players.length} jogadores
+                </span>
+                <div className="items-per-page">
+                  <label>Itens por página:</label>
+                  <select value={itemsPerPage} onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pagination-controls">
+                <button
+                  className="pagination-btn"
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  title="Página anterior"
+                >
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                <div className="pagination-numbers">
+                  {(() => {
+                    const pages = [];
+                    const maxVisible = 5;
+                    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+                    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+                    if (endPage - startPage < maxVisible - 1) {
+                      startPage = Math.max(1, endPage - maxVisible + 1);
+                    }
+
+                    if (startPage > 1) {
+                      pages.push(
+                        <button key={1} className="pagination-number" onClick={() => goToPage(1)}>
+                          1
+                        </button>
+                      );
+                      if (startPage > 2) {
+                        pages.push(<span key="start-ellipsis" className="pagination-ellipsis">...</span>);
+                      }
+                    }
+
+                    for (let i = startPage; i <= endPage; i++) {
+                      pages.push(
+                        <button
+                          key={i}
+                          className={`pagination-number ${currentPage === i ? 'active' : ''}`}
+                          onClick={() => goToPage(i)}
+                        >
+                          {i}
+                        </button>
+                      );
+                    }
+
+                    if (endPage < totalPages) {
+                      if (endPage < totalPages - 1) {
+                        pages.push(<span key="end-ellipsis" className="pagination-ellipsis">...</span>);
+                      }
+                      pages.push(
+                        <button key={totalPages} className="pagination-number" onClick={() => goToPage(totalPages)}>
+                          {totalPages}
+                        </button>
+                      );
+                    }
+
+                    return pages;
+                  })()}
+                </div>
+
+                <button
+                  className="pagination-btn"
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  title="Próxima página"
+                >
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
 
       {/* Modal de Detalhes */}
       {isModalOpen && selectedPlayer && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-10 shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto transition-all duration-300">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-lg font-bold text-white shadow-md">
-                  {selectedPlayer.nome_jogador?.charAt(0) || 'J'}
-                </div>
-                <h2 className="text-2xl font-bold text-white">Perfil do Jogador</h2>
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content player-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeModal}>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="modal-header">
+              <div className="player-avatar-modal">
+                {selectedPlayer.nome_jogador?.charAt(0).toUpperCase() || 'J'}
               </div>
-              <button
-                onClick={closeModal}
-                className="text-gray-400 hover:text-white text-2xl font-bold transition-colors duration-200"
-              >
-                ×
-              </button>
+              <div className="player-title-section">
+                <h2 className="modal-player-name">{selectedPlayer.nome_jogador}</h2>
+                <p className="modal-player-info">
+                  <span className="position-badge">{selectedPlayer.posicao_jogador}</span>
+                  <span className="divider">•</span>
+                  <span>{selectedPlayer.idade ? `${selectedPlayer.idade} anos` : 'Idade não informada'}</span>
+                  {selectedPlayer.nome_time && (
+                    <>
+                      <span className="divider">•</span>
+                      <span>{selectedPlayer.nome_time}</span>
+                    </>
+                  )}
+                </p>
+              </div>
             </div>
 
-            {/* Info */}
-            <div className="w-full flex flex-col items-center gap-6 mb-6">
-              <div className="w-full flex flex-col items-center">
-                <h3 className="text-xl font-semibold text-white">{selectedPlayer.nome_jogador}</h3>
-                <p className="text-gray-300">
-                  {selectedPlayer.idade ? `${selectedPlayer.idade} anos` : 'Idade não informada'}
-                  {selectedPlayer.nome_time && ` | ${selectedPlayer.nome_time}`}
-                </p>
-                <p className="text-green-400 font-medium">{selectedPlayer.posicao_jogador}</p>
-              </div>
-
-              {/* Foto */}
-              <div className="w-32 h-32 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 border border-green-700/30">
-                <div className="text-center">
-                  <div className="text-3xl mb-2">⚽</div>
-                  <span className="text-sm">Foto do Jogador</span>
-                </div>
-              </div>
-
-              {/* Físico */}
-              <div className="w-full">
-                <h4 className="text-lg font-medium text-white mb-3 text-center">Informações Físicas</h4>
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div className="bg-gray-800/50 rounded-lg p-3 border border-green-700/30">
-                    <p className="text-gray-400 text-sm">Altura</p>
-                    <p className="text-white font-semibold">
+            <div className="modal-body">
+              {/* Informações Físicas */}
+              <div className="info-section">
+                <h3 className="section-title">Informações Físicas</h3>
+                <div className="info-grid">
+                  <div className="info-card">
+                    <span className="info-label">Altura</span>
+                    <span className="info-value">
                       {selectedPlayer.altura_cm ? `${selectedPlayer.altura_cm} cm` : 'N/A'}
-                    </p>
+                    </span>
                   </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3 border border-green-700/30">
-                    <p className="text-gray-400 text-sm">Peso</p>
-                    <p className="text-white font-semibold">
+                  <div className="info-card">
+                    <span className="info-label">Peso</span>
+                    <span className="info-value">
                       {selectedPlayer.peso_kg ? `${selectedPlayer.peso_kg} kg` : 'N/A'}
-                    </p>
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* Estatísticas */}
-              <div className="w-full">
-                <h4 className="text-lg font-medium text-white mb-3 text-center">Estatísticas</h4>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="bg-gray-800/50 rounded-lg p-3 border border-green-700/30">
-                    <p className="text-gray-400">Gols</p>
-                    <p className="text-white font-semibold text-lg">{selectedPlayer.gols_marcados || 0}</p>
+              {/* Estatísticas de Ataque */}
+              <div className="info-section">
+                <h3 className="section-title">Estatísticas Ofensivas</h3>
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <div className="stat-header">
+                      <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span className="stat-label">Gols</span>
+                    </div>
+                    <span className="stat-value">{selectedPlayer.gols_marcados || 0}</span>
                   </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3 border border-green-700/30">
-                    <p className="text-gray-400">Assistências</p>
-                    <p className="text-white font-semibold text-lg">{selectedPlayer.assistencias || 0}</p>
+                  <div className="stat-card">
+                    <div className="stat-header">
+                      <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                      </svg>
+                      <span className="stat-label">Assistências</span>
+                    </div>
+                    <span className="stat-value">{selectedPlayer.assistencias || 0}</span>
                   </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3 border border-green-700/30">
-                    <p className="text-gray-400">Passes Certos</p>
-                    <p className="text-white font-semibold text-lg">{selectedPlayer.passes_certos || 0}</p>
+                  <div className="stat-card">
+                    <div className="stat-header">
+                      <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                      <span className="stat-label">Passes Certos</span>
+                    </div>
+                    <span className="stat-value">{selectedPlayer.passes_certos || 0}</span>
                   </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3 border border-green-700/30">
-                    <p className="text-gray-400">Finalizações</p>
-                    <p className="text-white font-semibold text-lg">{selectedPlayer.finalizacoes || 0}</p>
+                  <div className="stat-card">
+                    <div className="stat-header">
+                      <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                      <span className="stat-label">Finalizações</span>
+                    </div>
+                    <span className="stat-value">{selectedPlayer.finalizacoes || 0}</span>
                   </div>
                 </div>
               </div>
 
               {/* Disciplina */}
-              <div className="w-full">
-                <h4 className="text-lg font-medium text-white mb-3 text-center">Disciplina</h4>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="bg-yellow-900/20 rounded-lg p-3 border border-yellow-600/30">
-                    <p className="text-yellow-400">Cartões Amarelos</p>
-                    <p className="text-white font-semibold text-lg">{selectedPlayer.cartoes_amarelos || 0}</p>
-                  </div>
-                  <div className="bg-red-900/20 rounded-lg p-3 border border-red-600/30">
-                    <p className="text-red-400">Cartões Vermelhos</p>
-                    <p className="text-white font-semibold text-lg">{selectedPlayer.cartoes_vermelhos || 0}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Comentários (local, só visual) */}
-              <div className="w-full">
-                <h4 className="text-lg font-medium text-white mb-3 text-center">Comentários</h4>
-                <form onSubmit={handleCommentSubmit} className="flex flex-col gap-3 mb-4">
-                  <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Adicione um comentário sobre o jogador..."
-                    className="px-4 py-3 rounded-lg border border-green-700 bg-gray-800/50 text-gray-100 placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none transition-all duration-200 w-full resize-none"
-                    rows="3"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 w-full"
-                    disabled={!newComment.trim()}
-                  >
-                    Adicionar Comentário
-                  </button>
-                </form>
-
-                <div className="max-h-40 overflow-y-auto space-y-2">
-                  {comments.length > 0 ? (
-                    comments.map((comment) => (
-                      <div key={comment.id} className="bg-gray-800/30 border border-green-700/30 rounded-lg p-3">
-                        <p className="text-gray-300 text-sm mb-1">{comment.text}</p>
-                        <p className="text-gray-500 text-xs">{comment.date}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="bg-gray-800/20 border border-gray-600/30 rounded-lg p-4 text-center">
-                      <p className="text-gray-400 text-sm">Nenhum comentário ainda.</p>
-                      <p className="text-gray-500 text-xs mt-1">Seja o primeiro a comentar sobre este jogador!</p>
+              <div className="info-section">
+                <h3 className="section-title">Disciplina</h3>
+                <div className="discipline-grid">
+                  <div className="discipline-card yellow">
+                    <div className="card-icon">⚠️</div>
+                    <div className="card-content">
+                      <span className="card-label">Cartões Amarelos</span>
+                      <span className="card-value">{selectedPlayer.cartoes_amarelos || 0}</span>
                     </div>
-                  )}
+                  </div>
+                  <div className="discipline-card red">
+                    <div className="card-icon">🚫</div>
+                    <div className="card-content">
+                      <span className="card-label">Cartões Vermelhos</span>
+                      <span className="card-value">{selectedPlayer.cartoes_vermelhos || 0}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="flex justify-center">
-              <button
-                onClick={closeModal}
-                className="bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 px-8 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md transition-all duration-200"
-              >
-                Fechar
-              </button>
             </div>
           </div>
         </div>
@@ -349,42 +541,31 @@ export default function PlayerList() {
 
       {/* Modal de Confirmação de Delete */}
       {isDeleteModalOpen && playerToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-black/90 backdrop-blur-sm border border-red-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-md w-full transition-all duration-300">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-500 rounded-full flex items-center justify-center text-white text-xl font-bold">
-                !
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">Confirmar Remoção</h2>
-                <p className="text-gray-300 text-sm">Esta ação não pode ser desfeita</p>
-              </div>
+        <div className="modal-overlay" onClick={closeDeleteModal}>
+          <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-icon-wrapper">
+              <svg className="delete-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
             </div>
+            
+            <h2 className="delete-title">Remover Jogador?</h2>
+            <p className="delete-message">
+              Tem certeza que deseja remover <strong>{playerToDelete.nome_jogador}</strong>? Esta ação não pode ser desfeita.
+            </p>
 
-            <div className="mb-6">
-              <p className="text-gray-300 mb-2">
-                Tem certeza que deseja remover o jogador:
-              </p>
-              <p className="text-white font-semibold text-lg">
-                {playerToDelete.nome_jogador}
-              </p>
-              <p className="text-gray-400 text-sm">
-                {playerToDelete.posicao_jogador} • {playerToDelete.nome_time || 'Sem time'}
-              </p>
-            </div>
-
-            <div className="flex gap-3 justify-end">
+            <div className="delete-actions">
               <button
                 onClick={closeDeleteModal}
                 disabled={isDeleting}
-                className="bg-gray-700 text-gray-300 font-semibold py-2.5 px-6 rounded-lg hover:bg-gray-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="btn-cancel"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleDeletePlayer}
                 disabled={isDeleting}
-                className="bg-gradient-to-r from-red-600 to-red-500 text-white font-semibold py-2.5 px-6 rounded-lg hover:from-red-700 hover:to-red-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="btn-confirm-delete"
               >
                 {isDeleting ? 'Removendo...' : 'Remover'}
               </button>

@@ -1,8 +1,9 @@
 import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
+import './PlayerListCadastro.css';
 
 function PlayerListCadastro() {
   const { token } = useContext(AuthContext);
@@ -119,202 +120,250 @@ function PlayerListCadastro() {
   };
 
   return (
-    <div className='flex min-h-screen bg-black'>
+    <div className='player-cadastro-page'>
       <SideBar_Olheiro />
-      <div className='flex justify-center items-start min-h-screen w-full p-4 pt-16 box-border'>
-        <div className='bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-6 sm:p-8 shadow-xl max-w-md w-full'>
-          <h2 className='text-2xl sm:text-3xl text-center font-bold text-white mb-2'>
-            Cadastrar Jogador
-          </h2>
+      
+      <div className='cadastro-container'>
+        <div className='cadastro-card'>
+          <div className='cadastro-header'>
+            <h2 className='cadastro-title'>Cadastrar Jogador</h2>
+            <p className='cadastro-subtitle'>Preencha as informações do novo jogador</p>
+          </div>
 
-          {error && <p className='text-center text-red-400 text-sm mb-2'>{error}</p>}
+          {error && <div className='error-message'>{error}</div>}
 
-          <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Nome do Jogador</label>
-              <input
-                type='text'
-                name='nome_jogador'
-                value={formData.nome_jogador}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
-            </div>
+          <form onSubmit={handleSubmit} className='cadastro-form'>
+            {/* Informações Básicas */}
+            <div className='form-section'>
+              <h3 className='section-title'>Informações Básicas</h3>
+              
+              <div className='form-field'>
+                <label className='form-label'>
+                  Nome do Jogador <span className='required'>*</span>
+                </label>
+                <input
+                  type='text'
+                  name='nome_jogador'
+                  value={formData.nome_jogador}
+                  onChange={handleChange}
+                  required
+                  placeholder='Digite o nome completo'
+                  className='form-input'
+                />
+              </div>
 
-                {/* Categoria da Posição */}
-                <div>
-                  <label className="text-gray-300">
-                    Categoria da Posição
+              <div className='form-field'>
+                <label className='form-label'>
+                  Categoria da Posição <span className='required'>*</span>
+                </label>
+                <select
+                  value={categoriaSelecionada}
+                  onChange={(e) => {
+                    setCategoriaSelecionada(e.target.value);
+                    setFormData({...formData, posicao_jogador: ''});
+                  }}
+                  className='form-select'
+                  required
+                >
+                  <option value=''>Selecione a categoria</option>
+                  {categoriasGerais.map(categoria => (
+                    <option key={categoria.value} value={categoria.value}>
+                      {categoria.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {categoriaSelecionada && (
+                <div className='form-field'>
+                  <label className='form-label'>
+                    Posição Específica <span className='required'>*</span>
                   </label>
                   <select
-                    value={categoriaSelecionada}
-                    onChange={(e) => {
-                      setCategoriaSelecionada(e.target.value);
-                      setFormData({...formData, posicao_jogador: ''}); // Limpa posição específica
-                    }}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
+                    value={formData.posicao_jogador}
+                    onChange={(e) => setFormData({...formData, posicao_jogador: e.target.value})}
+                    className='form-select'
                     required
                   >
-                    <option value="">Selecione a categoria</option>
-                    {categoriasGerais.map(categoria => (
-                      <option key={categoria.value} value={categoria.value}>
-                        {categoria.label}
+                    <option value=''>Selecione a posição</option>
+                    {posicoesPorCategoria[categoriaSelecionada]?.map(posicao => (
+                      <option key={posicao.value} value={posicao.value}>
+                        {posicao.label}
                       </option>
                     ))}
                   </select>
                 </div>
+              )}
 
-                {/* Posição Específica */}
-                {categoriaSelecionada && (
-                  <div>
-                    <label className="text-gray-300">
-                      Posição Específica
-                    </label>
-                    <select
-                      value={formData.posicao_jogador}
-                      onChange={(e) => setFormData({...formData, posicao_jogador: e.target.value})}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
-                      required
-                    >
-                      <option value="">Selecione a posição</option>
-                      {posicoesPorCategoria[categoriaSelecionada]?.map(posicao => (
-                        <option key={posicao.value} value={posicao.value}>
-                          {posicao.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Nome do Time</label>
-              <input
-                type='text'
-                name='nome_time'
-                value={formData.nome_time}
-                onChange={handleChange}
-                required
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
+              <div className='form-field'>
+                <label className='form-label'>
+                  Nome do Time <span className='required'>*</span>
+                </label>
+                <input
+                  type='text'
+                  name='nome_time'
+                  value={formData.nome_time}
+                  onChange={handleChange}
+                  required
+                  placeholder='Digite o nome do time'
+                  className='form-input'
+                />
+              </div>
             </div>
 
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Altura (cm)</label>
-              <input
-                type='number'
-                name='altura_cm'
-                value={formData.altura_cm}
-                onChange={handleChange}
-                required
-                min='0'
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
+            {/* Informações Físicas */}
+            <div className='form-section'>
+              <h3 className='section-title'>Informações Físicas</h3>
+              
+              <div className='form-group two-columns'>
+                <div className='form-field'>
+                  <label className='form-label'>
+                    Altura (cm) <span className='required'>*</span>
+                  </label>
+                  <input
+                    type='number'
+                    name='altura_cm'
+                    value={formData.altura_cm}
+                    onChange={handleChange}
+                    required
+                    min='0'
+                    placeholder='Ex: 180'
+                    className='form-input'
+                  />
+                </div>
+
+                <div className='form-field'>
+                  <label className='form-label'>
+                    Peso (kg) <span className='required'>*</span>
+                  </label>
+                  <input
+                    type='number'
+                    name='peso_kg'
+                    value={formData.peso_kg}
+                    onChange={handleChange}
+                    required
+                    min='0'
+                    placeholder='Ex: 75'
+                    className='form-input'
+                  />
+                </div>
+              </div>
+
+              <div className='form-field'>
+                <label className='form-label'>
+                  Idade <span className='required'>*</span>
+                </label>
+                <input
+                  type='number'
+                  name='idade'
+                  value={formData.idade}
+                  onChange={handleChange}
+                  required
+                  min='0'
+                  placeholder='Ex: 25'
+                  className='form-input'
+                />
+              </div>
             </div>
 
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Peso (kg)</label>
-              <input
-                type='number'
-                name='peso_kg'
-                value={formData.peso_kg}
-                onChange={handleChange}
-                required
-                min='0'
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
+            {/* Estatísticas */}
+            <div className='form-section'>
+              <h3 className='section-title'>Estatísticas</h3>
+              
+              <div className='stats-grid'>
+                <div className='form-field'>
+                  <label className='form-label'>Passes Certos</label>
+                  <input
+                    type='number'
+                    name='passes_certos'
+                    value={formData.passes_certos}
+                    onChange={handleChange}
+                    min='0'
+                    placeholder='0'
+                    className='form-input'
+                  />
+                </div>
+
+                <div className='form-field'>
+                  <label className='form-label'>Gols Marcados</label>
+                  <input
+                    type='number'
+                    name='gols_marcados'
+                    value={formData.gols_marcados}
+                    onChange={handleChange}
+                    min='0'
+                    placeholder='0'
+                    className='form-input'
+                  />
+                </div>
+
+                <div className='form-field'>
+                  <label className='form-label'>Assistências</label>
+                  <input
+                    type='number'
+                    name='assistencias'
+                    value={formData.assistencias}
+                    onChange={handleChange}
+                    min='0'
+                    placeholder='0'
+                    className='form-input'
+                  />
+                </div>
+
+                <div className='form-field'>
+                  <label className='form-label'>Finalizações</label>
+                  <input
+                    type='number'
+                    name='finalizacoes'
+                    value={formData.finalizacoes}
+                    onChange={handleChange}
+                    min='0'
+                    placeholder='0'
+                    className='form-input'
+                  />
+                </div>
+
+                <div className='form-field'>
+                  <label className='form-label'>Cartões Amarelos</label>
+                  <input
+                    type='number'
+                    name='cartoes_amarelos'
+                    value={formData.cartoes_amarelos}
+                    onChange={handleChange}
+                    min='0'
+                    placeholder='0'
+                    className='form-input'
+                  />
+                </div>
+
+                <div className='form-field'>
+                  <label className='form-label'>Cartões Vermelhos</label>
+                  <input
+                    type='number'
+                    name='cartoes_vermelhos'
+                    value={formData.cartoes_vermelhos}
+                    onChange={handleChange}
+                    min='0'
+                    placeholder='0'
+                    className='form-input'
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Idade</label>
-              <input
-                type='number'
-                name='idade'
-                value={formData.idade}
-                onChange={handleChange}
-                required
-                min='0'
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
+            {/* Form Actions */}
+            <div className='form-actions'>
+              <Link to='/dashboard' className='btn-cancel'>
+                Cancelar
+              </Link>
+              <button
+                type='submit'
+                disabled={loading}
+                className='btn-submit'
+              >
+                {loading ? 'Cadastrando...' : 'Cadastrar Jogador'}
+              </button>
             </div>
-
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Passes Certos</label>
-              <input
-                type='number'
-                name='passes_certos'
-                value={formData.passes_certos}
-                onChange={handleChange}
-                min='0'
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
-            </div>
-
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Gols Marcados</label>
-              <input
-                type='number'
-                name='gols_marcados'
-                value={formData.gols_marcados}
-                onChange={handleChange}
-                min='0'
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
-            </div>
-
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Assistências</label>
-              <input
-                type='number'
-                name='assistencias'
-                value={formData.assistencias}
-                onChange={handleChange}
-                min='0'
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
-            </div>
-
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Cartões Amarelos</label>
-              <input
-                type='number'
-                name='cartoes_amarelos'
-                value={formData.cartoes_amarelos}
-                onChange={handleChange}
-                min='0'
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
-            </div>
-
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Cartões Vermelhos</label>
-              <input
-                type='number'
-                name='cartoes_vermelhos'
-                value={formData.cartoes_vermelhos}
-                onChange={handleChange}
-                min='0'
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
-            </div>
-
-            <div className='flex flex-col gap-1'>
-              <label className='text-gray-300'>Finalizações</label>
-              <input
-                type='number'
-                name='finalizacoes'
-                value={formData.finalizacoes}
-                onChange={handleChange}
-                min='0'
-                className='px-4 py-2 rounded-lg border border-green-700 bg-black text-gray-100 focus:border-green-500 focus:ring-2 focus:ring-green-500/30 focus:outline-none w-full'
-              />
-            </div>
-
-            <button
-              type='submit'
-              disabled={loading}
-              className='bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold py-2.5 rounded-lg hover:from-green-700 hover:to-green-600 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed w-full'
-            >
-              {loading ? 'Cadastrando...' : 'Cadastrar'}
-            </button>
           </form>
         </div>
       </div>
