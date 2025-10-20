@@ -66,3 +66,25 @@ exports.login = async (req, res) => {
     return res.status(500).json({ error: "Erro ao fazer login." });
   }
 };
+
+exports.atualizarSenha = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const { nova_senha } = req.body;
+
+    const novaSenhaHash = crypto.createHash("md5").update(nova_senha).digest("hex");
+
+    const olheiro = await Olheiro.findOne({ where: {email_usuario: email} });
+    if (!olheiro) {
+      return res.status(404).json({ error: "Olheiro não encontrado." });
+    }
+    
+    olheiro.senha_usuario = novaSenhaHash;
+    await olheiro.save();
+    return res.status(200).json({ message: "Senha atualizada com sucesso." });
+  }
+  catch (err) {
+    console.error("Erro ao atualizar senha do olheiro:", err);
+    return res.status(500).json({ error: "Erro ao atualizar senha do olheiro." });
+  }
+};

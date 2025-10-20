@@ -1,5 +1,6 @@
 // controllers/controllerJogador.js
-const { Jogador, Time } = require('../models/index');
+const { Jogador, Time, Comentarios } = require('../models/index');
+const { Op } = require('sequelize');
 
 // POST /api/jogador/cadastrar
 exports.cadastrarJogador = async (req, res) => {
@@ -163,5 +164,152 @@ exports.deletarJogador = async (req, res) => {
     const code = err.name || 'UNKNOWN_ERROR';
     const msg = err.message || 'erro';
     return res.status(200).json({ ok: false, reason: code, msg: `Erro ao deletar jogador (${code}): ${msg}` });
+  }
+};
+
+// GET /api/jogador/filtrar
+exports.filtrarJogadores = async (req, res) => {
+    try {
+        const {
+            nome_jogador,
+            posicao_jogador,
+            nome_time,
+            idadeMin,
+            idadeMax,
+            gols_marcadosMin,
+            assistenciasMin,
+            passes_certosMin,
+            cartoes_amarelosMax,
+            cartoes_vermelhosMax,
+            finalizacoesMin,
+        } = req.query;
+
+        const filtros = {};
+
+        // Filtro por nome (busca parcial)
+        if (nome_jogador) {
+            filtros.nome_jogador = { [Op.like]: `%${nome_jogador}%` };
+        }
+
+        // Filtro por posição
+        if (posicao_jogador) {
+            filtros.posicao_jogador = posicao_jogador;
+        }
+
+        // Filtro por idade (intervalo)
+        if (idadeMin || idadeMax) {
+            filtros.idade = {};
+            if (idadeMin) filtros.idade[Op.gte] = parseInt(idadeMin);
+            if (idadeMax) filtros.idade[Op.lte] = parseInt(idadeMax);
+        }
+
+        // Filtro por estatísticas (mínimos e máximos)
+        if (gols_marcadosMin) filtros.gols_marcados = { [Op.gte]: parseInt(gols_marcadosMin) };
+        if (assistenciasMin) filtros.assistencias = { [Op.gte]: parseInt(assistenciasMin) };
+        if (passes_certosMin) filtros.passes_certos = { [Op.gte]: parseInt(passes_certosMin) };
+        if (cartoes_amarelosMax) filtros.cartoes_amarelos = { [Op.lte]: parseInt(cartoes_amarelosMax) };
+        if (cartoes_vermelhosMax) filtros.cartoes_vermelhos = { [Op.lte]: parseInt(cartoes_vermelhosMax) };
+        if (finalizacoesMin) filtros.finalizacoes = { [Op.gte]: parseInt(finalizacoesMin) };
+
+        // Filtro por time (nome do time)
+        let includeTime = { model: Time, attributes: ['nome_time'], required: false };
+        if (nome_time) {
+            includeTime.where = { nome_time: { [Op.like]: `%${nome_time}%` } };
+            includeTime.required = true; // INNER JOIN se nome_time for especificado
+        }
+
+        const jogadores = await Jogador.findAll({
+            where: filtros,
+            include: [includeTime],
+            order: [['nome_jogador', 'ASC']], // Ordena por nome
+        });
+
+        // Formata a resposta para o formato esperado pelo frontend
+        const formatted = jogadores.map(j => ({
+            id_jogador: j.id_jogador,
+            nome_jogador: j.nome_jogador,
+            posicao_jogador: j.posicao_jogador,
+            nome_time: j.Time ? j.Time.nome_time : 'Sem time',
+            altura_cm: j.altura_cm,
+            peso_kg: j.peso_kg,
+            idade: j.idade,
+            passes_certos: j.passes_certos,
+            gols_marcados: j.gols_marcados,
+            assistencias: j.assistencias,
+            cartoes_amarelos: j.cartoes_amarelos,
+            cartoes_vermelhos: j.cartoes_vermelhos,
+            finalizacoes: j.finalizacoes,
+        }));
+
+        return res.status(200).json(formatted);
+    } catch (error) {
+        console.error('Erro ao filtrar jogadores:', error);
+        return res.status(200).json([]); // Retorna array vazio para não quebrar o frontend
+    }
+};
+
+exports.registrarComentario = async (req, res) => {
+  try {
+    const { id_jogador } = req.params;
+    const { comentario } = req.body;
+
+    const comentarioCriado = await Comentarios.create({
+      id_jogador,
+      comentario,
+    });
+    
+    return res.status(200).json({ ok: true, msg: 'Comentário registrado com sucesso.', comentario: comentarioCriado });
+  } catch (err) {
+    console.error('Erro ao registrar comentário:', err);
+    const code = err.name || 'UNKNOWN_ERROR';
+    const msg = err.message || 'erro';
+    return res.status(200).json({ ok: false, reason: code, msg: `Erro ao registrar comentário (${code}): ${msg}` });
+  }
+};
+
+exports.pegarComentarios = async (req, res) => {
+  try {
+    const { id_jogador } = req.params;
+    const comentarios = await Comentarios.findAll({ where: { id_jogador } });
+    
+    return res.status(200).json({ ok: true, comentarios });
+  } catch (err) {
+    console.error('Erro ao pegar comentários:', err);
+    const code = err.name || 'UNKNOWN_ERROR';
+    const msg = err.message || 'erro';
+    return res.status(200).json({ ok: false, reason: code, msg: `Erro ao pegar comentários (${code}): ${msg}` });
+  }
+};
+
+exports.estatisticasJogador = async (req, res) => {
+  try {
+    //com base no id do jogador, retornar as estatísticas solicitadas
+    const { id } = req.params;
+    const jogador = await Jogador.findByPk(id);
+    if (!jogador) {
+      return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Jogador não encontrado.' });
+    }
+    
+    //dado extra, calcular quantas finalizações o jogador converteu em gol
+    const media_finalizacoes = jogador.finalizacoes > 0 ? (jogador.gols_marcados / jogador.finalizacoes).toFixed(2) : 0;
+
+    //front espera este
+    const estatisticas = {
+      passes_certos: jogador.passes_certos,
+      gols_marcados: jogador.gols_marcados,
+      assistencias: jogador.assistencias,
+      cartoes_amarelos: jogador.cartoes_amarelos,
+      cartoes_vermelhos: jogador.cartoes_vermelhos,
+      finalizacoes: jogador.finalizacoes,
+      media_finalizacoes: parseFloat(media_finalizacoes)
+    };
+    
+    return res.status(200).json({ ok: true, estatisticas });
+  }
+  catch (err) {
+    console.error('Erro ao obter estatísticas do jogador:', err);
+    const code = err.name || 'ERRO AO OBTER ESTATÍSTICAS';
+    const msg = err.message || 'erro no db';
+    return res.status(200).json({ ok: false, reason: code, msg: `Erro ao obter estatísticas do jogador (${code}): ${msg}` });
   }
 };

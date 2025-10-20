@@ -62,6 +62,10 @@ const Jogador = sequelize.define('Jogador', {
     allowNull: false,
     defaultValue: 0,
   },
+  id_comentarios: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
 }, {
   tableName: 'jogadores',
   timestamps: false,
