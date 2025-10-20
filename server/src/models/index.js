@@ -7,9 +7,9 @@ const Comentarios = require('./Comentarios');
 
 // Definir associações
 Jogador.belongsTo(Time, { foreignKey: 'id_time' });
-Time.hasMany(Jogador, { foreignKey: 'id_jogador' });
+Time.hasMany(Jogador, { foreignKey: 'id_time' });
 Comentarios.belongsTo(Jogador, { foreignKey: 'id_jogador' });
-Jogador.hasMany(Comentarios, { foreignKey: 'id_comentarios' });
+Jogador.hasMany(Comentarios, { foreignKey: 'id_jogador' });
 
 module.exports = {
   Jogador,

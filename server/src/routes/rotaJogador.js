@@ -13,7 +13,7 @@ router.put('/atualizar/:id', autenticarToken, autenticaAdmin, controllerJogador.
 router.delete('/deletar/:id', autenticarToken, autenticaAdmin, controllerJogador.deletarJogador);
 router.get('/filtrar', autenticarToken, controllerJogador.filtrarJogadores);
 router.get('/estatisticas/:id', autenticarToken, controllerJogador.estatisticasJogador);
-router.post('/comentarios/:id_jogador', autenticarToken, controllerJogador.adicionarComentario);
+router.post('/comentarios/:id_jogador', autenticarToken, controllerJogador.registrarComentario);
 router.get('/comentarios/:id_jogador', autenticarToken, controllerJogador.pegarComentarios);
 
 module.exports = router;

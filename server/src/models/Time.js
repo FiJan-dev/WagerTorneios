@@ -22,10 +22,6 @@ const Time = sequelize.define('Time', {
             len: [0, 100],
         },
     },
-    id_jogardor: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-    },
 }, {
     tableName: 'times',
     timestamps: false,
