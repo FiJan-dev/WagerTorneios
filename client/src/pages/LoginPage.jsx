@@ -66,7 +66,7 @@ export default function Login() {
                 <input
                   id='email'
                   type='email'
-                  placeholder='seu@email.com'
+                  placeholder=''
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -87,7 +87,7 @@ export default function Login() {
                 <input
                   id='password'
                   type='password'
-                  placeholder='Digite sua senha'
+                  placeholder=''
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

@@ -16,6 +16,7 @@ export default function PlayerList() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
+  const [playerComment, setPlayerComment] = useState('');
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,11 +81,13 @@ export default function PlayerList() {
 
   const openModal = (player) => {
     setSelectedPlayer(player);
+    setPlayerComment(''); // Reset comment when opening modal
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setSelectedPlayer(null);
+    setPlayerComment(''); // Clear comment when closing modal
     setIsModalOpen(false);
   };
 
@@ -532,6 +535,29 @@ export default function PlayerList() {
                       <span className="card-value">{selectedPlayer.cartoes_vermelhos || 0}</span>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Comentários */}
+              <div className="info-section">
+                <h3 className="section-title">Comentários</h3>
+                <div className="comment-section">
+                  <textarea
+                    className="comment-textarea"
+                    value={playerComment}
+                    onChange={(e) => setPlayerComment(e.target.value)}
+                    placeholder="Adicione suas observações sobre o jogador..."
+                    rows="4"
+                  />
+                  <button 
+                    className="btn-send-comment"
+                    onClick={() => alert('Comentário enviado! (funcionalidade fictícia)')}
+                  >
+                    <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    Enviar Comentário
+                  </button>
                 </div>
               </div>
             </div>
