@@ -46,7 +46,6 @@ const syncAndSeed = async () => {
       console.log('Admin já existe');
     }
 
-    
     await populate(); 
 
   } catch (err) {

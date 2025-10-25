@@ -52,7 +52,7 @@ exports.listarJogadores = async (_req, res) => {
       attributes: ['id_jogador', 'nome_jogador', 'posicao_jogador', 'id_time', 'idade', 'altura_cm', 'peso_kg'],
       include: [
         { model: Time, attributes: ['nome_time'] },
-        { model: Estatisticas, attributes: Object.keys(Estatisticas.rawAttributes).filter(k => k !== 'id_estatistica' && k !== 'id_jogador') }
+        { model: Estatisticas, attributes: Object.keys(Estatisticas.rawAttributes).filter(k => k !== 'id_estatistica' && k !== 'id_jogador'), required: false }
       ],
       order: [['nome_jogador', 'ASC']]
     });
@@ -68,7 +68,7 @@ exports.listarJogadores = async (_req, res) => {
       ...Object.fromEntries(
         Object.keys(Estatisticas.rawAttributes)
           .filter(k => !['id_estatistica', 'id_jogador'].includes(k))
-          .map(k => [k, j.Estatisticas?.[k] ?? 0])
+          .map(k => [k, j.Estatistica?.[k] ?? 0])
       )
     }));
 
