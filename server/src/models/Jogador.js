@@ -20,48 +20,12 @@ const Jogador = sequelize.define('Jogador', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    altura_cm: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-    },
-    peso_kg: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-    },
     idade: {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
-    passes_certos: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-    },
-    gols_marcados: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-    },
-    assistencias: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
-    },
-    cartoes_amarelos: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-  },
-  cartoes_vermelhos: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-  },
-  finalizacoes: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-  },
+    altura_cm: { type: DataTypes.INTEGER, allowNull: true },
+    peso_kg: { type: DataTypes.INTEGER, allowNull: true },
 }, {
   tableName: 'jogadores',
   timestamps: false,

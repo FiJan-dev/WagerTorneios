@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const sequelize = new Sequelize(
     process.env.DB_NAME || 'wagerdb',
-    process.env.DB_user || 'dev',
+    process.env.DB_USER || 'dev',
     process.env.DB_PASSWORD || '1234',
     {
         host: process.env.DB_HOST || 'db',
