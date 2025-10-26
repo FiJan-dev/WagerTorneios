@@ -14,6 +14,7 @@ import HomePage from './pages/HomePage';
 import PlayerList from './pages/PlayerList';
 import PlayerListCadastro from './pages/PlayerListCadastro';
 import './App.css';
+import GraficoDados from './pages/Grafico';
 
 function App() {
   return (
@@ -78,6 +79,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PlayerListCadastro />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/grafdados'
+              element={
+                <ProtectedRoute>
+                  <GraficoDados />
                 </ProtectedRoute>
               }
             />
