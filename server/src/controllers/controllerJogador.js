@@ -217,7 +217,19 @@ exports.EstatisticasGrafico = async (req, res) => {
         normalizar(stats.drible, 60),
         normalizar(stats.finalizacoes, 100)
       ],
-      type: 'radar'
+      rawStats: {
+        passes_certos: stats.passes_certos,
+        finalizacoes: stats.finalizacoes,
+        gols_marcados: stats.gols_marcados,
+        assistencias: stats.assistencias,
+        cartoes_amarelos: stats.cartoes_amarelos,
+        cartoes_vermelhos: stats.cartoes_vermelhos,
+        roubadas_bola: stats.roubadas_bola,
+        aceleracao: stats.aceleracao,
+        chute_forca: stats.chute_forca,
+        passe_total: stats.passe_total,
+        drible: stats.drible,
+      }
     };
 
     res.json({ ok: true, data });

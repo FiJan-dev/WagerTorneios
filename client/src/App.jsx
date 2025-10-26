@@ -83,7 +83,7 @@ function App() {
               }
             />
             <Route
-              path='/grafdados'
+              path='/grafico/:id'
               element={
                 <ProtectedRoute>
                   <GraficoDados />
