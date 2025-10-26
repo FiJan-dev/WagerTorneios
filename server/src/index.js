@@ -8,6 +8,7 @@ const rotaPartida = require("./routes/rotaPartidas.js");
 const rotaJogador = require("./routes/rotaJogador.js");
 const crypto = require('crypto');
 const { Olheiro } = require('./models/index');
+const { populate } = require('./scripts/popular');
 
 const app = express();
 
@@ -18,17 +19,17 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.set('sequelize', sequelize);
 
 // Função assíncrona para sincronizar e semear o admin
-const syncAndSeedAdmin = async () => {
+const syncAndSeed = async () => {
   try {
     await sequelize.sync({ force: false });
     console.log('Banco de dados sincronizado');
 
-    // Verifica e cria usuário admin padrão
+    // 1. Cria admin
     const defaultAdmin = {
       admin: 1,
       nome_usuario: 'Admin',
       email_usuario: 'admin@example.com',
-      senha_usuario: 'admin', // Será hasheado
+      senha_usuario: 'admin',
     };
 
     const existingAdmin = await Olheiro.findOne({ where: { email_usuario: defaultAdmin.email_usuario } });
@@ -40,18 +41,21 @@ const syncAndSeedAdmin = async () => {
         email_usuario: defaultAdmin.email_usuario,
         senha_usuario: hashedPassword,
       });
-      console.log('Usuário admin padrão criado:', defaultAdmin.email_usuario);
+      console.log('Usuário admin criado:', defaultAdmin.email_usuario);
     } else {
-      console.log('Usuário admin padrão já existe:', defaultAdmin.email_usuario);
+      console.log('Admin já existe');
     }
+
+    await populate(); 
+
   } catch (err) {
-    console.error('Erro ao sincronizar o banco de dados ou criar usuário admin:', err);
-    throw err; // Rejoga o erro para ser capturado fora
+    console.error('Erro na inicialização:', err);
+    process.exit(1);
   }
 };
 
 // Chama a função assíncrona e lida com o resultado
-syncAndSeedAdmin().catch(err => {
+syncAndSeed().catch(err => {
   console.error('Falha na inicialização do banco de dados:', err);
   process.exit(1); // Encerra o processo se houver erro crítico
 });
@@ -63,7 +67,7 @@ app.use("/api/partida", rotaPartida);
 app.use("/api/jogador", rotaJogador);
 
 // Healthcheck
-app.get("/", (_req, res) => {
+app.get("/health", (_req, res) => {
   res.send("API funcionando!");
 });
 
