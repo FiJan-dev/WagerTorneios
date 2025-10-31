@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import backgroundImage from '../assets/backg.jpg';
 import FuzzyText from '../components/FuzzyText';
+import { TypewriterEffect } from '../components/TypewriterEffect';
 import './HomePage.css';
 
 export default function HomePage() {
@@ -71,9 +72,16 @@ export default function HomePage() {
             </div>
           </h1>
 
-          <p className="hero-description">
-            Plataforma Profissional de Gestão Esportiva
-          </p>
+          <TypewriterEffect
+            words={[
+              { text: "Plataforma" },
+              { text: "Profissional" },
+              { text: "de" },
+              { text: "Gestão", className: "text-blue-500" },
+              { text: "Esportiva", className: "text-blue-500" }
+            ]}
+            className="hero-description"
+          />
 
           <div className="hero-buttons">
             <Link to="/login" className="btn-primary">
