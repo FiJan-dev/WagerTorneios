@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import Aurora from '../components/Aurora';
 import './LoginPage.css';
 
 export default function Login() {
@@ -30,19 +31,15 @@ export default function Login() {
   };
 
   return (
-    <div className='login-container'>
-      {/* Background Effects */}
-      <div className="login-background-gradient"></div>
-      <div className="login-background-grid"></div>
-      
+    <div className="h-screen relative flex items-center justify-center py-8 px-4 bg-neutral-900">
+      <Aurora
+        colorStops={["#7cff67", "#A78BFA", "#5239FF"]}
+        blend={0.5}
+        amplitude={1.0}
+        speed={0.5}
+      />
       {/* Main Content */}
       <div className='login-content'>
-        {/* Logo Section */}
-        <div className='login-logo-section'>
-          <div className='login-logo-icon'>WT</div>
-          <h2 className='login-logo-text'>WagerTorneios</h2>
-        </div>
-
         {/* Login Card */}
         <div className='login-card'>
           <div className='login-header'>
@@ -60,13 +57,10 @@ export default function Login() {
                 Email
               </label>
               <div className='input-wrapper'>
-                <svg className="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                </svg>
                 <input
                   id='email'
                   type='email'
-                  placeholder=''
+                  placeholder='Digite seu email'
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -81,13 +75,10 @@ export default function Login() {
                 Senha
               </label>
               <div className='input-wrapper'>
-                <svg className="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
                 <input
                   id='password'
                   type='password'
-                  placeholder=''
+                  placeholder='Digite sua senha'
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

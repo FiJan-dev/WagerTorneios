@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Aurora from '../components/Aurora';
 import './RegisterPage.css';
 
 export default function Register() {
@@ -54,19 +55,15 @@ export default function Register() {
   };
 
   return (
-    <div className='register-container'>
-      {/* Background Effects */}
-      <div className="register-background-gradient"></div>
-      <div className="register-background-grid"></div>
-      
+    <div className="h-screen relative flex items-center justify-center py-8 px-4 bg-neutral-900">
+      <Aurora
+        colorStops={["#7cff67", "#A78BFA", "#5239FF"]}
+        blend={0.5}
+        amplitude={1.0}
+        speed={0.5}
+      />
       {/* Main Content */}
       <div className='register-content'>
-        {/* Logo Section */}
-        <div className='register-logo-section'>
-          <div className='register-logo-icon'>WT</div>
-          <h2 className='register-logo-text'>WagerTorneios</h2>
-        </div>
-
         {/* Register Card */}
         <div className='register-card'>
           <div className='register-header'>
