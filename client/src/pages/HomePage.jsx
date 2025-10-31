@@ -1,8 +1,25 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import backgroundImage from '../assets/backg.jpg';
+import FuzzyText from '../components/FuzzyText';
 import './HomePage.css';
 
 export default function HomePage() {
+  const [showNavbar, setShowNavbar] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setShowNavbar(true);
+      } else {
+        setShowNavbar(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <div className="homepage-container">
       {/* Background Image */}
@@ -16,7 +33,15 @@ export default function HomePage() {
       <div className="background-grid"></div>
       
       {/* Navigation */}
-      <nav className="navbar">
+      <nav className="navbar" style={{ 
+        position: 'fixed', 
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        zIndex: 100, 
+        transform: showNavbar ? 'translateY(0)' : 'translateY(-100%)', 
+        transition: 'transform 0.3s ease' 
+      }}>
         <div className="nav-content">
           <div className="logo-section">
             <div className="logo-icon">WT</div>
@@ -31,23 +56,23 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <main className="hero-section">
+      <main className="hero-section" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 80px)', padding: '2rem', paddingTop: '80px' }}>
         <div className="hero-content">
-          <div className="hero-badge">
-            <svg className="badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-            </svg>
-            Plataforma Profissional de Gestão Esportiva
-          </div>
-
-          <h1 className="hero-title">
-            Gestão inteligente para
-            <span className="hero-title-highlight"> olheiros profissionais</span>
+          <h1 className="hero-title" style={{ marginTop: '150px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <FuzzyText 
+                fontSize='clamp(3rem, 12vw, 9rem)'
+                baseIntensity={0.2} 
+                hoverIntensity={0.5} 
+                enableHover={true}
+              >
+                WagerTorneios
+              </FuzzyText>
+            </div>
           </h1>
 
           <p className="hero-description">
-            Sistema completo de gestão para descoberta de talentos, 
-            organização de campeonatos e análise de performance de atletas.
+            Plataforma Profissional de Gestão Esportiva
           </p>
 
           <div className="hero-buttons">
