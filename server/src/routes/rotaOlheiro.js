@@ -5,6 +5,7 @@ const autenticarToken = require('../middleware/authmiddlaware.js');
 
 router.post('/login', controllerUsuario.login);
 router.post('/cadastrar', controllerUsuario.cadastrarOlheiro);
+router.put('/recuperar-senha/:email', controllerUsuario.atualizarSenha);
 
 
 
