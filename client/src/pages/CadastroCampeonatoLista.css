@@ -1,0 +1,578 @@
+/* ===========================
+   CAMPEONATO LISTA - DESIGN MINIMALISTA PROFISSIONAL
+   =========================== */
+
+:root {
+  --cl-bg-dark: #0a0e1f;
+  --cl-bg-secondary: #111827;
+  --cl-bg-card: #1a1f35;
+  --cl-accent: #3b82f6;
+  --cl-accent-hover: #2563eb;
+  --cl-text-primary: #f9fafb;
+  --cl-text-secondary: #9ca3af;
+  --cl-border: #1f2937;
+  --cl-border-light: #374151;
+  --cl-error: #ef4444;
+  --cl-success: #10b981;
+  --cl-warning: #f59e0b;
+}
+
+/* ===========================
+   PAGE LAYOUT
+   =========================== */
+
+.campeonato-list-page {
+  min-height: 100vh;
+  background: var(--cl-bg-dark);
+  display: flex;
+  justify-content: center;
+  padding-top: 80px;
+}
+
+.campeonato-list-container {
+  flex: 1;
+  max-width: 1400px;
+  padding: 2rem;
+  margin: 0 auto;
+}
+
+/* ===========================
+   HEADER
+   =========================== */
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.header-title-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--cl-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.page-subtitle {
+  font-size: 0.938rem;
+  color: var(--cl-text-secondary);
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--cl-accent), var(--cl-accent-hover));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.938rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Search Bar */
+.search-container {
+  margin-bottom: 1.5rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: var(--cl-bg-secondary);
+  border: 1px solid var(--cl-border);
+  border-radius: 8px;
+  color: var(--cl-text-primary);
+  font-size: 0.938rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--cl-accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-input::placeholder {
+  color: var(--cl-text-secondary);
+  opacity: 0.6;
+}
+
+/* ===========================
+   CONTENT
+   =========================== */
+
+.page-content {
+  background: var(--cl-bg-card);
+  border: 1px solid var(--cl-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Loading, Error, Empty States */
+.loading-state,
+.error-state,
+.empty-state {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--cl-text-secondary);
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--cl-border);
+  border-top-color: var(--cl-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-state {
+  color: var(--cl-error);
+}
+
+/* ===========================
+   TABLE
+   =========================== */
+
+.table-container {
+  overflow-x: auto;
+}
+
+.campeonatos-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.campeonatos-table thead {
+  background: var(--cl-bg-secondary);
+  border-bottom: 2px solid var(--cl-border);
+}
+
+.campeonatos-table th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: var(--cl-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+  border-right: 1px solid var(--cl-border);
+}
+
+.campeonatos-table th:last-child {
+  border-right: none;
+}
+
+.campeonatos-table th:nth-child(1) { width: 25%; } /* Nome */
+.campeonatos-table th:nth-child(2) { width: 12%; } /* Status */
+.campeonatos-table th:nth-child(3) { width: 15%; } /* Data Início */
+.campeonatos-table th:nth-child(4) { width: 15%; } /* Data Fim */
+.campeonatos-table th:nth-child(5) { width: 20%; } /* Local */
+.campeonatos-table th:nth-child(6) { width: 13%; } /* Ações */
+
+.campeonatos-table tbody tr {
+  border-bottom: 1px solid var(--cl-border);
+  transition: background 0.2s ease;
+}
+
+.campeonatos-table tbody tr:hover {
+  background: var(--cl-bg-secondary);
+}
+
+.campeonatos-table td {
+  padding: 1rem;
+  font-size: 0.938rem;
+  color: var(--cl-text-primary);
+  vertical-align: middle;
+  text-align: left;
+  border-right: 1px solid var(--cl-border);
+}
+
+.campeonatos-table td:last-child {
+  border-right: none;
+}
+
+.campeonatos-table td:nth-child(1) { width: 25%; }
+.campeonatos-table td:nth-child(2) { width: 12%; }
+.campeonatos-table td:nth-child(3) { width: 15%; }
+.campeonatos-table td:nth-child(4) { width: 15%; }
+.campeonatos-table td:nth-child(5) { width: 20%; }
+.campeonatos-table td:nth-child(6) { width: 13%; }
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.813rem;
+  font-weight: 600;
+}
+
+.status-badge.ativo {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--cl-success);
+}
+
+.status-badge.futuro {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: var(--cl-accent);
+}
+
+.status-badge.encerrado {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--cl-error);
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  padding: 0.5rem 0.875rem;
+  background: var(--cl-accent);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+  background: var(--cl-accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn-action.btn-delete {
+  background: transparent;
+  border: 1px solid var(--cl-border);
+  color: var(--cl-text-secondary);
+  padding: 0.5rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-action.btn-delete:hover {
+  border-color: var(--cl-error);
+  color: var(--cl-error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ===========================
+   MODALS
+   =========================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: var(--cl-bg-card);
+  border: 1px solid var(--cl-border);
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 2rem 2rem 1.5rem;
+  border-bottom: 1px solid var(--cl-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.modal-title-section {
+  flex: 1;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cl-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.modal-subtitle {
+  font-size: 0.938rem;
+  color: var(--cl-accent);
+  font-weight: 500;
+  margin: 0;
+}
+
+.modal-close {
+  width: 36px;
+  height: 36px;
+  background: var(--cl-bg-secondary);
+  border: 1px solid var(--cl-border);
+  border-radius: 8px;
+  color: var(--cl-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: var(--cl-bg-dark);
+  color: var(--cl-text-primary);
+  border-color: var(--cl-error);
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.info-card {
+  padding: 1rem;
+  background: var(--cl-bg-secondary);
+  border: 1px solid var(--cl-border);
+  border-radius: 8px;
+}
+
+.info-label {
+  font-size: 0.813rem;
+  color: var(--cl-text-secondary);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.info-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--cl-text-primary);
+}
+
+.modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--cl-border);
+  display: flex;
+  justify-content: center;
+}
+
+/* Delete Modal */
+.delete-modal {
+  max-width: 480px;
+}
+
+.delete-modal .modal-header {
+  border-bottom: none;
+  padding-bottom: 1rem;
+}
+
+.delete-warning {
+  padding: 1rem;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+  color: var(--cl-warning);
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.delete-info {
+  margin-bottom: 1.5rem;
+}
+
+.delete-campeonato-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--cl-text-primary);
+  margin: 0.5rem 0;
+}
+
+.delete-campeonato-details {
+  font-size: 0.875rem;
+  color: var(--cl-text-secondary);
+}
+
+.delete-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn-cancel,
+.btn-confirm-delete {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.938rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel {
+  background: var(--cl-bg-secondary);
+  color: var(--cl-text-primary);
+  border: 1px solid var(--cl-border);
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: var(--cl-bg-dark);
+  border-color: var(--cl-border-light);
+}
+
+.btn-confirm-delete {
+  background: var(--cl-error);
+  color: white;
+}
+
+.btn-confirm-delete:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-cancel:disabled,
+.btn-confirm-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+
+@media (max-width: 1024px) {
+  .campeonato-list-container {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .campeonato-list-page {
+    padding-top: 70px;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .campeonatos-table {
+    font-size: 0.875rem;
+  }
+
+  .campeonatos-table th,
+  .campeonatos-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .modal-content {
+    max-width: 100%;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1.5rem;
+  }
+
+  .delete-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancel,
+  .btn-confirm-delete {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .campeonato-list-container {
+    padding: 1rem;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+  }
+}
