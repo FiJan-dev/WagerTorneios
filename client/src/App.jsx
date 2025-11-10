@@ -15,6 +15,7 @@ import PlayerList from './pages/PlayerList';
 import PlayerListCadastro from './pages/PlayerListCadastro';
 import './App.css';
 import GraficoDados from './pages/Grafico';
+import Perfil from './pages/Perfil';
 
 function App() {
   return (
@@ -87,6 +88,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <GraficoDados />
+                </ProtectedRoute>
+              }
+            />
+           <Route
+              path='/perfil'
+              element={
+                <ProtectedRoute>
+                  <Perfil />
                 </ProtectedRoute>
               }
             />
