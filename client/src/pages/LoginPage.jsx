@@ -25,7 +25,7 @@ export default function Login() {
     }
     else {
       // Redirect to the dashboard after successful login
-      navigate('/dashboard', { replace: true });
+      navigate('/jogadores', { replace: true });
     }
     setLoading(false);
   };

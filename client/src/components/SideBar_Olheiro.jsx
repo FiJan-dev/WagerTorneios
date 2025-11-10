@@ -13,7 +13,7 @@ function SideBar_Olheiro() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const mainItems = useMemo(() => [
-    { id: 'dashboard', label: 'Jogadores', icon: <FaUsers />, path: '/dashboard' },
+    { id: 'dashboard', label: 'Jogadores', icon: <FaUsers />, path: '/jogadores' },
     { id: 'cadastrocampeonatolista', label: 'Campeonatos', icon: <MdGroup />, path: '/cadastrocampeonatolista' },
     { id: 'cadastropartidalista', label: 'Partidas', icon: <RiGroupFill />, path: '/cadastropartidalista' },
   ], []);

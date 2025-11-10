@@ -361,6 +361,15 @@
   color: var(--pl-accent);
 }
 
+.btn-action.btn-stats {
+  text-decoration: none;
+}
+
+.btn-action.btn-stats:hover {
+  border-color: var(--pl-success);
+  color: var(--pl-success);
+}
+
 .btn-action.btn-delete:hover {
   border-color: var(--pl-error);
   color: var(--pl-error);
@@ -486,6 +495,26 @@
 
 .btn-card-action:hover {
   background: var(--pl-accent-hover);
+}
+
+.btn-card-stats {
+  flex: 1;
+  padding: 0.625rem;
+  background: transparent;
+  color: var(--pl-success);
+  border: 1px solid var(--pl-success);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-card-stats:hover {
+  background: var(--pl-success);
+  color: white;
 }
 
 .btn-card-delete {

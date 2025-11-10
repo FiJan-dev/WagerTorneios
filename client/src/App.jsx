@@ -13,6 +13,7 @@ import RecoverPassword from './pages/RecoverPassword';
 import HomePage from './pages/HomePage';
 import PlayerList from './pages/PlayerList';
 import PlayerListCadastro from './pages/PlayerListCadastro';
+import Perfil from './pages/Perfil';
 import './App.css';
 import GraficoDados from './pages/Grafico';
 
@@ -67,7 +68,7 @@ function App() {
               }
             />
             <Route
-              path='/dashboard'
+              path='/jogadores'
               element={
                 <ProtectedRoute>
                   <PlayerList />
@@ -84,6 +85,22 @@ function App() {
             />
             <Route
               path='/grafico/:id'
+              element={
+                <ProtectedRoute>
+                  <GraficoDados />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/jogadores/estatisticas/:id'
+              element={
+                <ProtectedRoute>
+                  <Perfil />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/jogadores/estatisticas/:id/grafico'
               element={
                 <ProtectedRoute>
                   <GraficoDados />
