@@ -88,3 +88,19 @@ exports.atualizarSenha = async (req, res) => {
     return res.status(500).json({ error: "Erro ao atualizar senha do olheiro." });
   }
 };
+
+exports.excluirOlheiro = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const olheiro = await Olheiro.findByPk(id);
+    if (!olheiro) {
+      return res.status(404).json({ error: "Olheiro não encontrado." });
+    }
+    await olheiro.destroy();
+    return res.status(200).json({ message: "Olheiro excluído com sucesso." });
+  }
+  catch (err) {
+    console.error("Erro ao excluir olheiro:", err);
+    return res.status(500).json({ error: "Erro ao excluir olheiro." });
+  }
+};

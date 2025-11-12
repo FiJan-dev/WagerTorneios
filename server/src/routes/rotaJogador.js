@@ -14,5 +14,8 @@ router.get('/estatisticas/:id', autenticarToken, controllerJogador.estatisticas)
 router.get('/grafico/:id', autenticarToken, controllerJogador.EstatisticasGrafico);
 router.post('/comentarios/:id_jogador', autenticarToken, controllerJogador.registrarComentario);
 router.get('/comentarios/:id_jogador', autenticarToken, controllerJogador.pegarComentarios);
-
+router.post('/shortlist/:id_jogador', autenticarToken, autenticaAdmin, controllerJogador.adicionarShortlist);
+router.post('/shortlist/adicionar', autenticarToken, autenticaAdmin, controllerJogador.adicionarShortlist);
+router.get('/shortlist', autenticarToken, controllerJogador.listarShortlist);
+router.delete('/shortlist/remover/:id', autenticarToken, autenticaAdmin, controllerJogador.removerShortlist);
 module.exports = router;
