@@ -33,16 +33,22 @@ export default function Register() {
 
     try {
       setLoading(true);
-      await axios.post(`${API_BASE}/cadastrar`, {
+      const response = await axios.post(`${API_BASE}/cadastrar`, {
         nome: name,
         email,
         senha: password,
       });
 
-      setSuccess("Cadastro realizado com sucesso! Redirecionando...");
+      // Verificar se precisa de aprovação
+      if (response.data.aprovado === false) {
+        setSuccess("Cadastro realizado! Aguarde a aprovação do administrador para fazer login.");
+      } else {
+        setSuccess("Cadastro realizado com sucesso! Redirecionando...");
+      }
+      
       setTimeout(() => {
         navigate("/login");
-      }, 2000);
+      }, 3000);
     } catch (err) {
       console.error(err);
       const msg =

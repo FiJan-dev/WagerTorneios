@@ -14,6 +14,7 @@ import HomePage from './pages/HomePage';
 import PlayerList from './pages/PlayerList';
 import PlayerListCadastro from './pages/PlayerListCadastro';
 import Perfil from './pages/Perfil';
+import GerenciarOlheiros from './pages/GerenciarOlheiros';
 import './App.css';
 import GraficoDados from './pages/Grafico';
 
@@ -104,6 +105,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <GraficoDados />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/gerenciar-olheiros'
+              element={
+                <ProtectedRoute>
+                  <GerenciarOlheiros />
                 </ProtectedRoute>
               }
             />
