@@ -1,3 +1,5 @@
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 const Jogador = require('./Jogador');
 const Time = require('./Time');
 const Campeonato = require('./Campeonato');

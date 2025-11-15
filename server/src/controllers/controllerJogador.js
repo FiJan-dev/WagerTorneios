@@ -46,14 +46,56 @@ exports.cadastrarJogador = async (req, res) => {
 };
 
 // GET /api/jogador/listar
-exports.listarJogadores = async (_req, res) => {
+exports.listarJogadores = async (req, res) => {
   try {
+    const { posicao, idadeMin, idadeMax, alturaMin, alturaMax, pesoMin, pesoMax, nome, time } = req.query;
+    
+    // Construir filtros dinâmicos
+    const whereClause = {};
+    
+    if (posicao) {
+      whereClause.posicao_jogador = posicao;
+    }
+    
+    if (idadeMin || idadeMax) {
+      whereClause.idade = {};
+      if (idadeMin) whereClause.idade[Op.gte] = parseInt(idadeMin);
+      if (idadeMax) whereClause.idade[Op.lte] = parseInt(idadeMax);
+    }
+    
+    if (alturaMin || alturaMax) {
+      whereClause.altura_cm = {};
+      if (alturaMin) whereClause.altura_cm[Op.gte] = parseInt(alturaMin);
+      if (alturaMax) whereClause.altura_cm[Op.lte] = parseInt(alturaMax);
+    }
+    
+    if (pesoMin || pesoMax) {
+      whereClause.peso_kg = {};
+      if (pesoMin) whereClause.peso_kg[Op.gte] = parseInt(pesoMin);
+      if (pesoMax) whereClause.peso_kg[Op.lte] = parseInt(pesoMax);
+    }
+    
+    if (nome) {
+      whereClause.nome_jogador = { [Op.like]: `%${nome}%` };
+    }
+    
+    const includeClause = [
+      { 
+        model: Time, 
+        attributes: ['nome_time'],
+        ...(time && { where: { nome_time: { [Op.like]: `%${time}%` } } })
+      },
+      { 
+        model: Estatisticas, 
+        attributes: Object.keys(Estatisticas.rawAttributes).filter(k => k !== 'id_estatistica' && k !== 'id_jogador'), 
+        required: false 
+      }
+    ];
+
     const jogadores = await Jogador.findAll({
       attributes: ['id_jogador', 'nome_jogador', 'posicao_jogador', 'id_time', 'idade', 'altura_cm', 'peso_kg'],
-      include: [
-        { model: Time, attributes: ['nome_time'] },
-        { model: Estatisticas, attributes: Object.keys(Estatisticas.rawAttributes).filter(k => k !== 'id_estatistica' && k !== 'id_jogador'), required: false }
-      ],
+      where: whereClause,
+      include: includeClause,
       order: [['nome_jogador', 'ASC']]
     });
 
