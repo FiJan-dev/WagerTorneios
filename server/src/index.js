@@ -27,6 +27,7 @@ const syncAndSeed = async () => {
     // 1. Cria admin
     const defaultAdmin = {
       admin: 1,
+      aprovado: 1, // Admin sempre aprovado
       nome_usuario: 'Admin',
       email_usuario: 'admin@example.com',
       senha_usuario: 'admin',
@@ -37,12 +38,18 @@ const syncAndSeed = async () => {
       const hashedPassword = crypto.createHash('md5').update(defaultAdmin.senha_usuario).digest('hex');
       await Olheiro.create({
         admin: defaultAdmin.admin,
+        aprovado: defaultAdmin.aprovado,
         nome_usuario: defaultAdmin.nome_usuario,
         email_usuario: defaultAdmin.email_usuario,
         senha_usuario: hashedPassword,
       });
       console.log('Usuário admin criado:', defaultAdmin.email_usuario);
     } else {
+      // Garantir que admin existente esteja aprovado
+      if (existingAdmin.aprovado !== 1) {
+        existingAdmin.aprovado = 1;
+        await existingAdmin.save();
+      }
       console.log('Admin já existe');
     }
 

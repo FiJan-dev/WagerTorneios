@@ -17,12 +17,17 @@ exports.cadastrarOlheiro = async (req, res) => {
 
   const olheiro = await Olheiro.create({
     admin: 0,
+    aprovado: 0, // Pendente de aprovação
     nome_usuario: nome,
     email_usuario: email,
     senha_usuario: senhaHash,
   });
 
-  return res.status(201).json({ message: "ok", id: olheiro.id_usuario });
+  return res.status(201).json({ 
+    message: "Cadastro realizado com sucesso! Aguarde a aprovação do administrador.", 
+    id: olheiro.id_usuario,
+    aprovado: false
+  });
   } catch (err) {
     console.error("Erro ao cadastrar olheiro:", err);
     const code = err.code || "UNKNOWN";
@@ -44,11 +49,19 @@ exports.login = async (req, res) => {
 
     const olheiro = await Olheiro.findOne({
       where: { email_usuario: email, senha_usuario: senhaHash },
-      attributes: ['id_usuario', 'admin', 'nome_usuario', 'email_usuario'],
+      attributes: ['id_usuario', 'admin', 'aprovado', 'nome_usuario', 'email_usuario'],
     });
 
     if(!olheiro) {
       return res.status(401).json({ error: "Credenciais inválidas." });
+    }
+
+    // Verificar se o olheiro foi aprovado (exceto se for admin)
+    if (olheiro.admin !== 1 && olheiro.aprovado !== 1) {
+      const statusMsg = olheiro.aprovado === 0 
+        ? "Sua conta está pendente de aprovação pelo administrador." 
+        : "Sua conta foi rejeitada pelo administrador.";
+      return res.status(403).json({ error: statusMsg, aprovado: olheiro.aprovado });
     }
 
     const payload = {
@@ -86,5 +99,99 @@ exports.atualizarSenha = async (req, res) => {
   catch (err) {
     console.error("Erro ao atualizar senha do olheiro:", err);
     return res.status(500).json({ error: "Erro ao atualizar senha do olheiro." });
+  }
+};
+
+exports.excluirOlheiro = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const olheiro = await Olheiro.findByPk(id);
+    if (!olheiro) {
+      return res.status(404).json({ error: "Olheiro não encontrado." });
+    }
+    
+    // Não permitir excluir admin principal
+    if (olheiro.admin === 1 && olheiro.email_usuario === 'admin@example.com') {
+      return res.status(403).json({ error: "Não é possível excluir o administrador principal." });
+    }
+    
+    await olheiro.destroy();
+    return res.status(200).json({ message: "Olheiro excluído com sucesso." });
+  }
+  catch (err) {
+    console.error("Erro ao excluir olheiro:", err);
+    return res.status(500).json({ error: "Erro ao excluir olheiro." });
+  }
+};
+
+// GET /api/olheiro/listar - Lista todos os olheiros (apenas admin)
+exports.listarOlheiros = async (req, res) => {
+  try {
+    const olheiros = await Olheiro.findAll({
+      attributes: ['id_usuario', 'admin', 'aprovado', 'nome_usuario', 'email_usuario'],
+      order: [['aprovado', 'ASC'], ['id_usuario', 'DESC']]
+    });
+
+    const formatted = olheiros.map(o => ({
+      id_usuario: o.id_usuario,
+      nome_usuario: o.nome_usuario,
+      email_usuario: o.email_usuario,
+      admin: o.admin,
+      aprovado: o.aprovado,
+      status: o.aprovado === 0 ? 'Pendente' : o.aprovado === 1 ? 'Aprovado' : 'Rejeitado'
+    }));
+
+    return res.status(200).json({ ok: true, olheiros: formatted });
+  } catch (err) {
+    console.error("Erro ao listar olheiros:", err);
+    return res.status(500).json({ ok: false, error: "Erro ao listar olheiros." });
+  }
+};
+
+// PUT /api/olheiro/aprovar/:id - Aprovar olheiro (apenas admin)
+exports.aprovarOlheiro = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const olheiro = await Olheiro.findByPk(id);
+    
+    if (!olheiro) {
+      return res.status(404).json({ ok: false, error: "Olheiro não encontrado." });
+    }
+
+    if (olheiro.admin === 1) {
+      return res.status(400).json({ ok: false, error: "Administradores não precisam de aprovação." });
+    }
+
+    olheiro.aprovado = 1;
+    await olheiro.save();
+
+    return res.status(200).json({ ok: true, message: "Olheiro aprovado com sucesso." });
+  } catch (err) {
+    console.error("Erro ao aprovar olheiro:", err);
+    return res.status(500).json({ ok: false, error: "Erro ao aprovar olheiro." });
+  }
+};
+
+// PUT /api/olheiro/rejeitar/:id - Rejeitar olheiro (apenas admin)
+exports.rejeitarOlheiro = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const olheiro = await Olheiro.findByPk(id);
+    
+    if (!olheiro) {
+      return res.status(404).json({ ok: false, error: "Olheiro não encontrado." });
+    }
+
+    if (olheiro.admin === 1) {
+      return res.status(400).json({ ok: false, error: "Não é possível rejeitar um administrador." });
+    }
+
+    olheiro.aprovado = 2;
+    await olheiro.save();
+
+    return res.status(200).json({ ok: true, message: "Olheiro rejeitado." });
+  } catch (err) {
+    console.error("Erro ao rejeitar olheiro:", err);
+    return res.status(500).json({ ok: false, error: "Erro ao rejeitar olheiro." });
   }
 };

@@ -22,12 +22,42 @@ export default function PlayerList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
 
+  // Filter states
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    nome: '',
+    posicao: '',
+    time: '',
+    idadeMin: '',
+    idadeMax: '',
+    alturaMin: '',
+    alturaMax: '',
+    pesoMin: '',
+    pesoMax: ''
+  });
+
   const API_URL = 'http://localhost:5000/api/jogador/listar';
 
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
-        const resp = await axios.get(API_URL, {
+        setIsLoading(true);
+        
+        // Construir query params para os filtros
+        const params = new URLSearchParams();
+        if (filters.nome) params.append('nome', filters.nome);
+        if (filters.posicao) params.append('posicao', filters.posicao);
+        if (filters.time) params.append('time', filters.time);
+        if (filters.idadeMin) params.append('idadeMin', filters.idadeMin);
+        if (filters.idadeMax) params.append('idadeMax', filters.idadeMax);
+        if (filters.alturaMin) params.append('alturaMin', filters.alturaMin);
+        if (filters.alturaMax) params.append('alturaMax', filters.alturaMax);
+        if (filters.pesoMin) params.append('pesoMin', filters.pesoMin);
+        if (filters.pesoMax) params.append('pesoMax', filters.pesoMax);
+
+        const url = `${API_URL}${params.toString() ? `?${params.toString()}` : ''}`;
+        
+        const resp = await axios.get(url, {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
 
@@ -51,6 +81,7 @@ export default function PlayerList() {
           : (Array.isArray(payload?.data) ? payload.data : []);
 
         setPlayers(list);
+        setCurrentPage(1); // Reset to first page when filters change
       } catch (err) {
         console.error(err);
         setError('Erro ao carregar jogadores.');
@@ -61,7 +92,7 @@ export default function PlayerList() {
     };
 
     fetchPlayers();
-  }, [token]);
+  }, [token, filters]);
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -130,6 +161,26 @@ export default function PlayerList() {
     }
   };
 
+  const handleFilterChange = (field, value) => {
+    setFilters(prev => ({ ...prev, [field]: value }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      nome: '',
+      posicao: '',
+      time: '',
+      idadeMin: '',
+      idadeMax: '',
+      alturaMin: '',
+      alturaMax: '',
+      pesoMin: '',
+      pesoMax: ''
+    });
+  };
+
+  const hasActiveFilters = Object.values(filters).some(value => value !== '');
+
   return (
     <div className="player-list-page">
       <SideBar_Olheiro />
@@ -152,6 +203,18 @@ export default function PlayerList() {
                   Adicionar Jogador
                 </Link>
               )}
+              
+              <button
+                className={`btn-filter ${showFilters ? 'active' : ''} ${hasActiveFilters ? 'has-filters' : ''}`}
+                onClick={() => setShowFilters(!showFilters)}
+                title="Filtrar jogadores"
+              >
+                <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Filtros
+                {hasActiveFilters && <span className="filter-badge">{Object.values(filters).filter(v => v !== '').length}</span>}
+              </button>
               
               <div className="view-toggle">
                 <button
@@ -176,6 +239,146 @@ export default function PlayerList() {
             </div>
           </div>
         </div>
+
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="filters-panel">
+            <div className="filters-header">
+              <h3 className="filters-title">
+                <svg className="filters-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                Filtros Avançados
+              </h3>
+              {hasActiveFilters && (
+                <button className="btn-clear-filters" onClick={clearFilters}>
+                  <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Limpar Filtros
+                </button>
+              )}
+            </div>
+
+            <div className="filters-grid">
+              {/* Nome */}
+              <div className="filter-group">
+                <label className="filter-label">Nome do Jogador</label>
+                <input
+                  type="text"
+                  className="filter-input"
+                  placeholder="Buscar por nome..."
+                  value={filters.nome}
+                  onChange={(e) => handleFilterChange('nome', e.target.value)}
+                />
+              </div>
+
+              {/* Time */}
+              <div className="filter-group">
+                <label className="filter-label">Time</label>
+                <input
+                  type="text"
+                  className="filter-input"
+                  placeholder="Buscar por time..."
+                  value={filters.time}
+                  onChange={(e) => handleFilterChange('time', e.target.value)}
+                />
+              </div>
+
+              {/* Posição */}
+              <div className="filter-group">
+                <label className="filter-label">Posição</label>
+                <select
+                  className="filter-select"
+                  value={filters.posicao}
+                  onChange={(e) => handleFilterChange('posicao', e.target.value)}
+                >
+                  <option value="">Todas as posições</option>
+                  <option value="GOL">Goleiro (GOL)</option>
+                  <option value="LAT">Lateral (LAT)</option>
+                  <option value="ZAG">Zagueiro (ZAG)</option>
+                  <option value="MEI">Meio-Campo (MEI)</option>
+                  <option value="ATA">Atacante (ATA)</option>
+                  <option value="TEC">Técnico (TEC)</option>
+                </select>
+              </div>
+
+              {/* Idade */}
+              <div className="filter-group filter-range">
+                <label className="filter-label">Idade</label>
+                <div className="range-inputs">
+                  <input
+                    type="number"
+                    className="filter-input filter-input-small"
+                    placeholder="Min"
+                    min="0"
+                    max="99"
+                    value={filters.idadeMin}
+                    onChange={(e) => handleFilterChange('idadeMin', e.target.value)}
+                  />
+                  <span className="range-separator">até</span>
+                  <input
+                    type="number"
+                    className="filter-input filter-input-small"
+                    placeholder="Max"
+                    min="0"
+                    max="99"
+                    value={filters.idadeMax}
+                    onChange={(e) => handleFilterChange('idadeMax', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Altura */}
+              <div className="filter-group filter-range">
+                <label className="filter-label">Altura (cm)</label>
+                <div className="range-inputs">
+                  <input
+                    type="number"
+                    className="filter-input filter-input-small"
+                    placeholder="Min"
+                    min="0"
+                    value={filters.alturaMin}
+                    onChange={(e) => handleFilterChange('alturaMin', e.target.value)}
+                  />
+                  <span className="range-separator">até</span>
+                  <input
+                    type="number"
+                    className="filter-input filter-input-small"
+                    placeholder="Max"
+                    min="0"
+                    value={filters.alturaMax}
+                    onChange={(e) => handleFilterChange('alturaMax', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Peso */}
+              <div className="filter-group filter-range">
+                <label className="filter-label">Peso (kg)</label>
+                <div className="range-inputs">
+                  <input
+                    type="number"
+                    className="filter-input filter-input-small"
+                    placeholder="Min"
+                    min="0"
+                    value={filters.pesoMin}
+                    onChange={(e) => handleFilterChange('pesoMin', e.target.value)}
+                  />
+                  <span className="range-separator">até</span>
+                  <input
+                    type="number"
+                    className="filter-input filter-input-small"
+                    placeholder="Max"
+                    min="0"
+                    value={filters.pesoMax}
+                    onChange={(e) => handleFilterChange('pesoMax', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Content */}
         <div className="page-content">
@@ -252,6 +455,15 @@ export default function PlayerList() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                           </button>
+                          <Link
+                            to={`/jogadores/estatisticas/${player.id_jogador}`}
+                            className="btn-action btn-stats"
+                            title="Ver estatísticas"
+                          >
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                          </Link>
                           {isAdmin() && (
                             <button
                               className="btn-action btn-delete"
@@ -312,6 +524,12 @@ export default function PlayerList() {
                     >
                       Ver Detalhes
                     </button>
+                    <Link
+                      to={`/jogadores/estatisticas/${player.id_jogador}`}
+                      className="btn-card-stats"
+                    >
+                      Estatísticas
+                    </Link>
                     {isAdmin() && (
                       <button
                         className="btn-card-delete"

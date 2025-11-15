@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { MdGroup } from "react-icons/md";
-import { FaUsers } from "react-icons/fa";
+import { FaUsers, FaUserCheck } from "react-icons/fa";
 import { RiGroupFill } from "react-icons/ri";
 import { BsDoorOpenFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
@@ -11,12 +11,22 @@ import './SideBar_Olheiro.css';
 function SideBar_Olheiro() {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isAdmin } = useContext(AuthContext);
 
-  const mainItems = useMemo(() => [
-    { id: 'dashboard', label: 'Jogadores', icon: <FaUsers />, path: '/dashboard' },
-    { id: 'cadastrocampeonatolista', label: 'Campeonatos', icon: <MdGroup />, path: '/cadastrocampeonatolista' },
-    { id: 'cadastropartidalista', label: 'Partidas', icon: <RiGroupFill />, path: '/cadastropartidalista' },
-  ], []);
+  const mainItems = useMemo(() => {
+    const items = [
+      { id: 'dashboard', label: 'Jogadores', icon: <FaUsers />, path: '/jogadores' },
+      { id: 'cadastrocampeonatolista', label: 'Campeonatos', icon: <MdGroup />, path: '/cadastrocampeonatolista' },
+      { id: 'cadastropartidalista', label: 'Partidas', icon: <RiGroupFill />, path: '/cadastropartidalista' },
+    ];
+    
+    // Adiciona item admin apenas se for admin
+    if (isAdmin()) {
+      items.push({ id: 'gerenciar-olheiros', label: 'Gerenciar Olheiros', icon: <FaUserCheck />, path: '/gerenciar-olheiros' });
+    }
+    
+    return items;
+  }, [isAdmin]);
 
   const bottomItems = useMemo(() => [
     { id: 'olheiropropfile', label: 'Perfil', icon: <CgProfile />, path: '/olheiropropfile' },

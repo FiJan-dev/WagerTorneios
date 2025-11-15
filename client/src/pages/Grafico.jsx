@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import Chart from 'chart.js/auto';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -227,6 +227,19 @@ const GraficoDados = () => {
       <div className="background-grid"></div>
 
       <div className="relative z-10 max-w-5xl mx-auto p-6 pt-24">
+        {/* Botão Voltar */}
+        <div className="mb-6 flex justify-between items-center">
+          <Link 
+            to={`/jogadores/estatisticas/${id}`} 
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[rgba(59,130,246,0.1)] hover:bg-[rgba(59,130,246,0.2)] text-[#60a5fa] border border-[rgba(59,130,246,0.3)] hover:border-[rgba(59,130,246,0.5)] rounded-lg transition-all duration-200 hover:-translate-y-0.5"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Voltar para Estatísticas
+          </Link>
+        </div>
+
         <h2 className="text-3xl font-bold text-[var(--color-text-primary)] mb-10 text-center">Estatísticas do Jogador</h2>
         <div className="bg-[rgba(17,24,39,0.5)] border border-[var(--color-border)] rounded-lg shadow-lg p-6 backdrop-blur-md mb-10">
           {populateTable()}

@@ -12,6 +12,11 @@ const Olheiro = sequelize.define('Olheiro', {
         allowNull: false,
         defaultValue: 0,
     },
+    aprovado: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0, // 0 = pendente, 1 = aprovado, 2 = rejeitado
+    },
     nome_usuario: {
         type: DataTypes.STRING(100),
         allowNull: false,

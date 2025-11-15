@@ -99,7 +99,7 @@ function PlayerListCadastro() {
       }
 
       alert('Jogador registrado com sucesso!');
-      navigate('/dashboard');
+      navigate('/jogadores');
     } catch (err) {
       const data = err?.response?.data;
       const msg =
@@ -353,7 +353,7 @@ function PlayerListCadastro() {
 
             {/* Form Actions */}
             <div className='form-actions'>
-              <Link to='/dashboard' className='btn-cancel'>
+              <Link to='/jogadores' className='btn-cancel'>
                 Cancelar
               </Link>
               <button

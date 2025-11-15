@@ -1,5 +1,5 @@
 // controllers/controllerJogador.js
-const { Jogador, Time, Estatisticas, Comentarios } = require('../models/index');
+const { Jogador, Time, Estatisticas, Comentarios, Shortlist } = require('../models/index');
 const { Op } = require('sequelize');
 
 const POSICOES = { 1: 'GOL', 2: 'LAT', 3: 'ZAG', 4: 'MEI', 5: 'ATA', 6: 'TEC' };
@@ -46,14 +46,56 @@ exports.cadastrarJogador = async (req, res) => {
 };
 
 // GET /api/jogador/listar
-exports.listarJogadores = async (_req, res) => {
+exports.listarJogadores = async (req, res) => {
   try {
+    const { posicao, idadeMin, idadeMax, alturaMin, alturaMax, pesoMin, pesoMax, nome, time } = req.query;
+    
+    // Construir filtros dinâmicos
+    const whereClause = {};
+    
+    if (posicao) {
+      whereClause.posicao_jogador = posicao;
+    }
+    
+    if (idadeMin || idadeMax) {
+      whereClause.idade = {};
+      if (idadeMin) whereClause.idade[Op.gte] = parseInt(idadeMin);
+      if (idadeMax) whereClause.idade[Op.lte] = parseInt(idadeMax);
+    }
+    
+    if (alturaMin || alturaMax) {
+      whereClause.altura_cm = {};
+      if (alturaMin) whereClause.altura_cm[Op.gte] = parseInt(alturaMin);
+      if (alturaMax) whereClause.altura_cm[Op.lte] = parseInt(alturaMax);
+    }
+    
+    if (pesoMin || pesoMax) {
+      whereClause.peso_kg = {};
+      if (pesoMin) whereClause.peso_kg[Op.gte] = parseInt(pesoMin);
+      if (pesoMax) whereClause.peso_kg[Op.lte] = parseInt(pesoMax);
+    }
+    
+    if (nome) {
+      whereClause.nome_jogador = { [Op.like]: `%${nome}%` };
+    }
+    
+    const includeClause = [
+      { 
+        model: Time, 
+        attributes: ['nome_time'],
+        ...(time && { where: { nome_time: { [Op.like]: `%${time}%` } } })
+      },
+      { 
+        model: Estatisticas, 
+        attributes: Object.keys(Estatisticas.rawAttributes).filter(k => k !== 'id_estatistica' && k !== 'id_jogador'), 
+        required: false 
+      }
+    ];
+
     const jogadores = await Jogador.findAll({
       attributes: ['id_jogador', 'nome_jogador', 'posicao_jogador', 'id_time', 'idade', 'altura_cm', 'peso_kg'],
-      include: [
-        { model: Time, attributes: ['nome_time'] },
-        { model: Estatisticas, attributes: Object.keys(Estatisticas.rawAttributes).filter(k => k !== 'id_estatistica' && k !== 'id_jogador'), required: false }
-      ],
+      where: whereClause,
+      include: includeClause,
       order: [['nome_jogador', 'ASC']]
     });
 
@@ -238,3 +280,79 @@ exports.EstatisticasGrafico = async (req, res) => {
     res.status(200).json({ ok: false, msg: 'Erro interno' });
   }
 };
+
+// POST /api/jogador/shortlist/adicionar
+exports.adicionarShortlist = async (req, res) => {
+  try {
+    const { id_jogador } = req.body;
+
+    if (!id_jogador) {
+      return res.status(200).json({ ok: false, reason: 'validation', msg: 'ID do jogador é obrigatório.' });
+    }
+
+    const jogador = await Jogador.findByPk(id_jogador);
+    if (!jogador) {
+      return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Jogador não encontrado.' });
+    }
+
+    const [shortlist, created] = await Shortlist.findOrCreate({ where: { id_jogador } });
+
+    if (!created) {
+      return res.status(200).json({ ok: false, msg: 'Jogador já está na shortlist.' });
+    }
+
+    return res.status(200).json({ ok: true, msg: 'Jogador adicionado à shortlist.', jogador });
+  } catch (err) {
+    console.error('Erro ao adicionar à shortlist:', err);
+    return res.status(200).json({ ok: false, reason: err.name || 'ERROR', msg: err.message });
+  }
+};
+
+// GET /api/jogador/shortlist
+exports.listarShortlist = async (_req, res) => {
+  try {
+    const jogadores = await Shortlist.findAll({
+      include: [
+        {
+          model: Jogador,
+          attributes: ['id_jogador', 'nome_jogador', 'posicao_jogador', 'id_time', 'idade', 'altura_cm', 'peso_kg'],
+          include: [{ model: Time, attributes: ['nome_time'] }]
+        }
+      ]
+    });
+
+    const formatted = jogadores.map(j => ({
+      id_jogador: j.Jogador.id_jogador,
+      nome_jogador: j.Jogador.nome_jogador,
+      posicao_jogador: j.Jogador.posicao_jogador,
+      nome_time: j.Jogador.Time?.nome_time || 'Sem time',
+      idade: j.Jogador.idade,
+      altura_cm: j.Jogador.altura_cm,
+      peso_kg: j.Jogador.peso_kg
+    }));
+
+    return res.status(200).json({ ok: true, jogadores: formatted });
+  } catch (err) {
+    console.error('Erro ao listar shortlist:', err);
+    return res.status(200).json({ ok: false, reason: err.name || 'ERROR', msg: err.message });
+  }
+};
+
+// DELETE /api/jogador/shortlist/remover/:id
+exports.removerShortlist = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const jogador = await Shortlist.findOne({ where: { id_jogador: id } });
+    if (!jogador) {
+      return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Jogador não está na shortlist.' });
+    }
+
+    await jogador.destroy();
+    return res.status(200).json({ ok: true, msg: 'Jogador removido da shortlist.' });
+  } catch (err) {
+    console.error('Erro ao remover da shortlist:', err);
+    return res.status(200).json({ ok: false, reason: err.name || 'ERROR', msg: err.message });
+  }
+};
+
