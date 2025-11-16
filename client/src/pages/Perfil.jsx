@@ -2,11 +2,12 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { FaStar } from 'react-icons/fa';
 import './Perfil.css';
 
 const Perfil = () => {
   const { id } = useParams();
-  const { token } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext); 
   const [jogador, setJogador] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,6 +44,51 @@ const Perfil = () => {
     }
   }, [id, token]);
 
+
+
+  const adicionarShortlist = async () => {
+    const id_jogador = parseInt(id);
+
+    if (!id_jogador || isNaN(id_jogador)) {
+      alert("ID do jogador inválido.");
+      return;
+    }
+    if (!jogador) {
+        alert("Dados do jogador não carregados.");
+        return;
+    }
+
+    const confirmAdd = window.confirm(`Adicionar ${jogador.nome_jogador} à shortlist?`);
+    if (!confirmAdd) return;
+
+    try {
+      const res = await axios.post(
+        'http://localhost:5000/api/jogador/shortlist/adicionar',
+        { id_jogador: id_jogador }, // Enviando o ID no corpo
+        {
+          headers: {
+            Authorization: `Bearer ${token}` // Autenticação
+          }
+        }
+      );
+
+      if (res.data.ok) {
+        alert(`✅ ${jogador.nome_jogador} adicionado à shortlist com sucesso!`);
+      } else {
+        const message = res.data.message || 'Erro ao adicionar jogador.';
+        alert(message);
+      }
+    } catch (err) {
+      console.error("Erro ao adicionar à shortlist:", err.response?.data || err);
+      // A API deve retornar uma mensagem amigável para "Jogador já está na lista"
+      const message = err.response?.data?.message || 'Não foi possível adicionar. Tente novamente.';
+      alert(`❌ Erro: ${message}`);
+    }
+  };
+
+
+
+
   if (loading) {
     return (
       <div className="perfil-container">
@@ -76,7 +122,7 @@ const Perfil = () => {
     );
   }
 
-  // Calcular estatísticas
+
   const precisao_passe = jogador.passe_total > 0 
     ? Math.round((jogador.passes_certos / jogador.passe_total) * 100) 
     : 0;
@@ -155,6 +201,32 @@ const Perfil = () => {
 
           {/* Botões de Ação */}
           <div className="action-buttons-perfil">
+            
+            {user && ( 
+                <button
+                    onClick={adicionarShortlist}
+                    className="btn-shortlist"
+                    style={{ 
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        backgroundColor: '#FFD700', 
+                        color: '#1a202c',
+                        padding: '10px 20px',
+                        borderRadius: '8px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.3s',
+                        border: 'none',
+                        fontSize: '0.9rem'
+                    }}
+                >
+                    <FaStar size={16} />
+                    Adicionar à Shortlist
+                </button>
+            )}
+            
             <Link to={`/jogadores/estatisticas/${id}/grafico`} className="btn-grafico">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />

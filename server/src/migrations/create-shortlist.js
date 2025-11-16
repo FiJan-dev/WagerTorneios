@@ -16,6 +16,16 @@ module.exports = {
           key: 'id_jogador'
         },
         onDelete: 'CASCADE'
+      },
+
+      id_usuario: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'usuarios', 
+          key: 'id_usuario'
+        },
+        onDelete: 'CASCADE'
       }
     });
   },
