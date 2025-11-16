@@ -102,6 +102,47 @@ exports.atualizarSenha = async (req, res) => {
   }
 };
 
+// PUT /api/olheiro/atualizar/:id - Atualizar perfil do olheiro
+exports.atualizarPerfil = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nome_usuario, email_usuario } = req.body;
+
+    const olheiro = await Olheiro.findByPk(id);
+    if (!olheiro) {
+      return res.status(404).json({ ok: false, error: "Olheiro não encontrado." });
+    }
+
+    // Verificar se o email já está em uso por outro usuário
+    if (email_usuario && email_usuario !== olheiro.email_usuario) {
+      const emailExistente = await Olheiro.findOne({ where: { email_usuario } });
+      if (emailExistente) {
+        return res.status(400).json({ ok: false, error: "Este email já está em uso." });
+      }
+    }
+
+    // Atualizar dados
+    if (nome_usuario) olheiro.nome_usuario = nome_usuario;
+    if (email_usuario) olheiro.email_usuario = email_usuario;
+
+    await olheiro.save();
+
+    return res.status(200).json({ 
+      ok: true, 
+      message: "Perfil atualizado com sucesso.",
+      olheiro: {
+        id_usuario: olheiro.id_usuario,
+        nome_usuario: olheiro.nome_usuario,
+        email_usuario: olheiro.email_usuario,
+        admin: olheiro.admin
+      }
+    });
+  } catch (err) {
+    console.error("Erro ao atualizar perfil:", err);
+    return res.status(500).json({ ok: false, error: "Erro ao atualizar perfil." });
+  }
+};
+
 exports.excluirOlheiro = async (req, res) => {
   try {
     const { id } = req.params;

@@ -7,6 +7,7 @@ const autenticaAdmin = require('../middleware/authAdmin.js');
 router.post('/login', controllerUsuario.login);
 router.post('/cadastrar', controllerUsuario.cadastrarOlheiro);
 router.put('/recuperar-senha/:email', controllerUsuario.atualizarSenha);
+router.put('/atualizar/:id', autenticarToken, controllerUsuario.atualizarPerfil);
 
 // Rotas protegidas por admin
 router.get('/listar', autenticarToken, autenticaAdmin, controllerUsuario.listarOlheiros);
