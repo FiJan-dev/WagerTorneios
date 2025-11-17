@@ -70,7 +70,7 @@ exports.login = async (req, res) => {
       role: 'olheiro',
     };
 
-    const token = jwt.sign(payload, proccess.env.SECRET_KEY, { expiresIn: '10h' });
+    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '10h' });
     return res.status(200).json({ token, user: payload });
   } catch (err) {
     console.error("Erro ao fazer login:", err);
