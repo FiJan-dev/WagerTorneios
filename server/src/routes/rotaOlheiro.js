@@ -8,6 +8,9 @@ router.post('/login', controllerUsuario.login);
 router.post('/cadastrar', controllerUsuario.cadastrarOlheiro);
 router.put('/recuperar-senha/:email', controllerUsuario.atualizarSenha);
 
+// Rota protegida por autenticação
+router.put('/atualizar-foto/:id', autenticarToken, controllerUsuario.atualizarFotoPerfil);
+
 // Rotas protegidas por admin
 router.get('/listar', autenticarToken, autenticaAdmin, controllerUsuario.listarOlheiros);
 router.put('/aprovar/:id', autenticarToken, autenticaAdmin, controllerUsuario.aprovarOlheiro);

@@ -81,10 +81,22 @@
   border-bottom: 1px solid var(--op-border);
 }
 
-.avatar-large {
+.avatar-container {
+  position: relative;
   width: 120px;
   height: 120px;
   margin: 0 auto 1.5rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.avatar-container:hover {
+  transform: scale(1.05);
+}
+
+.avatar-large {
+  width: 120px;
+  height: 120px;
   background: linear-gradient(135deg, var(--op-accent), var(--op-accent-hover));
   border-radius: 50%;
   display: flex;
@@ -97,8 +109,43 @@
   transition: all 0.3s ease;
 }
 
+.avatar-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: white;
+  transition: opacity 0.3s ease;
+}
+
+.avatar-overlay svg {
+  width: 32px;
+  height: 32px;
+}
+
+.edit-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
 .avatar-large:hover {
-  transform: scale(1.05);
   box-shadow: 0 6px 24px rgba(59, 130, 246, 0.4);
 }
 
@@ -233,9 +280,14 @@
     padding-bottom: 1.5rem;
   }
 
-  .avatar-large {
+  .avatar-container,
+  .avatar-large,
+  .avatar-image {
     width: 100px;
     height: 100px;
+  }
+
+  .avatar-large {
     font-size: 2.5rem;
   }
 
@@ -267,9 +319,14 @@
     padding: 1.5rem 1rem;
   }
 
-  .avatar-large {
+  .avatar-container,
+  .avatar-large,
+  .avatar-image {
     width: 80px;
     height: 80px;
+  }
+
+  .avatar-large {
     font-size: 2rem;
   }
 
