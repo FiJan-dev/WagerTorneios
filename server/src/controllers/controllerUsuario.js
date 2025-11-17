@@ -67,12 +67,21 @@ exports.login = async (req, res) => {
       admin: olheiro.admin,
       nome: olheiro.nome_usuario,
       email: olheiro.email_usuario,
-      foto_perfil: olheiro.foto_perfil,
+      // Não incluir foto_perfil no token para evitar headers muito grandes
+      // foto_perfil: olheiro.foto_perfil,
       role: 'olheiro',
     };
 
     const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '10h' });
-    return res.status(200).json({ token, user: payload });
+    
+    // Retornar foto_perfil separadamente do token
+    return res.status(200).json({ 
+      token, 
+      user: {
+        ...payload,
+        foto_perfil: olheiro.foto_perfil
+      }
+    });
   } catch (err) {
     console.error("Erro ao fazer login:", err);
     return res.status(500).json({ error: "Erro ao fazer login." });

@@ -80,9 +80,13 @@ app.get("/health", (_req, res) => {
 
 // Start
 const port = process.env.SERVER_PORT || 5000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
+
+// Aumentar limite de headers do servidor HTTP
+server.maxHeadersCount = 0; // Remove limite de contagem de headers
+server.headersTimeout = 60000; // 60 segundos timeout para headers
 
 // Handler de erro final
 app.use((err, _req, res, _next) => {
