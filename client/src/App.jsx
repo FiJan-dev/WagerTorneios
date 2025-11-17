@@ -15,6 +15,7 @@ import PlayerList from './pages/PlayerList';
 import PlayerListCadastro from './pages/PlayerListCadastro';
 import Perfil from './pages/Perfil';
 import GerenciarOlheiros from './pages/GerenciarOlheiros';
+import ShortlistPage from './pages/ShortListPage'; // 👈 LINHA ADICIONADA
 import './App.css';
 import GraficoDados from './pages/Grafico';
 
@@ -116,6 +117,15 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path='/shortlist'
+              element={
+                <ProtectedRoute>
+                  <ShortlistPage />
+                </ProtectedRoute>
+              }
+            />
+
             <Route path='*' element={<h1 className='text-white'>Página não encontrada</h1>} />
           </Routes>
           <Footer />

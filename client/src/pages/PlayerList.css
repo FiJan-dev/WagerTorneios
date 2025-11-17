@@ -1413,3 +1413,59 @@
     font-size: 0.813rem;
   }
 }
+
+/* PlayerList.css - Adicionado estilos para botão de shortlist */
+
+/* ... (todo o CSS anterior) ... */
+
+/* Botão Shortlist */
+.btn-shortlist {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--pl-warning);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-shortlist:hover {
+  background: darken(var(--pl-warning), 10%);
+  transform: translateY(-2px);
+}
+
+.btn-card.btn-shortlist {
+  flex: 1;
+  justify-content: center;
+}
+
+/* Ajuste nas ações da tabela */
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.actions-cell .btn-action {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Ajuste nos cards */
+.card-footer {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.card-footer .btn-card {
+  flex: 1;
+  min-width: 100px;
+  padding: 0.75rem;
+  font-size: 0.938rem;
+}

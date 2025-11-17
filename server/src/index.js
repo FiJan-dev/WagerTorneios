@@ -17,11 +17,11 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 app.set('sequelize', sequelize);
-
 // Função assíncrona para sincronizar e semear o admin
 const syncAndSeed = async () => {
+  await sequelize.sync({ alter: true }); // Use { force: true } para recriar tabelas, { alter: true } para atualizar sem perder dados
   try {
-    await sequelize.sync({ force: false });
+
     console.log('Banco de dados sincronizado');
 
     // 1. Cria admin
@@ -80,9 +80,13 @@ app.get("/health", (_req, res) => {
 
 // Start
 const port = process.env.SERVER_PORT || 5000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
+
+// Aumentar limite de headers do servidor HTTP
+server.maxHeadersCount = 0; // Remove limite de contagem de headers
+server.headersTimeout = 60000; // 60 segundos timeout para headers
 
 // Handler de erro final
 app.use((err, _req, res, _next) => {

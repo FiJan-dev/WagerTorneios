@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { MdGroup } from "react-icons/md";
-import { FaUsers, FaUserCheck } from "react-icons/fa";
+import { FaUsers, FaUserCheck, FaStar } from "react-icons/fa";
 import { RiGroupFill } from "react-icons/ri";
 import { BsDoorOpenFill } from "react-icons/bs";
 import { CgProfile } from "react-icons/cg";
@@ -16,6 +16,7 @@ function SideBar_Olheiro() {
   const mainItems = useMemo(() => {
     const items = [
       { id: 'dashboard', label: 'Jogadores', icon: <FaUsers />, path: '/jogadores' },
+      { id: 'shortlist', label: 'Shortlist', icon: <FaStar />, path: '/shortlist' },
       { id: 'cadastrocampeonatolista', label: 'Campeonatos', icon: <MdGroup />, path: '/cadastrocampeonatolista' },
       { id: 'cadastropartidalista', label: 'Partidas', icon: <RiGroupFill />, path: '/cadastropartidalista' },
     ];

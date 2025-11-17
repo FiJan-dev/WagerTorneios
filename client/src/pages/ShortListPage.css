@@ -1,0 +1,388 @@
+/* ShortlistPage.css - Estilo completo em CSS puro (sem Tailwind) */
+
+.shortlist-container {
+  position: relative;
+  min-height: 100vh;
+  background: #0a0e1f;
+  color: #f9fafb;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Backgrounds */
+.shortlist-bg-gradient {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(10,14,31,0.95), rgba(15,23,42,0.9));
+  z-index: 0;
+}
+
+.shortlist-bg-grid {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+  background-size: 70px 70px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Conteúdo principal */
+.shortlist-content {
+  position: relative;
+  z-index: 10;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* Cabeçalho */
+.shortlist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.shortlist-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #f9fafb, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.shortlist-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(30, 58, 138, 0.3);
+  border: 1px solid rgba(30, 58, 138, 0.5);
+  color: #93c5fd;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.shortlist-counter svg {
+  width: 16px;
+  height: 16px;
+  fill: #fbbf24;
+  color: #fbbf24;
+}
+
+/* Botão Voltar */
+.btn-voltar-shortlist {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #93c5fd;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.btn-voltar-shortlist:hover {
+  color: #dbeafe;
+}
+
+.btn-voltar-shortlist svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Loading */
+.shortlist-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5rem 0;
+}
+
+.shortlist-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 4px solid #1e40af;
+  border-top: 4px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Erro */
+.shortlist-error {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  background: rgba(127, 29, 29, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 0.75rem;
+  color: #fca5a5;
+}
+
+/* Estado vazio */
+.shortlist-empty {
+  text-align: center;
+  padding: 5rem 1rem;
+}
+
+.shortlist-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background: rgba(30, 58, 138, 0.3);
+  border: 2px dashed #1e40af;
+  margin-bottom: 1.5rem;
+}
+
+.shortlist-empty-icon svg {
+  width: 3rem;
+  height: 3rem;
+  color: #3b82f6;
+}
+
+.shortlist-empty h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #d1d5db;
+  margin-bottom: 0.5rem;
+}
+
+.shortlist-empty p {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.btn-explorar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #3b82f6;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-explorar:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
+/* Grid de Jogadores */
+.shortlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card do Jogador */
+.shortlist-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #1e293b;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.shortlist-card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.15);
+}
+
+/* Ícone do Jogador */
+.shortlist-player-icon {
+  position: relative;
+  width: 5rem;
+  height: 5rem;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  background: rgba(30, 58, 138, 0.3);
+  border: 4px solid rgba(30, 58, 138, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.shortlist-card:hover .shortlist-player-icon {
+  transform: scale(1.1);
+  border-color: #3b82f6;
+}
+
+.shortlist-player-icon svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #60a5fa;
+}
+
+.shortlist-icon-border {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #3b82f6, #60a5fa) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.shortlist-card:hover .shortlist-icon-border {
+  opacity: 1;
+}
+
+/* Nome e Info */
+.shortlist-player-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-align: center;
+  color: #f9fafb;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shortlist-player-info {
+  text-align: center;
+  color: #60a5fa;
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+/* Detalhes */
+.shortlist-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.shortlist-detail-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.shortlist-detail-value {
+  color: #d1d5db;
+  font-weight: 600;
+}
+
+/* Botões de Ação */
+.shortlist-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-perfil,
+.btn-remover {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-perfil {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-perfil:hover {
+  background: #2563eb;
+}
+
+.btn-remover {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-remover:hover {
+  background: #b91c1c;
+}
+
+.shortlist-actions svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .shortlist-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .shortlist-title {
+    font-size: 2rem;
+  }
+  .shortlist-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .shortlist-title {
+    font-size: 1.75rem;
+  }
+  .shortlist-player-icon {
+    width: 4rem;
+    height: 4rem;
+  }
+  .shortlist-player-icon svg {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+.shortlist-card-modern {
+  position: relative;
+}
+
+.shortlist-name-modern {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Responsivo para grid */
+@media (max-width: 1536px) {
+  .shortlist-container .grid-cols-5 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 1280px) {
+  .shortlist-container .grid-cols-4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 768px) {
+  .shortlist-container .grid-cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shortlist-container .grid-cols-2 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+}

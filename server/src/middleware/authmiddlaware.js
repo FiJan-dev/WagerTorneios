@@ -2,6 +2,7 @@ const jwt  = require('jsonwebtoken');
 const key = process.env.SECRET_KEY;
 
 const autenticarToken = (req, res, next) => {
+    console.log('MIDDLEWARE AUTENTICARTOKEN CHAMADO');
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1];
 

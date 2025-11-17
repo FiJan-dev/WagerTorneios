@@ -40,6 +40,11 @@ const Olheiro = sequelize.define('Olheiro', {
             notEmpty: true,
         },
     },
+    foto_perfil: {
+        type: DataTypes.TEXT('long'),
+        allowNull: true,
+        defaultValue: null,
+    },
 }, {
     tableName: 'olheiro',
     timestamps: false,

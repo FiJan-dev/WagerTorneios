@@ -1,12 +1,14 @@
+// src/pages/PlayerList.jsx
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
 import './PlayerList.css';
+import { FiList } from 'react-icons/fi'; // Ícone de shortlist
 
 export default function PlayerList() {
-  const { token, isAdmin } = useContext(AuthContext);
+  const { token, isAdmin, user } = useContext(AuthContext);
   const [players, setPlayers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -160,6 +162,33 @@ export default function PlayerList() {
       setIsDeleting(false);
     }
   };
+
+  // ADICIONAR À SHORTLIST
+  const handleAddToShortlist = async (player) => {
+  if (!token || !user?.id) {
+    alert('Você precisa estar logado.');
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/api/jogador/shortlist/adicionar',
+      { id_jogador: player.id_jogador }, // SÓ O id_jogador
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+
+    if (response.data.ok) {
+      alert('Adicionado à shortlist!');
+    } else {
+      alert(response.data.msg);
+    }
+  } catch (err) {
+    console.error('Erro:', err.response?.data);
+    alert(err.response?.data?.msg || 'Erro');
+  }
+};
 
   const handleFilterChange = (field, value) => {
     setFilters(prev => ({ ...prev, [field]: value }));
@@ -455,6 +484,16 @@ export default function PlayerList() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                           </button>
+
+                          {/* BOTÃO SHORTLIST */}
+                          <button
+                            className="btn-action btn-shortlist"
+                            onClick={() => handleAddToShortlist(player)}
+                            title="Adicionar à shortlist"
+                          >
+                            <FiList size={16} />
+                          </button>
+
                           <Link
                             to={`/jogadores/estatisticas/${player.id_jogador}`}
                             className="btn-action btn-stats"
@@ -464,6 +503,7 @@ export default function PlayerList() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
                           </Link>
+
                           {isAdmin() && (
                             <button
                               className="btn-action btn-delete"
@@ -524,12 +564,23 @@ export default function PlayerList() {
                     >
                       Ver Detalhes
                     </button>
+
+                    {/* BOTÃO SHORTLIST NO CARD */}
+                    <button
+                      className="btn-card-shortlist"
+                      onClick={() => handleAddToShortlist(player)}
+                      title="Adicionar à shortlist"
+                    >
+                      <FiList size={16} />
+                    </button>
+
                     <Link
                       to={`/jogadores/estatisticas/${player.id_jogador}`}
                       className="btn-card-stats"
                     >
                       Estatísticas
                     </Link>
+
                     {isAdmin() && (
                       <button
                         className="btn-card-delete"
@@ -740,14 +791,14 @@ export default function PlayerList() {
                 <h3 className="section-title">Disciplina</h3>
                 <div className="discipline-grid">
                   <div className="discipline-card yellow">
-                    <div className="card-icon">⚠️</div>
+                    <div className="card-icon">Amarelo</div>
                     <div className="card-content">
                       <span className="card-label">Cartões Amarelos</span>
                       <span className="card-value">{selectedPlayer.cartoes_amarelos || 0}</span>
                     </div>
                   </div>
                   <div className="discipline-card red">
-                    <div className="card-icon">🚫</div>
+                    <div className="card-icon">Vermelho</div>
                     <div className="card-content">
                       <span className="card-label">Cartões Vermelhos</span>
                       <span className="card-value">{selectedPlayer.cartoes_vermelhos || 0}</span>

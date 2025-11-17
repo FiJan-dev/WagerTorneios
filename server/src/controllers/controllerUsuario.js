@@ -2,8 +2,6 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const Olheiro = require("../models/Olheiro");
 
-const key = process.env.SECRET_KEY; // defina no .env do server
-
 // POST /api/olheiro/cadastrar
 exports.cadastrarOlheiro = async (req, res) => {
   try {
@@ -49,7 +47,7 @@ exports.login = async (req, res) => {
 
     const olheiro = await Olheiro.findOne({
       where: { email_usuario: email, senha_usuario: senhaHash },
-      attributes: ['id_usuario', 'admin', 'aprovado', 'nome_usuario', 'email_usuario'],
+      attributes: ['id_usuario', 'admin', 'aprovado', 'nome_usuario', 'email_usuario', 'foto_perfil'],
     });
 
     if(!olheiro) {
@@ -69,11 +67,21 @@ exports.login = async (req, res) => {
       admin: olheiro.admin,
       nome: olheiro.nome_usuario,
       email: olheiro.email_usuario,
+      // Não incluir foto_perfil no token para evitar headers muito grandes
+      // foto_perfil: olheiro.foto_perfil,
       role: 'olheiro',
     };
 
-    const token = jwt.sign(payload, key, { expiresIn: '10h' });
-    return res.status(200).json({ token, user: payload });
+    const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '10h' });
+    
+    // Retornar foto_perfil separadamente do token
+    return res.status(200).json({ 
+      token, 
+      user: {
+        ...payload,
+        foto_perfil: olheiro.foto_perfil
+      }
+    });
   } catch (err) {
     console.error("Erro ao fazer login:", err);
     return res.status(500).json({ error: "Erro ao fazer login." });
@@ -193,5 +201,49 @@ exports.rejeitarOlheiro = async (req, res) => {
   } catch (err) {
     console.error("Erro ao rejeitar olheiro:", err);
     return res.status(500).json({ ok: false, error: "Erro ao rejeitar olheiro." });
+  }
+};
+
+// PUT /api/olheiro/atualizar-foto/:id - Atualizar foto de perfil
+exports.atualizarFotoPerfil = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { foto_perfil } = req.body;
+
+    console.log('=== ATUALIZAR FOTO DE PERFIL ===');
+    console.log('ID do usuário:', id);
+    console.log('Usuário autenticado:', req.user);
+    console.log('Foto recebida (primeiros 100 chars):', foto_perfil?.substring(0, 100));
+
+    if (!foto_perfil) {
+      return res.status(400).json({ ok: false, error: "Foto de perfil é obrigatória." });
+    }
+
+    const olheiro = await Olheiro.findByPk(id);
+    
+    if (!olheiro) {
+      console.log('Olheiro não encontrado');
+      return res.status(404).json({ ok: false, error: "Olheiro não encontrado." });
+    }
+
+    // Verificar se o usuário está atualizando sua própria foto (req.user é definido pelo middleware de autenticação)
+    if (req.user && req.user.id !== parseInt(id) && req.user.admin !== 1) {
+      console.log('Tentativa de atualizar foto de outro usuário');
+      return res.status(403).json({ ok: false, error: "Você só pode atualizar sua própria foto de perfil." });
+    }
+
+    olheiro.foto_perfil = foto_perfil;
+    await olheiro.save();
+
+    console.log('Foto de perfil atualizada com sucesso');
+
+    return res.status(200).json({ 
+      ok: true, 
+      message: "Foto de perfil atualizada com sucesso.",
+      foto_perfil: olheiro.foto_perfil 
+    });
+  } catch (err) {
+    console.error("Erro ao atualizar foto de perfil:", err);
+    return res.status(500).json({ ok: false, error: "Erro ao atualizar foto de perfil." });
   }
 };

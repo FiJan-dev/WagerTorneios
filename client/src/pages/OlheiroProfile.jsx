@@ -1,54 +1,214 @@
+import { useContext, useState, useRef } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
+import './OlheiroProfile.css';
 
 export default function OlheiroProfile() {
+  const { user, setUser } = useContext(AuthContext);
+  const [isUploading, setIsUploading] = useState(false);
+  const [showEditIcon, setShowEditIcon] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validar tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor, selecione um arquivo de imagem válido.');
+      return;
+    }
+
+    // Validar tamanho (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('A imagem deve ter no máximo 5MB.');
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      // Converter para base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result;
+
+        try {
+          // Enviar para o backend
+          const token = localStorage.getItem('token');
+          console.log('Enviando foto para o servidor...', { userId: user.id });
+          
+          const response = await fetch(`http://localhost:5000/api/olheiro/atualizar-foto/${user.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ foto_perfil: base64String })
+          });
+
+          const data = await response.json();
+          console.log('Resposta do servidor:', data);
+
+          if (response.ok) {
+            // Atualizar o contexto do usuário e localStorage
+            const updatedUser = { ...user, foto_perfil: data.foto_perfil };
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            alert('Foto de perfil atualizada com sucesso!');
+          } else {
+            console.error('Erro na resposta:', data);
+            alert(data.error || 'Erro ao atualizar foto de perfil.');
+          }
+        } catch (fetchError) {
+          console.error('Erro na requisição:', fetchError);
+          alert('Erro ao conectar com o servidor.');
+        } finally {
+          setIsUploading(false);
+        }
+      };
+
+      reader.onerror = () => {
+        alert('Erro ao ler o arquivo.');
+        setIsUploading(false);
+      };
+
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Erro ao fazer upload da foto:', error);
+      alert('Erro ao fazer upload da foto.');
+      setIsUploading(false);
+    }
+  };
+
+  if (!user) {
+    return (
+      <div className="olheiro-profile-page">
+        <SideBar_Olheiro />
+        <div className="profile-container">
+          <div className="loading-state">
+            <p>Carregando informações do usuário...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Get the first letter of the name for the avatar
+  const avatarLetter = user.nome ? user.nome.charAt(0).toUpperCase() : 'O';
+  const isUserAdmin = user.admin === 1;
 
   return (
-    <div className="flex min-h-screen bg-black">
+    <div className="olheiro-profile-page">
       <SideBar_Olheiro />
-      <div className="flex justify-center items-center min-h-screen w-full p-8 pt-20 box-border">
-        <div className="bg-black/90 backdrop-blur-sm border border-green-700 rounded-2xl p-8 sm:p-12 shadow-xl max-w-2xl w-full flex flex-col items-center transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
-          <div className="mb-8 flex justify-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-500 rounded-full grid place-items-center text-2xl font-bold text-white shadow-md">
-              O
+      <div className="profile-container">
+        <div className="profile-content">
+          
+          {/* Header Section */}
+          <div className="profile-header">
+            <div 
+              className="avatar-container"
+              onMouseEnter={() => setShowEditIcon(true)}
+              onMouseLeave={() => setShowEditIcon(false)}
+              onClick={handleImageClick}
+            >
+              {user.foto_perfil ? (
+                <img 
+                  src={user.foto_perfil} 
+                  alt="Foto de perfil" 
+                  className="avatar-image"
+                />
+              ) : (
+                <div className="avatar-large">
+                  {avatarLetter}
+                </div>
+              )}
+              {showEditIcon && (
+                <div className="avatar-overlay">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="32" 
+                    height="32" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                  <span className="edit-text">
+                    {isUploading ? 'Carregando...' : 'Editar foto'}
+                  </span>
+                </div>
+              )}
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+            <h1 className="profile-title">
+              {user.nome}
+            </h1>
+            <p className="profile-email">
+              {user.email}
+            </p>
+            {isUserAdmin && (
+              <span className="admin-badge">
+                Administrador
+              </span>
+            )}
           </div>
-          <h1 className="text-2xl sm:text-3xl text-center font-bold text-white mb-4">
-            Perfil do Olheiro
-          </h1>
-          <p className="text-center text-gray-300 text-base mb-8">
-            Informações e histórico do olheiro
-          </p>
 
-          {/* Olheiro Info */}
-          <div className="w-full flex flex-col items-center gap-6 mb-8">
-            <div className="w-full flex flex-col items-center mb-2">
-              <h2 className="text-xl font-semibold text-white mb-1">Carlos Santos</h2>
-              <p className="text-gray-300">Email: carlos.santos@email.com</p>
-            </div>
-
-            {/* Photo Area */}
-            <div className="w-36 h-36 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 my-4">
-              <span>Foto do Olheiro</span>
-            </div>
-
-            {/* Description Area */}
-            <div className="w-full mb-4">
-              <h3 className="text-lg font-medium text-white mb-3">Sobre</h3>
-              <p className="text-gray-300 text-sm leading-relaxed">
-                Olheiro experiente com mais de 10 anos de experiência no futebol. Especialista em identificar talentos jovens e avaliar potencial técnico e tático dos jogadores.
+          {/* Info Cards Grid */}
+          <div className="info-grid">
+            
+            {/* About Card */}
+            <div className="info-card">
+              <h3 className="card-title">Sobre</h3>
+              <p className="card-text">
+                {isUserAdmin 
+                  ? 'Administrador da plataforma com acesso completo a todas as funcionalidades do sistema.'
+                  : 'Olheiro responsável por avaliar e acompanhar jogadores, criar relatórios e identificar talentos promissores.'}
               </p>
             </div>
 
-            {/* Statistics Area */}
-            <div className="w-full">
-              <h3 className="text-lg font-medium text-white mb-3">Estatísticas</h3>
-              <ul className="text-gray-300 text-sm space-y-2">
-                <li>Jogadores Avaliados: 150</li>
-                <li>Relatórios Criados: 89</li>
-                <li>Campanhas Acompanhadas: 12</li>
-                <li>Anos de Experiência: 10</li>
+            {/* Account Info Card */}
+            <div className="info-card">
+              <h3 className="card-title">Informações da Conta</h3>
+              <ul className="info-list">
+                <li>
+                  <span className="info-label">ID:</span>
+                  <span className="info-value">{user.id}</span>
+                </li>
+                <li>
+                  <span className="info-label">Nome:</span>
+                  <span className="info-value">{user.nome}</span>
+                </li>
+                <li>
+                  <span className="info-label">Email:</span>
+                  <span className="info-value">{user.email}</span>
+                </li>
+                <li>
+                  <span className="info-label">Tipo:</span>
+                  <span className="info-value">{isUserAdmin ? 'Administrador' : 'Olheiro'}</span>
+                </li>
+                <li>
+                  <span className="info-label">Status:</span>
+                  <span className="status-active">Ativo</span>
+                </li>
               </ul>
             </div>
+
           </div>
 
         </div>
