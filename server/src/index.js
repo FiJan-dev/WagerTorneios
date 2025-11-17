@@ -19,6 +19,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.set('sequelize', sequelize);
 // Função assíncrona para sincronizar e semear o admin
 const syncAndSeed = async () => {
+  await sequelize.sync({ alter: true }); // Use { force: true } para recriar tabelas, { alter: true } para atualizar sem perder dados
   try {
 
     console.log('Banco de dados sincronizado');
