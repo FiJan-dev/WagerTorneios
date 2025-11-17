@@ -9,17 +9,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import './ShortListPage.css'; // Nome minúsculo!
 
 const ShortlistPage = () => {
-  const { user } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const [shortlist, setShortlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const fetchShortlist = async () => {
-    if (!user) return;
+    if (!user || !token) return;
     try {
       setLoading(true);
       setError('');
-      const res = await axios.get('http://localhost:5000/api/jogador/shortlist');
+      const res = await axios.get('http://localhost:5000/api/jogador/shortlist', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (res.data.ok) {
         setShortlist(res.data.jogadores || []);
       } else {
@@ -37,7 +39,9 @@ const ShortlistPage = () => {
     if (!window.confirm("Remover este jogador da shortlist?")) return;
 
     try {
-      const res = await axios.delete(`http://localhost:5000/api/jogador/shortlist/remover/${id_jogador}`);
+      const res = await axios.delete(`http://localhost:5000/api/jogador/shortlist/remover/${id_jogador}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (res.data.ok) {
         setShortlist(prev => prev.filter(j => j.id_jogador !== id_jogador));
       } else {
@@ -51,7 +55,7 @@ const ShortlistPage = () => {
 
   useEffect(() => {
     fetchShortlist();
-  }, [user]);
+  }, [user, token]);
 
   // Usuário não logado
   if (!user) {
