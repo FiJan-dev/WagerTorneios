@@ -1,38 +1,42 @@
+// src/models/Shortlist.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Jogador = require('./Jogador'); 
-const Usuario = require('./Usuario'); 
+const Jogador = require('./Jogador');
+const Olheiro = require('./Olheiro'); // <--- ADICIONEI
 
 const Shortlist = sequelize.define('Shortlist', {
-    id_shortlist: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    id_jogador: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'jogadores',
-            key: 'id_jogador'
-        }
-    },
-
-    id_usuario: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'usuarios', 
-            key: 'id_usuario'
-        }
+  id_shortlist: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  id_jogador: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Jogador,
+      key: 'id_jogador'
     }
+  },
+  id_usuario: { // <--- A COLUNA QUE FALTAVA!
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Olheiro,
+      key: 'id_usuario'
+    }
+  }
 }, {
-    tableName: 'shortlist',
-    timestamps: false
+  tableName: 'shortlist',
+  timestamps: true, // <--- MUDA PARA true (tem createdAt/updatedAt)
 });
 
-// Associações
-Shortlist.belongsTo(Jogador, { foreignKey: 'id_jogador', targetKey: 'id_jogador' });
-Shortlist.belongsTo(Usuario, { foreignKey: 'id_usuario', targetKey: 'id_usuario' }); 
+// === ASSOCIAÇÕES CORRETAS ===
+Shortlist.belongsTo(Jogador, { foreignKey: 'id_jogador' });
+Shortlist.belongsTo(Olheiro, { foreignKey: 'id_usuario' });
 
+Jogador.hasMany(Shortlist, { foreignKey: 'id_jogador' });
+Olheiro.hasMany(Shortlist, { foreignKey: 'id_usuario' });
+
+// Exporta apenas o Shortlist (os outros já estão em seus arquivos)
 module.exports = Shortlist;

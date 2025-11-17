@@ -2,8 +2,6 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const Olheiro = require("../models/Olheiro");
 
-const key = process.env.SECRET_KEY; // defina no .env do server
-
 // POST /api/olheiro/cadastrar
 exports.cadastrarOlheiro = async (req, res) => {
   try {
@@ -72,7 +70,7 @@ exports.login = async (req, res) => {
       role: 'olheiro',
     };
 
-    const token = jwt.sign(payload, key, { expiresIn: '10h' });
+    const token = jwt.sign(payload, proccess.env.SECRET_KEY, { expiresIn: '10h' });
     return res.status(200).json({ token, user: payload });
   } catch (err) {
     console.error("Erro ao fazer login:", err);

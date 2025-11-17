@@ -1,3 +1,4 @@
+// src/models/index.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Jogador = require('./Jogador');
@@ -7,37 +8,29 @@ const Partida = require('./Partida');
 const Olheiro = require('./Olheiro');
 const Comentarios = require('./Comentarios');
 const Estatisticas = require('./Estatisticas');
-const Shortlist = sequelize.define('Shortlist', {
-  id_shortlist: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  id_jogador: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Jogador,
-      key: 'id_jogador'
-    }
-  }
-}, {
-  tableName: 'shortlist',
-  timestamps: false
-});
+const Shortlist = require('./ShortList'); // <--- Corrigido: Shortlist (não ShortList)
 
-// Associações
+// === ASSOCIAÇÕES ===
+
+// Time ↔ Jogador
 Jogador.belongsTo(Time, { foreignKey: 'id_time' });
 Time.hasMany(Jogador, { foreignKey: 'id_time' });
 
+// Comentários ↔ Jogador
 Comentarios.belongsTo(Jogador, { foreignKey: 'id_jogador' });
 Jogador.hasMany(Comentarios, { foreignKey: 'id_jogador' });
 
+// Estatísticas ↔ Jogador
 Jogador.hasOne(Estatisticas, { foreignKey: 'id_jogador', onDelete: 'CASCADE' });
 Estatisticas.belongsTo(Jogador, { foreignKey: 'id_jogador' });
 
-Jogador.hasOne(Shortlist, { foreignKey: 'id_jogador' });
+// Shortlist ↔ Jogador
+Jogador.hasMany(Shortlist, { foreignKey: 'id_jogador' }); // <--- CORRIGIDO
 Shortlist.belongsTo(Jogador, { foreignKey: 'id_jogador' });
+
+// Shortlist ↔ Olheiro
+Olheiro.hasMany(Shortlist, { foreignKey: 'id_usuario' }); // <--- ADICIONADO
+Shortlist.belongsTo(Olheiro, { foreignKey: 'id_usuario' });
 
 module.exports = {
   Jogador,

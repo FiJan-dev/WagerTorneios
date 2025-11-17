@@ -17,11 +17,10 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 app.set('sequelize', sequelize);
-
 // Função assíncrona para sincronizar e semear o admin
 const syncAndSeed = async () => {
   try {
-    await sequelize.sync({ force: false });
+
     console.log('Banco de dados sincronizado');
 
     // 1. Cria admin

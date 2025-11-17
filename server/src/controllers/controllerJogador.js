@@ -289,12 +289,13 @@ exports.adicionarShortlist = async (req, res) => {
     const { id_jogador } = req.body;
     // CRUCIAL: Pega o ID do usuário do token (middleware autenticarToken)
     // Usamos 'req.user' ou 'req.usuario' dependendo da sua autenticação.
-    const id_usuario = req.user?.id_usuario || req.usuario?.id_usuario; 
+    const id_usuario = req.user?.id 
 
     if (!id_jogador) {
       return res.status(400).json({ ok: false, reason: 'validation', msg: 'ID do jogador é obrigatório.' }); // Alterado para 400
    }
    if (!id_usuario) {
+      console.log(req.user);
        return res.status(401).json({ ok: false, msg: 'Usuário não autenticado.' }); // Adicionado para segurança
    }
 
@@ -326,7 +327,7 @@ exports.adicionarShortlist = async (req, res) => {
 exports.listarShortlist = async (req, res) => {
     // CRUCIAL: Pega o ID do usuário do token (middleware autenticarToken)
     // Usamos 'req.user' ou 'req.usuario' dependendo da sua autenticação.
-    const id_usuario = req.user?.id_usuario || req.usuario?.id_usuario; 
+    const id_usuario = req.user?.id 
     
     if (!id_usuario) {
        return res.status(401).json({ ok: false, msg: 'Usuário não autenticado.' });
@@ -372,7 +373,7 @@ exports.removerShortlist = async (req, res) => {
   try {
     const { id } = req.params; // id é o id_jogador
         // CRUCIAL: Pega o ID do usuário do token (middleware autenticarToken)
-        const id_usuario = req.user?.id_usuario || req.usuario?.id_usuario; 
+        const id_usuario = req.user?.id 
 
         if (!id_usuario) {
             return res.status(401).json({ ok: false, msg: 'Usuário não autenticado.' });

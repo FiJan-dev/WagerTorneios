@@ -2,35 +2,26 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('shortlist', {
-      id_shortlist: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+    await queryInterface.addColumn('shortlist', 'id_usuario', {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'olheiros', // nome da tabela de olheiros
+        key: 'id_usuario'
       },
-      id_jogador: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'jogadores',
-          key: 'id_jogador'
-        },
-        onDelete: 'CASCADE'
-      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE'
+    });
 
-      id_usuario: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'usuarios', 
-          key: 'id_usuario'
-        },
-        onDelete: 'CASCADE'
-      }
+    // Adicionar índice
+    await queryInterface.addIndex('shortlist', ['id_jogador', 'id_usuario'], {
+      unique: true,
+      name: 'shortlist_unique_jogador_usuario'
     });
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable('shortlist');
+    await queryInterface.removeIndex('shortlist', 'shortlist_unique_jogador_usuario');
+    await queryInterface.removeColumn('shortlist', 'id_usuario');
   }
 };
