@@ -81,11 +81,25 @@ function AtualizarEstatisticas() {
     fetchJogador();
   }, [id, token, isAdmin, navigate]);
 
+  // Prevenir scroll do mouse em inputs numéricos
+  useEffect(() => {
+    const handleWheel = (e) => {
+      if (document.activeElement && document.activeElement.type === 'number') {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      document.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEstatisticas((prev) => ({ 
       ...prev, 
-      [name]: parseInt(value) || 0 
+      [name]: value 
     }));
   };
 
@@ -95,10 +109,16 @@ function AtualizarEstatisticas() {
     setSuccess('');
     setSaving(true);
 
+    // Converter valores para números antes de enviar
+    const dadosEnviar = {};
+    Object.keys(estatisticas).forEach(key => {
+      dadosEnviar[key] = parseInt(estatisticas[key]) || 0;
+    });
+
     try {
       const resp = await axios.put(
         `http://localhost:5000/api/jogador/estatisticas/${id}`,
-        estatisticas,
+        dadosEnviar,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
