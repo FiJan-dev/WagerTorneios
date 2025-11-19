@@ -572,15 +572,27 @@ export default function PlayerList() {
                           </Link>
 
                           {isAdmin() && (
-                            <button
-                              className="btn-action btn-delete"
-                              onClick={() => openDeleteModal(player)}
-                              title="Remover jogador"
-                            >
-                              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
+                            <>
+                              <Link
+                                to={`/atualizar-estatisticas/${player.id_jogador}`}
+                                className="btn-action btn-edit-stats"
+                                title="Editar estatísticas"
+                              >
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                              </Link>
+                              
+                              <button
+                                className="btn-action btn-delete"
+                                onClick={() => openDeleteModal(player)}
+                                title="Remover jogador"
+                              >
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </>
                           )}
                         </div>
                       </td>
@@ -649,23 +661,33 @@ export default function PlayerList() {
                     </Link>
 
                     {isAdmin() && (
-                      <button
-                        className="btn-card-delete"
-                        onClick={() => openDeleteModal(player)}
-                        title="Remover"
-                      >
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
+                      <>
+                        <Link
+                          to={`/atualizar-estatisticas/${player.id_jogador}`}
+                          className="btn-card-edit-stats"
+                          title="Editar estatísticas"
+                        >
+                          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </Link>
+                        
+                        <button
+                          className="btn-card-delete"
+                          onClick={() => openDeleteModal(player)}
+                          title="Remover"
+                        >
+                          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
               ))}
             </div>
-          )}
-
-          {/* Pagination */}
+          )}          {/* Pagination */}
           {players.length > 0 && (
             <div className="pagination-container">
               <div className="pagination-info">
@@ -816,39 +838,71 @@ export default function PlayerList() {
                 <div className="stats-grid">
                   <div className="stat-card">
                     <div className="stat-header">
-                      <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
                       <span className="stat-label">Gols</span>
                     </div>
                     <span className="stat-value">{selectedPlayer.gols_marcados || 0}</span>
                   </div>
                   <div className="stat-card">
                     <div className="stat-header">
-                      <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                      </svg>
                       <span className="stat-label">Assistências</span>
                     </div>
                     <span className="stat-value">{selectedPlayer.assistencias || 0}</span>
                   </div>
                   <div className="stat-card">
                     <div className="stat-header">
-                      <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                      </svg>
+                      <span className="stat-label">Finalizações</span>
+                    </div>
+                    <span className="stat-value">{selectedPlayer.finalizacoes || 0}</span>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-header">
+                      <span className="stat-label">Força de Chute</span>
+                    </div>
+                    <span className="stat-value">{selectedPlayer.chute_forca || 0}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Estatísticas de Passe */}
+              <div className="info-section">
+                <h3 className="section-title">Estatísticas de Passe</h3>
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <div className="stat-header">
                       <span className="stat-label">Passes Certos</span>
                     </div>
                     <span className="stat-value">{selectedPlayer.passes_certos || 0}</span>
                   </div>
                   <div className="stat-card">
                     <div className="stat-header">
-                      <svg className="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                      <span className="stat-label">Finalizações</span>
+                      <span className="stat-label">Total de Passes</span>
                     </div>
-                    <span className="stat-value">{selectedPlayer.finalizacoes || 0}</span>
+                    <span className="stat-value">{selectedPlayer.passe_total || 0}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Estatísticas Físicas e Técnicas */}
+              <div className="info-section">
+                <h3 className="section-title">Habilidades Físicas e Técnicas</h3>
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <div className="stat-header">
+                      <span className="stat-label">Aceleração</span>
+                    </div>
+                    <span className="stat-value">{selectedPlayer.aceleracao || 0}</span>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-header">
+                      <span className="stat-label">Drible</span>
+                    </div>
+                    <span className="stat-value">{selectedPlayer.drible || 0}</span>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-header">
+                      <span className="stat-label">Roubadas de Bola</span>
+                    </div>
+                    <span className="stat-value">{selectedPlayer.roubadas_bola || 0}</span>
                   </div>
                 </div>
               </div>

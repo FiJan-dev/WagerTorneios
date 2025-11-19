@@ -9,6 +9,7 @@ const autenticaAdmin = require('../middleware/authAdmin');
 router.post('/cadastrar', autenticarToken, autenticaAdmin, controllerJogador.cadastrarJogador);
 router.get('/listar', autenticarTokenSoft, controllerJogador.listarJogadores);
 router.put('/atualizar/:id', autenticarToken, autenticaAdmin, controllerJogador.atualizarJogador);
+router.put('/estatisticas/:id', autenticarToken, autenticaAdmin, controllerJogador.atualizarEstatisticas);
 router.delete('/deletar/:id', autenticarToken, autenticaAdmin, controllerJogador.deletarJogador);
 router.get('/estatisticas/:id', autenticarTokenSoft, controllerJogador.estatisticas);
 router.get('/grafico/:id', autenticarTokenSoft, controllerJogador.EstatisticasGrafico);
