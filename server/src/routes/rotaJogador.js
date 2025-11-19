@@ -17,5 +17,6 @@ router.get('/comentarios/:id_jogador', autenticarTokenSoft, controllerJogador.pe
 router.post('/shortlist/adicionar', autenticarToken, controllerJogador.adicionarShortlist);
 router.get('/shortlist', autenticarToken, controllerJogador.listarShortlist);
 router.delete('/shortlist/remover/:id', autenticarToken, controllerJogador.removerShortlist);
+router.post('/comparar', autenticarToken, controllerJogador.compararJogadores);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 // src/pages/PlayerList.jsx
 import { useState, useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import SideBar_Olheiro from '../components/SideBar_Olheiro';
@@ -9,6 +9,7 @@ import { FiList } from 'react-icons/fi'; // Ícone de shortlist
 
 export default function PlayerList() {
   const { token, isAdmin, user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [players, setPlayers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,6 +20,10 @@ export default function PlayerList() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
   const [playerComment, setPlayerComment] = useState('');
+  
+  // Comparison states
+  const [selectedForComparison, setSelectedForComparison] = useState([]);
+  const [comparisonMode, setComparisonMode] = useState(false);
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -208,6 +213,33 @@ export default function PlayerList() {
     });
   };
 
+  // Comparison functions
+  const toggleComparisonMode = () => {
+    setComparisonMode(!comparisonMode);
+    setSelectedForComparison([]);
+  };
+
+  const handleSelectForComparison = (playerId) => {
+    setSelectedForComparison(prev => {
+      if (prev.includes(playerId)) {
+        return prev.filter(id => id !== playerId);
+      } else if (prev.length < 3) {
+        return [...prev, playerId];
+      } else {
+        alert('Você pode selecionar no máximo 3 jogadores para comparar');
+        return prev;
+      }
+    });
+  };
+
+  const handleCompare = () => {
+    if (selectedForComparison.length < 2) {
+      alert('Selecione pelo menos 2 jogadores para comparar');
+      return;
+    }
+    navigate('/compare-players', { state: { playerIds: selectedForComparison } });
+  };
+
   const hasActiveFilters = Object.values(filters).some(value => value !== '');
 
   return (
@@ -231,6 +263,30 @@ export default function PlayerList() {
                   </svg>
                   Adicionar Jogador
                 </Link>
+              )}
+
+              <button
+                className={`btn-compare ${comparisonMode ? 'active' : ''}`}
+                onClick={toggleComparisonMode}
+                title="Modo de comparação"
+              >
+                <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                {comparisonMode ? 'Cancelar' : 'Comparar'}
+              </button>
+
+              {comparisonMode && selectedForComparison.length > 0 && (
+                <button
+                  className="btn-do-compare"
+                  onClick={handleCompare}
+                  title={`Comparar ${selectedForComparison.length} jogador(es)`}
+                >
+                  <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                  Comparar ({selectedForComparison.length})
+                </button>
               )}
               
               <button
@@ -440,6 +496,7 @@ export default function PlayerList() {
               <table className="players-table">
                 <thead>
                   <tr>
+                    {comparisonMode && <th className="checkbox-column">Comparar</th>}
                     <th>Jogador</th>
                     <th>Posição</th>
                     <th>Idade</th>
@@ -450,7 +507,17 @@ export default function PlayerList() {
                 </thead>
                 <tbody>
                   {currentPlayers.map((player) => (
-                    <tr key={player.id_jogador}>
+                    <tr key={player.id_jogador} className={comparisonMode && selectedForComparison.includes(player.id_jogador) ? 'selected-for-comparison' : ''}>
+                      {comparisonMode && (
+                        <td className="checkbox-column">
+                          <input
+                            type="checkbox"
+                            className="comparison-checkbox"
+                            checked={selectedForComparison.includes(player.id_jogador)}
+                            onChange={() => handleSelectForComparison(player.id_jogador)}
+                          />
+                        </td>
+                      )}
                       <td>
                         <div className="player-cell">
                           <div className="player-avatar">

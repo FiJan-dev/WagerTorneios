@@ -396,3 +396,61 @@ exports.removerShortlist = async (req, res) => {
           return res.status(500).json({ ok: false, reason: err.name || 'ERROR', msg: 'Erro interno ao remover da shortlist.' });
         }
 };
+
+// POST /api/jogador/comparar
+exports.compararJogadores = async (req, res) => {
+  try {
+    const { playerIds } = req.body;
+
+    if (!playerIds || !Array.isArray(playerIds) || playerIds.length < 2 || playerIds.length > 3) {
+      return res.status(200).json({ 
+        ok: false, 
+        reason: 'validation', 
+        msg: 'Você deve selecionar entre 2 e 3 jogadores para comparar.' 
+      });
+    }
+
+    const jogadores = await Jogador.findAll({
+      where: { id_jogador: playerIds },
+      include: [
+        { 
+          model: Time, 
+          attributes: ['nome_time'] 
+        },
+        { 
+          model: Estatisticas, 
+          attributes: Object.keys(Estatisticas.rawAttributes).filter(k => k !== 'id_estatistica' && k !== 'id_jogador'), 
+          required: false 
+        }
+      ]
+    });
+
+    if (jogadores.length !== playerIds.length) {
+      return res.status(200).json({ 
+        ok: false, 
+        reason: 'not_found', 
+        msg: 'Um ou mais jogadores não foram encontrados.' 
+      });
+    }
+
+    const formatted = jogadores.map(j => ({
+      id_jogador: j.id_jogador,
+      nome_jogador: j.nome_jogador,
+      posicao_jogador: j.posicao_jogador,
+      idade: j.idade,
+      altura_cm: j.altura_cm,
+      peso_kg: j.peso_kg,
+      Time: j.Time,
+      Estatistica: j.Estatistica
+    }));
+
+    return res.status(200).json({ ok: true, jogadores: formatted });
+  } catch (err) {
+    console.error('Erro ao comparar jogadores:', err);
+    return res.status(500).json({ 
+      ok: false, 
+      reason: err.name || 'ERROR', 
+      msg: 'Erro interno ao comparar jogadores.' 
+    });
+  }
+};
