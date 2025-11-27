@@ -132,6 +132,7 @@
   border-radius: 50px;
   font-size: 0.875rem;
   font-weight: 600;
+  margin-top: 1.25rem;
 }
 
 .icone-olheiro {
@@ -198,6 +199,129 @@
 .disponivel {
   color: #10b981;
   font-weight: 700;
+}
+
+/* Seção: Avaliação (melhorias visuais) */
+.secao-avaliacao {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(59,130,246,0.06);
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  max-width: 520px;
+}
+
+.media-avaliacoes {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.nota-media {
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #f9fafb, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.avaliacoes-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.secao-avaliacao .titulo-avaliacao {
+  font-size: 1rem;
+  color: #cfe9ff;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+
+.star-large {
+  color: #FFD700;
+  filter: drop-shadow(0 6px 10px rgba(255,215,0,0.12));
+}
+
+.nota-media.animated {
+  transition: transform 300ms ease, opacity 300ms ease;
+}
+
+.total-avaliacoes {
+  color: #9ca3af;
+  font-size: 0.95rem;
+  margin-left: 4px;
+}
+
+.avaliacao-pessoal {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.rotulo-sua-nota {
+  color: #c7e6ff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.estrelas-interativas {
+  display: flex;
+  gap: 6px;
+}
+
+.estrelas-interativas span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.estrelas-interativas span:hover {
+  transform: translateY(-3px);
+  background: rgba(59,130,246,0.08);
+}
+
+.estrelas-interativas svg {
+  transition: color 0.15s, transform 0.15s;
+}
+
+.estrelas-interativas svg.filled {
+  color: #38bdf8;
+  filter: drop-shadow(0 6px 14px rgba(56,189,248,0.18));
+  transform: scale(1.05);
+}
+
+.estrelas-interativas svg.empty {
+  color: #4b5563;
+  opacity: 0.85;
+}
+
+.aviso-login-avaliacao {
+  color: #93c5fd;
+  background: rgba(59,130,246,0.04);
+  padding: 6px 10px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.status-avaliacao {
+  font-size: 0.85rem;
+  color: #93c5fd;
+}
+
+/* Pequenas melhorias para mobile */
+@media (max-width: 768px) {
+  .secao-avaliacao { justify-content: center; max-width: 100%; }
+  .avaliacao-pessoal { align-items: center; }
 }
 
 /* Estatísticas (mesmo do anterior) */

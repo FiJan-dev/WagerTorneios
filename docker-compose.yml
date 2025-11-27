@@ -10,7 +10,7 @@ services:
       - DB_USER=dev
       - DB_PASSWORD=1234
       - DB_NAME=wagerdb
-      - SECRET_KEY=troque-esta-chave
+      - SECRET_KEY=4567
     depends_on:
       - db
     volumes:

@@ -6,6 +6,7 @@ const rotaOlheiro = require("./routes/rotaOlheiro.js");
 const rotaCampeonato = require("./routes/rotaCampeonato.js");
 const rotaPartida = require("./routes/rotaPartidas.js");
 const rotaJogador = require("./routes/rotaJogador.js");
+const rotaNotas = require("./routes/rotaNotas.js");
 const crypto = require('crypto');
 const { Olheiro } = require('./models/index');
 const { populate } = require('./scripts/popular');
@@ -72,6 +73,7 @@ app.use("/api/olheiro", rotaOlheiro);
 app.use("/api/campeonato", rotaCampeonato);
 app.use("/api/partida", rotaPartida);
 app.use("/api/jogador", rotaJogador);
+app.use("/api/notas", rotaNotas);
 
 // Healthcheck
 app.get("/health", (_req, res) => {
