@@ -8,8 +8,8 @@ const Partida = require('./Partida');
 const Olheiro = require('./Olheiro');
 const Comentarios = require('./Comentarios');
 const Estatisticas = require('./Estatisticas');
-const Shortlist = require('./ShortList'); // <--- Corrigido: Shortlist (não ShortList)
-
+const Shortlist = require('./ShortList');
+const Notas = require('./Notas');
 // === ASSOCIAÇÕES ===
 
 // Time ↔ Jogador
@@ -32,6 +32,14 @@ Shortlist.belongsTo(Jogador, { foreignKey: 'id_jogador' });
 Olheiro.hasMany(Shortlist, { foreignKey: 'id_usuario' }); // <--- ADICIONADO
 Shortlist.belongsTo(Olheiro, { foreignKey: 'id_usuario' });
 
+// Notas ↔ Olheiro
+Olheiro.hasMany(Notas, {foreinkey: 'id_usuario' });
+Notas.belongsTo(Olheiro, {foreignKey: 'id_usuario'});
+
+// Notas ↔ Jogador
+Jogador.hasMany(Notas, {foreinkey: 'id_jogador' });
+Notas.belongsTo(Jogador, {foreignKey: 'id_jogador'});
+
 module.exports = {
   Jogador,
   Time,
@@ -40,5 +48,6 @@ module.exports = {
   Olheiro,
   Comentarios,
   Estatisticas,
-  Shortlist
+  Shortlist,
+  Notas
 };

@@ -13,9 +13,11 @@ import RecoverPassword from './pages/RecoverPassword';
 import HomePage from './pages/HomePage';
 import PlayerList from './pages/PlayerList';
 import PlayerListCadastro from './pages/PlayerListCadastro';
+import AtualizarEstatisticas from './pages/AtualizarEstatisticas';
 import Perfil from './pages/Perfil';
 import GerenciarOlheiros from './pages/GerenciarOlheiros';
-import ShortlistPage from './pages/ShortListPage'; // 👈 LINHA ADICIONADA
+import ShortlistPage from './pages/ShortListPage';
+import ComparePlayers from './pages/ComparePlayers';
 import './App.css';
 import GraficoDados from './pages/Grafico';
 
@@ -86,6 +88,14 @@ function App() {
               }
             />
             <Route
+              path='/atualizar-estatisticas/:id'
+              element={
+                <ProtectedRoute>
+                  <AtualizarEstatisticas />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path='/grafico/:id'
               element={
                 <ProtectedRoute>
@@ -122,6 +132,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ShortlistPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='/compare-players'
+              element={
+                <ProtectedRoute>
+                  <ComparePlayers />
                 </ProtectedRoute>
               }
             />

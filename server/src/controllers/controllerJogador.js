@@ -167,6 +167,51 @@ exports.atualizarJogador = async (req, res) => {
     }
 };
 
+// PUT /api/jogador/estatisticas/:id
+exports.atualizarEstatisticas = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    
+    const jogador = await Jogador.findByPk(id);
+    if (!jogador) return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Jogador não encontrado.' });
+
+    let stats = await Estatisticas.findOne({ where: { id_jogador: id } });
+    if (!stats) {
+      stats = await Estatisticas.create({ id_jogador: id });
+    }
+
+    const statsUpdates = {};
+    const statsKeys = [
+      'passes_certos', 'gols_marcados', 'assistencias', 
+      'cartoes_amarelos', 'cartoes_vermelhos', 'finalizacoes', 
+      'roubadas_bola', 'aceleracao', 'chute_forca', 
+      'passe_total', 'drible'
+    ];
+    
+    statsKeys.forEach(k => {
+      if (updates[k] !== undefined) {
+        statsUpdates[k] = parseInt(updates[k]) || 0;
+      }
+    });
+
+    await stats.update(statsUpdates);
+
+    return res.status(200).json({ 
+      ok: true, 
+      msg: 'Estatísticas atualizadas com sucesso.',
+      estatisticas: stats
+    });
+  } catch (error) {
+    console.error('Erro ao atualizar estatísticas:', error);
+    return res.status(200).json({ 
+      ok: false, 
+      reason: error.name || 'ERROR', 
+      msg: error.message 
+    });
+  }
+};
+
 // DELETE /api/jogador/deletar/:id
 exports.deletarJogador = async (req, res) => {
   try {
@@ -213,25 +258,43 @@ exports.pegarComentarios = async (req, res) => {
 exports.estatisticas = async (req, res) => {
   try {
     const { id } = req.params;
+    
+    const jogador = await Jogador.findByPk(id, {
+      include: [{ model: Time, attributes: ['nome_time'] }]
+    });
+    
+    if (!jogador) return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Jogador não encontrado.' });
+    
     const stats = await Estatisticas.findOne({ where: { id_jogador: id } });
-    if (!stats) return res.status(200).json({ ok: false, reason: 'not_found', msg: 'Estatísticas não encontradas.' });
+    
+    const media_finalizacoes = stats && stats.finalizacoes > 0 ? (stats.gols_marcados / stats.finalizacoes).toFixed(2) : 0;
 
-    const media_finalizacoes = stats.finalizacoes > 0 ? (stats.gols_marcados / stats.finalizacoes).toFixed(2) : 0;
-
-    return res.status(200).json({ ok: true, estatisticas: {
-      passes_certos: stats.passes_certos,
-      gols_marcados: stats.gols_marcados,
-      assistencias: stats.assistencias,
-      cartoes_amarelos: stats.cartoes_amarelos,
-      cartoes_vermelhos: stats.cartoes_vermelhos,
-      finalizacoes: stats.finalizacoes,
-      media_finalizacoes: parseFloat(media_finalizacoes),
-      roubadas_bola: stats.roubadas_bola,
-      aceleracao: stats.aceleracao,
-      chute_forca: stats.chute_forca,
-      passe_total: stats.passe_total,
-      drible: stats.drible,
-    }});
+    return res.status(200).json({ 
+      ok: true, 
+      jogador: {
+        id_jogador: jogador.id_jogador,
+        nome_jogador: jogador.nome_jogador,
+        posicao_jogador: jogador.posicao_jogador,
+        nome_time: jogador.Time?.nome_time || 'Sem time',
+        idade: jogador.idade,
+        altura_cm: jogador.altura_cm,
+        peso_kg: jogador.peso_kg
+      },
+      estatisticas: stats ? {
+        passes_certos: stats.passes_certos,
+        gols_marcados: stats.gols_marcados,
+        assistencias: stats.assistencias,
+        cartoes_amarelos: stats.cartoes_amarelos,
+        cartoes_vermelhos: stats.cartoes_vermelhos,
+        finalizacoes: stats.finalizacoes,
+        media_finalizacoes: parseFloat(media_finalizacoes),
+        roubadas_bola: stats.roubadas_bola,
+        aceleracao: stats.aceleracao,
+        chute_forca: stats.chute_forca,
+        passe_total: stats.passe_total,
+        drible: stats.drible,
+      } : {}
+    });
   } catch (err) {
     return res.status(200).json({ ok: false, reason: 'ERROR', msg: err.message });
   }
@@ -395,4 +458,62 @@ exports.removerShortlist = async (req, res) => {
           console.error('Erro ao remover da shortlist:', err);
           return res.status(500).json({ ok: false, reason: err.name || 'ERROR', msg: 'Erro interno ao remover da shortlist.' });
         }
+};
+
+// POST /api/jogador/comparar
+exports.compararJogadores = async (req, res) => {
+  try {
+    const { playerIds } = req.body;
+
+    if (!playerIds || !Array.isArray(playerIds) || playerIds.length < 2 || playerIds.length > 3) {
+      return res.status(200).json({ 
+        ok: false, 
+        reason: 'validation', 
+        msg: 'Você deve selecionar entre 2 e 3 jogadores para comparar.' 
+      });
+    }
+
+    const jogadores = await Jogador.findAll({
+      where: { id_jogador: playerIds },
+      include: [
+        { 
+          model: Time, 
+          attributes: ['nome_time'] 
+        },
+        { 
+          model: Estatisticas, 
+          attributes: Object.keys(Estatisticas.rawAttributes).filter(k => k !== 'id_estatistica' && k !== 'id_jogador'), 
+          required: false 
+        }
+      ]
+    });
+
+    if (jogadores.length !== playerIds.length) {
+      return res.status(200).json({ 
+        ok: false, 
+        reason: 'not_found', 
+        msg: 'Um ou mais jogadores não foram encontrados.' 
+      });
+    }
+
+    const formatted = jogadores.map(j => ({
+      id_jogador: j.id_jogador,
+      nome_jogador: j.nome_jogador,
+      posicao_jogador: j.posicao_jogador,
+      idade: j.idade,
+      altura_cm: j.altura_cm,
+      peso_kg: j.peso_kg,
+      Time: j.Time,
+      Estatistica: j.Estatistica
+    }));
+
+    return res.status(200).json({ ok: true, jogadores: formatted });
+  } catch (err) {
+    console.error('Erro ao comparar jogadores:', err);
+    return res.status(500).json({ 
+      ok: false, 
+      reason: err.name || 'ERROR', 
+      msg: 'Erro interno ao comparar jogadores.' 
+    });
+  }
 };
