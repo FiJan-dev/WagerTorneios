@@ -20,6 +20,8 @@ export default function PlayerList() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
   const [playerComment, setPlayerComment] = useState('');
+  const [playerComments, setPlayerComments] = useState([]);
+  const [isSendingComment, setIsSendingComment] = useState(false);
   
   // Comparison states
   const [selectedForComparison, setSelectedForComparison] = useState([]);
@@ -117,16 +119,64 @@ export default function PlayerList() {
     setCurrentPage(1); // Reset to first page when changing items per page
   };
 
-  const openModal = (player) => {
+  const openModal = async (player) => {
     setSelectedPlayer(player);
     setPlayerComment(''); // Reset comment when opening modal
     setIsModalOpen(true);
+    await loadPlayerComments(player.id_jogador);
   };
 
   const closeModal = () => {
     setSelectedPlayer(null);
     setPlayerComment(''); // Clear comment when closing modal
+    setPlayerComments([]);
     setIsModalOpen(false);
+  };
+
+  const loadPlayerComments = async (playerId) => {
+    try {
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      const response = await axios.get(`http://localhost:5000/api/jogador/comentarios/${playerId}`, config);
+      if (response.data.ok) {
+        setPlayerComments(response.data.comentarios || []);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar comentários:', err);
+    }
+  };
+
+  const handleSendComment = async () => {
+    if (!token) {
+      alert('Você precisa estar logado para comentar.');
+      return;
+    }
+
+    if (!playerComment.trim()) {
+      alert('Digite um comentário antes de enviar.');
+      return;
+    }
+
+    setIsSendingComment(true);
+    try {
+      const response = await axios.post(
+        `http://localhost:5000/api/jogador/comentarios/${selectedPlayer.id_jogador}`,
+        { comentario: playerComment },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.ok) {
+        alert('Comentário enviado com sucesso!');
+        setPlayerComment('');
+        await loadPlayerComments(selectedPlayer.id_jogador);
+      } else {
+        alert(response.data.msg || 'Erro ao enviar comentário.');
+      }
+    } catch (err) {
+      console.error('Erro ao enviar comentário:', err);
+      alert('Erro ao enviar comentário. Tente novamente.');
+    } finally {
+      setIsSendingComment(false);
+    }
   };
 
   const openDeleteModal = (player) => {
@@ -931,6 +981,27 @@ export default function PlayerList() {
               {/* Comentários */}
               <div className="info-section">
                 <h3 className="section-title">Comentários</h3>
+                
+                {/* Lista de comentários */}
+                {playerComments.length > 0 && (
+                  <div className="comments-list" style={{ marginBottom: '1rem', maxHeight: '200px', overflowY: 'auto' }}>
+                    {playerComments.map((comment) => (
+                      <div key={comment.id_comentarios} style={{
+                        padding: '0.75rem',
+                        marginBottom: '0.5rem',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: '8px',
+                        borderLeft: '3px solid #3b82f6'
+                      }}>
+                        <p style={{ margin: 0, color: '#e5e7eb', fontSize: '0.9rem' }}>
+                          {comment.texto_comentarios}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Formulário de novo comentário */}
                 <div className="comment-section">
                   <textarea
                     className="comment-textarea"
@@ -938,16 +1009,23 @@ export default function PlayerList() {
                     onChange={(e) => setPlayerComment(e.target.value)}
                     placeholder="Adicione suas observações sobre o jogador..."
                     rows="4"
+                    disabled={isSendingComment || !token}
                   />
                   <button 
                     className="btn-send-comment"
-                    onClick={() => alert('Comentário enviado! (funcionalidade fictícia)')}
+                    onClick={handleSendComment}
+                    disabled={isSendingComment || !token || !playerComment.trim()}
                   >
                     <svg className="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
-                    Enviar Comentário
+                    {isSendingComment ? 'Enviando...' : 'Enviar Comentário'}
                   </button>
+                  {!token && (
+                    <p style={{ color: '#9ca3af', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                      Faça login para adicionar comentários
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

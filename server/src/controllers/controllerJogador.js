@@ -236,7 +236,12 @@ exports.registrarComentario = async (req, res) => {
   try {
     const { id_jogador } = req.params;
     const { comentario } = req.body;
-    const c = await Comentarios.create({ id_jogador, comentario });
+    
+    if (!comentario || comentario.trim() === '') {
+      return res.status(400).json({ ok: false, msg: 'Comentário não pode ser vazio.' });
+    }
+    
+    const c = await Comentarios.create({ id_jogador, texto_comentarios: comentario });
     return res.status(200).json({ ok: true, msg: 'Comentário registrado.', comentario: c });
   } catch (err) {
     return res.status(200).json({ ok: false, reason: err.name || 'ERROR', msg: err.message });
