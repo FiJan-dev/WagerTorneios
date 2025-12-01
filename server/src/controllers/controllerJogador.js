@@ -236,12 +236,13 @@ exports.registrarComentario = async (req, res) => {
   try {
     const { id_jogador } = req.params;
     const { comentario } = req.body;
+    const id_usuario = req.user?.id_usuario || req.user?.id || req.user?.id_olheiro;
     
     if (!comentario || comentario.trim() === '') {
       return res.status(400).json({ ok: false, msg: 'Comentário não pode ser vazio.' });
     }
     
-    const c = await Comentarios.create({ id_jogador, texto_comentarios: comentario });
+    const c = await Comentarios.create({ id_jogador, texto_comentarios: comentario, id_usuario });
     return res.status(200).json({ ok: true, msg: 'Comentário registrado.', comentario: c });
   } catch (err) {
     return res.status(200).json({ ok: false, reason: err.name || 'ERROR', msg: err.message });
@@ -252,7 +253,13 @@ exports.registrarComentario = async (req, res) => {
 exports.pegarComentarios = async (req, res) => {
   try {
     const { id_jogador } = req.params;
-    const comentarios = await Comentarios.findAll({ where: { id_jogador } });
+    const comentarios = await Comentarios.findAll({ 
+      where: { id_jogador },
+      include: [{
+        model: require('../models/Olheiro'),
+        attributes: ['nome_usuario']
+      }]
+    });
     return res.status(200).json({ ok: true, comentarios });
   } catch (err) {
     return res.status(200).json({ ok: false, reason: err.name || 'ERROR', msg: err.message });

@@ -20,6 +20,10 @@ Time.hasMany(Jogador, { foreignKey: 'id_time' });
 Comentarios.belongsTo(Jogador, { foreignKey: 'id_jogador' });
 Jogador.hasMany(Comentarios, { foreignKey: 'id_jogador' });
 
+// Comentários ↔ Olheiro
+Comentarios.belongsTo(Olheiro, { foreignKey: 'id_usuario' });
+Olheiro.hasMany(Comentarios, { foreignKey: 'id_usuario' });
+
 // Estatísticas ↔ Jogador
 Jogador.hasOne(Estatisticas, { foreignKey: 'id_jogador', onDelete: 'CASCADE' });
 Estatisticas.belongsTo(Jogador, { foreignKey: 'id_jogador' });

@@ -993,6 +993,16 @@ export default function PlayerList() {
                         borderRadius: '8px',
                         borderLeft: '3px solid #3b82f6'
                       }}>
+                        {comment.Olheiro && (
+                          <p style={{ 
+                            margin: '0 0 0.25rem 0', 
+                            color: '#60a5fa', 
+                            fontSize: '0.8rem',
+                            fontWeight: '600'
+                          }}>
+                            {comment.Olheiro.nome_usuario}
+                          </p>
+                        )}
                         <p style={{ margin: 0, color: '#e5e7eb', fontSize: '0.9rem' }}>
                           {comment.texto_comentarios}
                         </p>
